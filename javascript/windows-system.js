@@ -48,12 +48,12 @@ class Window {
     
         var initialWidth, initialHeight, minWidth, minHeight, maxWidth, maxHeight;
     
-        initialWidth = INITIAL_WIDTH;
-        initialHeight = INITIAL_HEIGHT;
-        minWidth = INITIAL_WIDTH;
-        minHeight = INITIAL_HEIGHT;
-        maxWidth  = MAX_WIDTH;
-        maxHeight = MAX_HEIGHT;
+        initialWidth = this.INITIAL_WIDTH;
+        initialHeight = this.INITIAL_HEIGHT;
+        minWidth = this.INITIAL_WIDTH;
+        minHeight = this.INITIAL_HEIGHT;
+        maxWidth  = this.MAX_WIDTH;
+        maxHeight = this.MAX_HEIGHT;
     
         /* Setting up the panel */
         $( "#" + newID)

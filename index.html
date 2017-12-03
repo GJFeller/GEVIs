@@ -32,7 +32,7 @@
             <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
         
             <!-- Bootstrap-slider CSS -->
-            <link rel ="stylesheet" href= "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.1/css/bootstrap-slider.css">
+            <!--<link rel ="stylesheet" href= "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.1/css/bootstrap-slider.css">-->
 
             <!-- Spinner gif library -->
             <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
@@ -46,8 +46,9 @@
     </head>
 
     <body id = "windows-system">
-        <div class="container">
-            <h2>Geochemical Ensemble Visualization Tool</h2>
+        <h2>Geochemical Ensemble Visualization Tool</h2>
+        <button onclick="sayHello()">Say hello</button>
+        <div class="container">    
             <svg id ="workspace" width = "100%" height = "100%" class="svg-content-responsive"></svg>
             <!--<ul id="contextMenuScatterPlot" class="dropdown-menu" role="menu" style="display:none" >
                 <li><a tabindex="-1" id="bar-chart">Create a bar chart</a></li>
@@ -61,39 +62,45 @@
             </ul>-->
         </div>
         
-        <div class ="toolTip" style="display: none;"></div>
+        <!--<div class ="toolTip" style="display: none;"></div>-->
+        <script>
+            var count = 0;
+            /* Getting the document body */
+            var windowSystem = $("#windows-system");
+            /* Creating new window*/
+            var rootWindow;
+            /* Initialization of System */
+            $(document).ready(function(){
+                rootWindow = new Window('panel1-1', 'Selecao de Variaveis', null);
+                //initWindow();
+                //resizeTimeline();
+                /* Check limits whenever a resize event was trigger */
+                //$(window).on('resize', function(){
+                //    hideToolTipCluster();
+                //    checkLimits();
+                //});
+                /* Binding event to minimize buttons */
+                //windowSystem.on("click", ".btn-minimize", minimizeWindow);
+                /* Binding event to remove buttons */
+                //windowSystem.on("click", ".btn-remove", function(){
+                //    var id = $(this).parents(".panel").attr("id");
+                //    removeWindow(id, true);
+                //});
+                /* Binding event to scatter plot settings buttons */
+                //windowSystem.on("click", ".btn-settings-scatterplot", checkChildrenScatterPlot);
+                /* Binding event to minimized window */
+                //windowSystem.on("dblclick", ".fa-window-maximize", maximizeWindow);
+                /* Avoid to close settings menu */
+                //windowSystem.on('click', '.panel-settings', function(event){
+                //    event.stopPropagation();
+                //});
+            });
+        
+            function sayHello() {
+                count++;
+                var newWindow = new Window('panel1-1-' + count, 'Teste', rootWindow);
+            }
+        </script>
     </body>
 </html>
 
-<script>
-    /* Getting the document body */
-    var windowSystem = $("#windows-system");
-    /* Creating new window*/
-    var rootWindow;
-    /* Initialization of System */
-    $(document).ready(function(){
-        rootWindow = new Window('panel1-1', 'Seleção de Variáveis', null);
-        //initWindow();
-        //resizeTimeline();
-        /* Check limits whenever a resize event was trigger */
-        //$(window).on('resize', function(){
-        //    hideToolTipCluster();
-        //    checkLimits();
-        //});
-        /* Binding event to minimize buttons */
-        //windowSystem.on("click", ".btn-minimize", minimizeWindow);
-        /* Binding event to remove buttons */
-        //windowSystem.on("click", ".btn-remove", function(){
-        //    var id = $(this).parents(".panel").attr("id");
-        //    removeWindow(id, true);
-        //});
-        /* Binding event to scatter plot settings buttons */
-        //windowSystem.on("click", ".btn-settings-scatterplot", checkChildrenScatterPlot);
-        /* Binding event to minimized window */
-        //windowSystem.on("dblclick", ".fa-window-maximize", maximizeWindow);
-        /* Avoid to close settings menu */
-        //windowSystem.on('click', '.panel-settings', function(event){
-        //    event.stopPropagation();
-        //});
-    });
-</script>
