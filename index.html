@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+            <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1" />
+            
+            <!-- Latest compiled and minified CSS -->
+            <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+            
+            <!-- Latest compiled and minified CSS -->
+            <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+            
+            <!-- jQuery library -->
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+            
+            <!-- jQueryUI library -->
+            <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+            <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+            
+            <!-- Latest compiled Bootstrap JavaScript -->
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+            
+            <!-- D3 library -->
+            <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+            
+            <!-- Bootstrap-slider -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.1/bootstrap-slider.js"></script>
+            
+            <!-- Spin.js - Loading Spinner Effect -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
+
+            <!-- D3-tip library -->
+            <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+        
+            <!-- Bootstrap-slider CSS -->
+            <link rel ="stylesheet" href= "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.1/css/bootstrap-slider.css">
+
+            <!-- Spinner gif library -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
+
+            <script src="javascript/windows-system.js"></script>
+
+            <!-- Windows System CSS -->
+            <link rel="stylesheet" href="stylesheets/windows-system.css">
+
+            <title>Geochemical Ensemble Visualization Tool</title>
+    </head>
+
+    <body id = "windows-system">
+        <div class="container">
+            <h2>Geochemical Ensemble Visualization Tool</h2>
+            <svg id ="workspace" width = "100%" height = "100%" class="svg-content-responsive"></svg>
+            <!--<ul id="contextMenuScatterPlot" class="dropdown-menu" role="menu" style="display:none" >
+                <li><a tabindex="-1" id="bar-chart">Create a bar chart</a></li>
+                <li><a tabindex="-1" id="force-layout">Create a force layout</a></li>
+                <li class="divider"></li>
+                <li><a tabindex="-1" id="get-parent">Get parent</a></li>
+            </ul>
+            <ul id="contextMenuTimeline" class="dropdown-menu" role="menu" style="display:none" >
+                <li><a tabindex="-1" id="scatter-plot">Create a scatter plot</a></li>
+                <li><a tabindex="-1" id="time-line-crop">Create a timeline crop</a></li>
+            </ul>-->
+        </div>
+        
+        <div class ="toolTip" style="display: none;"></div>
+    </body>
+</html>
+
+<script>
+    /* Getting the document body */
+    var windowSystem = $("#windows-system");
+    /* Initialization of System */
+    $(document).ready(function(){
+        initWindow();
+        //resizeTimeline();
+        /* Check limits whenever a resize event was trigger */
+        //$(window).on('resize', function(){
+        //    hideToolTipCluster();
+        //    checkLimits();
+        //});
+        /* Binding event to minimize buttons */
+        //windowSystem.on("click", ".btn-minimize", minimizeWindow);
+        /* Binding event to remove buttons */
+        //windowSystem.on("click", ".btn-remove", function(){
+        //    var id = $(this).parents(".panel").attr("id");
+        //    removeWindow(id, true);
+        //});
+        /* Binding event to scatter plot settings buttons */
+        //windowSystem.on("click", ".btn-settings-scatterplot", checkChildrenScatterPlot);
+        /* Binding event to minimized window */
+        //windowSystem.on("dblclick", ".fa-window-maximize", maximizeWindow);
+        /* Avoid to close settings menu */
+        //windowSystem.on('click', '.panel-settings', function(event){
+        //    event.stopPropagation();
+        //});
+    });
+</script>
