@@ -68,9 +68,12 @@
 <script>
     /* Getting the document body */
     var windowSystem = $("#windows-system");
+    /* Creating new window*/
+    var rootWindow;
     /* Initialization of System */
     $(document).ready(function(){
-        initWindow();
+        rootWindow = new Window('panel1-1', 'Seleção de Variáveis', null);
+        //initWindow();
         //resizeTimeline();
         /* Check limits whenever a resize event was trigger */
         //$(window).on('resize', function(){
