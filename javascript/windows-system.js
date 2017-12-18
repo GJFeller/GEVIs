@@ -25,7 +25,6 @@ class Window {
     static getCenter(obj) {
 
         var $this = $("#" + obj);
-        console.log($this);
         var offset = $this.offset();
         var width = $this.width();
         var height = $this.height();
