@@ -102,11 +102,20 @@ class Window {
             .mouseleave(function() {
                 $(this).css("background", "#fff");
             })
-            .on("click", /*$this.minimizeWindow*/ function() {
+            .on("click", function() {
                 $this.minimizeWindow();
-                //console.log($(this));
             });
     
+        if(this.parent != null) {
+            $("#"+ newID + " .btn-default.btn-remove")
+                .removeAttr("disabled")
+                .on("click", function() {
+                    $this.removeWindow();
+                });
+        }
+        
+            
+            
         /* Getting the workspace SVG */
         var workspace = $("#workspace");
     
@@ -187,12 +196,9 @@ class Window {
     }
 
     minimizeWindow() {
-        console.log(this);
-        console.log("Called minimizeWindow with id="+this.id);
         this.createNewIcon();
         Window.centerLine(this.id, true);
         $("#"+this.id).hide();
-        //this.centerLine()
     }
 
     maximizeWindow(element) {
@@ -264,6 +270,19 @@ class Window {
         
         /* Makes all the lines that are connected to a icon to become dotted */
         d3.selectAll("line").filter(".class-" + this.id).style("stroke-dasharray", ("3, 3"));
+    }
+
+    removeWindow() {
+        this.removeLines();
+        $("#" + this.id).remove();
+        $("#icon-"+ this.id).remove();
+    }
+
+    removeLines() {
+        var lines = d3.selectAll("line").filter(".class-" + this.id);
+        for(var i = 0, len = lines.size(); i < len; i++) {
+            $("#" + lines[0][i].id).remove();
+        }
     }
 
 }
