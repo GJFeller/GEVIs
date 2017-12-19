@@ -37,79 +37,7 @@ class Window {
         return arr;
     }
 
-    createNewChild(currentId, chartObj, parent) {
-        var newElem = $('<div '+ 'id="' + currentId + '" class="panel panel-default"> <div class="panel-heading clearfix"> <h4 class="panel-title pull-left" style="padding-top: 7.5px;">' + chartObj + '</h4> <button disabled class="btn btn-default btn-remove"><i class="glyphicon glyphicon-remove"></i></button> <button class="btn btn-default btn-minimize"><i class="glyphicon glyphicon-minus"></i></button> </div><div class="panel-body center-panel"></div></div>').css({"position": "absolute"});
-        //var newID = "";
-        var chart;
-        $(".container").append(newElem);
-
-    
-        /* Sets up the panel settings as drag, resize, etc */
-        this.setUpPanel(currentId);
-
-        // Draw line
-        if(this.parent != null)
-            this.drawLine();
-    
-    }
-
-    setUpPanel(newID) {
-
-        var $this = this;
-        /* Guarantees the right colors of btn-minimize */
-        $("#"+ newID + " .btn-default.btn-minimize")
-            .mouseenter(function() {
-                $(this).css("background", "#e6e6e6");
-            })
-            .mouseleave(function() {
-                $(this).css("background", "#fff");
-            });
-    
-        /* Getting the workspace SVG */
-        var workspace = $("#workspace");
-    
-        //var isTimeline = newID === "panel-1-1";
-    
-        var initialWidth, initialHeight, minWidth, minHeight, maxWidth, maxHeight;
-    
-        initialWidth = this.INITIAL_WIDTH;
-        initialHeight = this.INITIAL_HEIGHT;
-        minWidth = this.INITIAL_WIDTH;
-        minHeight = this.INITIAL_HEIGHT;
-        maxWidth  = this.MAX_WIDTH;
-        maxHeight = this.MAX_HEIGHT;
-    
-        /* Setting up the panel */
-        $( "#" + newID)
-            .draggable({
-                handle: ".panel-heading",
-                stack: ".panel, .fa-window-maximize",
-                containment: [10,10, workspace.width() - initialWidth - 10 , 
-                    workspace.height() - initialHeight - 90],
-                drag: function(){
-                    $this.centerLine($this.id);
-                },
-                cancel: '.dropdown-menu'
-            })
-            .find(".panel-body")
-            .css({
-                height: initialHeight,
-                width: initialWidth
-            })
-            .resizable({
-                resize: function(){
-                    //var aPanel = $(this).parents(".panel")[0];
-                    $this.centerLine($this.id);
-                },
-                aspectRatio: true,
-                maxHeight: maxHeight,
-                maxWidth: maxWidth,
-                minHeight: minHeight,
-                minWidth: minWidth
-            });
-    }
-
-    centerLine(panelID, icon) {
+    static centerLine(panelID, icon) {
         if (typeof icon === 'undefined') { icon = false; }
         var lines =  d3.selectAll("line").filter(".class-" + panelID);
         var sizeLines = lines.size();
@@ -147,11 +75,103 @@ class Window {
         }
     }
 
+    createNewChild(currentId, chartObj, parent) {
+        var newElem = $('<div '+ 'id="' + currentId + '" class="panel panel-default"> <div class="panel-heading clearfix"> <h4 class="panel-title pull-left" style="padding-top: 7.5px;">' + chartObj + '</h4> <button disabled class="btn btn-default btn-remove"><i class="glyphicon glyphicon-remove"></i></button> <button class="btn btn-default btn-minimize"><i class="glyphicon glyphicon-minus"></i></button> </div><div class="panel-body center-panel"></div></div>').css({"position": "absolute"});
+        //var newID = "";
+        var chart;
+        $(".container").append(newElem);
+
+    
+        /* Sets up the panel settings as drag, resize, etc */
+        this.setUpPanel(currentId);
+
+        // Draw line
+        if(this.parent != null)
+            this.drawLine();
+    
+    }
+
+    setUpPanel(newID) {
+
+        var $this = this;
+        /* Guarantees the right colors of btn-minimize */
+        $("#"+ newID + " .btn-default.btn-minimize")
+            .mouseenter(function() {
+                $(this).css("background", "#e6e6e6");
+            })
+            .mouseleave(function() {
+                $(this).css("background", "#fff");
+            })
+            .on("click", /*$this.minimizeWindow*/ function() {
+                $this.minimizeWindow();
+                //console.log($(this));
+            });
+    
+        /* Getting the workspace SVG */
+        var workspace = $("#workspace");
+    
+        //var isTimeline = newID === "panel-1-1";
+    
+        var initialWidth, initialHeight, minWidth, minHeight, maxWidth, maxHeight;
+    
+        initialWidth = this.INITIAL_WIDTH;
+        initialHeight = this.INITIAL_HEIGHT;
+        minWidth = this.INITIAL_WIDTH;
+        minHeight = this.INITIAL_HEIGHT;
+        maxWidth  = this.MAX_WIDTH;
+        maxHeight = this.MAX_HEIGHT;
+    
+        /* Setting up the panel */
+        $( "#" + newID)
+            .draggable({
+                handle: ".panel-heading",
+                stack: ".panel, .fa-window-maximize",
+                containment: [10,10, workspace.width() - initialWidth - 10 , 
+                    workspace.height() - initialHeight - 90],
+                drag: function(){
+                    Window.centerLine($this.id);
+                },
+                cancel: '.dropdown-menu'
+            })
+            .find(".panel-body")
+            .css({
+                height: initialHeight,
+                width: initialWidth
+            })
+            .resizable({
+                resize: function(){
+                    //var aPanel = $(this).parents(".panel")[0];
+                    Window.centerLine($this.id);
+                },
+                aspectRatio: true,
+                maxHeight: maxHeight,
+                maxWidth: maxWidth,
+                minHeight: minHeight,
+                minWidth: minWidth
+            });
+        
+
+    }
+
+    
+
     drawLine() {
         var svg = d3.select("#workspace");
 
         var centerX = Window.getCenter(this.id);
         var centerY = Window.getCenter(this.parent.id);
+
+        // FIXME: Make an algorithm to detect the border limiting the line, because the line is draw at the center of the panel  
+        svg.append("svg:defs").append("svg:marker")
+            .attr("id", "triangle_"+ this.id + "_"+ this.parent.id)
+            .attr("refX", 15)
+            .attr("refY", -1.5)
+            .attr("markerWidth", 6)
+            .attr("markerHeight", 6)
+            .attr("orient", "auto")
+            .append("path")
+            .attr("d", "M 0 -5 10 10")
+            .style("stroke", "black");
 
         var line = svg.append("line")
             .style("stroke", "black")
@@ -160,7 +180,90 @@ class Window {
             .attr("x1", centerX["x"])
             .attr("y1", centerX["y"])
             .attr("x2", centerY["x"])
-            .attr("y2", centerY["y"]);
+            .attr("y2", centerY["y"])
+            .attr("marker-end", "url(#triangle_"+this.id + " class-" + this.parent.id +")");
+
+        
+    }
+
+    minimizeWindow() {
+        console.log(this);
+        console.log("Called minimizeWindow with id="+this.id);
+        this.createNewIcon();
+        Window.centerLine(this.id, true);
+        $("#"+this.id).hide();
+        //this.centerLine()
+    }
+
+    maximizeWindow(element) {
+        var icon = element;
+        var iconOffset = icon.offset();
+        var panel = $("#"+this.id);
+
+        var left = iconOffset.left - panel.width()/2;
+        var top = iconOffset.top - panel.height()/2;
+
+        if (left <= 10)
+            left = 10;
+
+        if (top <= 10)
+            top = 10;
+
+        panel
+            .show()
+            .css({
+                "left" : left,
+                "top"  : top
+            });
+        
+        $("#"+ this.id + " .btn-default.btn-minimize").css("background", "#fff");
+
+        icon.remove();
+
+        /* Removes the dotted stylesheets of lines */
+        d3.selectAll("line").filter(".class-" + this.id).style("stroke-dasharray", "");
+
+        /* Keeps the icons with dotted line stylesheets */
+        var activeIcons = $(" .fa-window-maximize");
+        for (var i = 0; i < activeIcons.size(); i++)
+        {
+            var iconID = activeIcons[i].id.replace("icon-", "");
+            d3.selectAll("line").filter(".class-" + iconID).style("stroke-dasharray", ("3, 3"));
+        }
+    }
+
+    createNewIcon() {
+
+        var $this = this;
+        var panelCenter = Window.getCenter(this.id);
+
+        var workspace = $("#workspace");
+
+        $(".container").append(
+            '<i id= "icon-' + this.id + '" class="fa fa-window-maximize fa-2x"></i>'
+        );
+
+        $("#icon-"+this.id)
+            .draggable({
+                stack: ".panel, .fa-window-maximize",
+                containment: [10,10, workspace.width() - this.WIDTH_ICON - 10 , workspace.height() - this.HEIGHT_ICON - 10],
+                drag: function(){
+                    Window.centerLine($this.id, true);
+                },
+                stop:function(){
+                    Window.centerLine($this.id, true);
+                }
+            })
+            .css({
+                "left" :  panelCenter["x"],
+                "top"  :  panelCenter["y"]
+            })
+            .on("dblclick", function() {
+                $this.maximizeWindow($(this));
+            });
+        
+        /* Makes all the lines that are connected to a icon to become dotted */
+        d3.selectAll("line").filter(".class-" + this.id).style("stroke-dasharray", ("3, 3"));
     }
 
 }
