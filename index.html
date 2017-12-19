@@ -66,6 +66,9 @@
         
         <!--<div class ="toolTip" style="display: none;"></div>-->
         <script>
+            function testCallback(panel) {
+                panel.append("<h2>Teste</h2><p>Um teste</p>");
+            }
             var count = 0;
             /* Getting the document body */
             var windowSystem = $("#windows-system");
@@ -73,7 +76,7 @@
             var rootWindow;
             /* Initialization of System */
             $(document).ready(function(){
-                rootWindow = new Window('panel1-1', 'Selecao de Variaveis', null);
+                rootWindow = new Window('panel1-1', 'Selecao de Variaveis', null, testCallback);
                 //initWindow();
                 //resizeTimeline();
                 /* Check limits whenever a resize event was trigger */
@@ -100,8 +103,10 @@
         
             function sayHello() {
                 count++;
-                var newWindow = new Window('panel1-1-' + count, 'Teste', rootWindow);
+                var newWindow = new Window('panel1-1-' + count, 'Teste', rootWindow, testCallback);
             }
+
+            
         </script>
     </body>
 </html>

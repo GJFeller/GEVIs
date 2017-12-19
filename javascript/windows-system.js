@@ -3,7 +3,7 @@
  */
 
 class Window {
-    constructor(id, title, parent) {
+    constructor(id, title, parent, callback) {
         this.id = id;
         this.title = title;
         this.parent = parent;
@@ -19,7 +19,7 @@ class Window {
         this.HEIGHT_ICON = 28;
         this.WIDTH_ICON = 28;
 
-        this.createNewChild(id, title, parent);
+        this.createNewChild(id, title, parent, callback);
     }
 
     static getCenter(obj) {
@@ -75,7 +75,7 @@ class Window {
         }
     }
 
-    createNewChild(currentId, chartObj, parent) {
+    createNewChild(currentId, chartObj, parent, callback) {
         var newElem = $('<div '+ 'id="' + currentId + '" class="panel panel-default"> <div class="panel-heading clearfix"> <h4 class="panel-title pull-left" style="padding-top: 7.5px;">' + chartObj + '</h4> <button disabled class="btn btn-default btn-remove"><i class="glyphicon glyphicon-remove"></i></button> <button class="btn btn-default btn-minimize"><i class="glyphicon glyphicon-minus"></i></button> </div><div class="panel-body center-panel"></div></div>').css({"position": "absolute"});
         //var newID = "";
         var chart;
@@ -89,6 +89,9 @@ class Window {
         if(this.parent != null)
             this.drawLine();
     
+        var centralPanel = $( "#" + currentId + " .panel-body.center-panel");
+        callback(centralPanel);
+        console.log(centralPanel);
     }
 
     setUpPanel(newID) {
