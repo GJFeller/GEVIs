@@ -39,6 +39,10 @@
 
             <script src="javascript/windows-system.js"></script>
 
+            <script src="javascript/abstract-panel-builder.js"></script>
+
+            <script src="javascript/scatterplot-matrix.js"></script>
+
             <!-- Windows System CSS -->
             <link rel="stylesheet" href="stylesheets/windows-system.css">
             <link rel="stylesheet" href="stylesheets/font-awesome.css">
@@ -66,7 +70,8 @@
         
         <!--<div class ="toolTip" style="display: none;"></div>-->
         <script>
-            function testCallback(panel) {
+            function testCallback(panel, id) {
+                console.log(panel);
                 panel.append("<h2>Teste</h2><p>Um teste</p>");
             }
             var count = 0;
@@ -103,7 +108,9 @@
         
             function sayHello() {
                 count++;
-                var newWindow = new Window('panel1-1-' + count, 'Teste', rootWindow, testCallback);
+                var scatterPlotMatrix = new ScatterplotMatrix({});
+                console.log(scatterPlotMatrix);
+                var newWindow = new Window('panel1-1-' + count, 'Teste', rootWindow, scatterPlotMatrix.appendToPanel);
             }
 
             

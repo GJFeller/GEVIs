@@ -7,19 +7,20 @@ class Window {
         this.id = id;
         this.title = title;
         this.parent = parent;
+        this.callback = callback;
         /* Initial values of panel Height and Width */
         this.INITIAL_HEIGHT = 250;
         this.INITIAL_WIDTH = 350;
 
         /* Max values of panel Height and Width */
-        this.MAX_HEIGHT = 620;
-        this.MAX_WIDTH = 1000;
+        this.MAX_HEIGHT = 720;
+        this.MAX_WIDTH = 1080;
 
         /* Constant values of icon Height and Width */
         this.HEIGHT_ICON = 28;
         this.WIDTH_ICON = 28;
 
-        this.createNewChild(id, title, parent, callback);
+        this.createNewChild(id, title, parent);
     }
 
     static getCenter(obj) {
@@ -75,7 +76,7 @@ class Window {
         }
     }
 
-    createNewChild(currentId, chartObj, parent, callback) {
+    createNewChild(currentId, chartObj, parent) {
         var newElem = $('<div '+ 'id="' + currentId + '" class="panel panel-default"> <div class="panel-heading clearfix"> <h4 class="panel-title pull-left" style="padding-top: 7.5px;">' + chartObj + '</h4> <button disabled class="btn btn-default btn-remove"><i class="glyphicon glyphicon-remove"></i></button> <button class="btn btn-default btn-minimize"><i class="glyphicon glyphicon-minus"></i></button> </div><div class="panel-body center-panel"></div></div>').css({"position": "absolute"});
         //var newID = "";
         var chart;
@@ -90,7 +91,7 @@ class Window {
             this.drawLine();
     
         var centralPanel = $( "#" + currentId + " .panel-body.center-panel");
-        callback(centralPanel);
+        this.callback(centralPanel, currentId);
         console.log(centralPanel);
     }
 
