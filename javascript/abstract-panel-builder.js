@@ -6,6 +6,9 @@ class AbstractPanelBuilder {
         if(this.appendToPanel === undefined) {
             throw new TypeError("Must override appendToPanel(panel)");
         }
+        if(this.render === undefined) {
+            throw new TypeError("Must override render()");
+        }
         if(this.resizePanel === undefined) {
             throw new TypeError("Must override resizePanel(width, height)");
         }

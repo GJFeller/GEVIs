@@ -7,10 +7,15 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
     }
 
     appendToPanel(panel, id) {
-        panel.append("<svg id=" + id + "-scatter ></svg>");
+        this.panel = panel;
+        panel.append("<svg id=" + id + "-scatter width=\"100%\" height=\"100%\"></svg>");
         this.id = id;
-        var width = panel.width();
-        var height = panel.height();
+        this.render()
+    }
+
+    render() {
+        var width = this.panel.width();
+        var height = this.panel.height();
         var margin = {top: 30, right: 30, bottom: 30, left: 50};
         var padding = 20;
         var numberVariables = 4;
@@ -46,10 +51,8 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
             .on("brush", this.brushmove)
             .on("brushend", this.brushend);
 
-        var svg = d3.select("#"+id+"-scatter");
-        svg.attr("width", sizeW * numberVariables + padding + margin.left + margin.right)
-            .attr("height", sizeH * numberVariables + padding + margin.top + margin.bottom)
-        .append("g")
+        var svg = d3.select("#"+this.id+"-scatter");
+        svg.append("g")
             .attr("transform", "translate(" + padding + margin.left + "," + padding / 2 + ")")
 
     }
@@ -67,7 +70,8 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
     }
 
     resizePanel(width, height) {
-
+        console.log(width);
+        console.log(height);
     }
 
 }
