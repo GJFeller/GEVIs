@@ -43,6 +43,8 @@
 
             <script src="javascript/scatterplot-matrix.js"></script>
 
+            <script src="javascript/backendEnsembleRequests.js"></script>
+
             <!-- Windows System CSS -->
             <link rel="stylesheet" href="stylesheets/windows-system.css">
             <link rel="stylesheet" href="stylesheets/font-awesome.css">
@@ -70,6 +72,7 @@
         
         <!--<div class ="toolTip" style="display: none;"></div>-->
         <script>
+            var backendConnection = new BackendRequests();
             function testCallback(panel, id) {
                 console.log(panel);
                 panel.append("<h2>Teste</h2><p>Um teste</p>");
@@ -82,6 +85,21 @@
             /* Initialization of System */
             $(document).ready(function(){
                 rootWindow = new Window('panel1-1', 'Selecao de Variaveis', null, testCallback);
+
+                backendConnection.getListEnsembles()
+                    .then(function(result) {
+                        console.log(result);
+                        backendConnection.getAllVariables(result[0]["ensembleId"])
+                            .then(function(result2) {
+                                console.log(result2);
+                            })
+                            .catch(function() {
+
+                            });
+                    })
+                    .catch(function() {
+
+                    });
                 //initWindow();
                 //resizeTimeline();
                 /* Check limits whenever a resize event was trigger */
