@@ -1,6 +1,8 @@
 class BackendRequests {
     constructor() {
-        this.url = "http://ensemblemongobackend.azurewebsites.net";
+        //this.url = "http://ensemblemongobackend.azurewebsites.net";
+        this.url = "http://gcevt-backend.herokuapp.com";
+        //this.url = "http://localhost:8002";
     }
 
     getListEnsembles() {
@@ -11,6 +13,9 @@ class BackendRequests {
                 resolve(JSON.parse(this.responseText));
             };
             xhttp.onerror = reject;
+            //xhttp.setRequestHeader("Access-Control-Allow-Origin", "*");
+            //xhttp.withCredentials = true;
+            //xhttp.setRequestHeader("Access-Control-Allow-Headers", "X-Requested-With, Content-Type");
             xhttp.open("GET", $this.url + "/getAllEnsembles", true);
             xhttp.send();
         });    
@@ -24,12 +29,12 @@ class BackendRequests {
                 resolve(JSON.parse(this.responseText));
             };
             xhttp.onerror = reject;
-            xhttp.open("GET", $this.url + "/getVariablesEnsemble?ensembleId="+ensembleId, true);
+            xhttp.open("GET", $this.url + "/getVariablesEnsemble/"+ensembleId, true);
             xhttp.send();
         });
     }
 
-    getAllVariables(ensembleId) {
+    getAllVariables() {
         var $this = this;
         return new Promise(function(resolve, reject) {
             var xhttp = new XMLHttpRequest();
@@ -37,7 +42,7 @@ class BackendRequests {
                 resolve(JSON.parse(this.responseText));
             };
             xhttp.onerror = reject;
-            xhttp.open("GET", $this.url + "/getAllVariables?ensembleId="+ensembleId, true);
+            xhttp.open("GET", $this.url + "/getAllVariables", true);
             xhttp.send();
         });  
     }
@@ -50,7 +55,7 @@ class BackendRequests {
                 resolve(JSON.parse(this.responseText));
             };
             xhttp.onerror = reject;
-            xhttp.open("GET", $this.url + "/getTemporalVarData?xIdx="+xIdx+"&yIdx="+yIdx+"&zIdx="+zIdx+"&simulationId="+simulationId+"&varId="+varId+"&ensembleId="+ensembleId, true);
+            xhttp.open("GET", $this.url + "/getTemporalVarData/"+xIdx+"/"+yIdx+"/"+zIdx+"/"+simulationId+"/"+varId+"/"+ensembleId, true);
             xhttp.send();
         });  
     }
@@ -63,7 +68,7 @@ class BackendRequests {
                 resolve(JSON.parse(this.responseText));
             };
             xhttp.onerror = reject;
-            xhttp.open("GET", $this.url + "/getTemporalVarData?xIdx="+xIdx+"&yIdx="+yIdx+"&zIdx="+zIdx+"&time="+time+"&simulationId="+simulationId+"&varIdList="+varIdList, true);
+            xhttp.open("GET", $this.url + "/getTemporalVarData/"+xIdx+"/"+yIdx+"/"+zIdx+"/"+time+"/"+simulationId+"/"+varIdList, true);
             xhttp.send();
         });  
     }

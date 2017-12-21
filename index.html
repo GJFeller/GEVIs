@@ -74,7 +74,6 @@
         <script>
             var backendConnection = new BackendRequests();
             function testCallback(panel, id) {
-                console.log(panel);
                 panel.append("<h2>Teste</h2><p>Um teste</p>");
             }
             var count = 0;
@@ -89,16 +88,23 @@
                 backendConnection.getListEnsembles()
                     .then(function(result) {
                         console.log(result);
-                        backendConnection.getAllVariables(result[0]["ensembleId"])
+                        backendConnection.getEnsembleVariables(result[0]["_id"])
                             .then(function(result2) {
                                 console.log(result2);
                             })
                             .catch(function() {
-
+                                console.log("Erro ao acessar o backend");
                             });
+                        /*backendConnection.getAllVariables(result[0]["ensembleId"])
+                            .then(function(result2) {
+                                console.log(result2);
+                            })
+                            .catch(function() {
+                                console.log("Erro ao acessar o backend");
+                            });*/
                     })
                     .catch(function() {
-
+                        console.log("Erro ao acessar o backend");
                     });
                 //initWindow();
                 //resizeTimeline();
