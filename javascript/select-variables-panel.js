@@ -7,18 +7,16 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
     }
 
     setEnsembleList(ensembleList) {
-        //console.log(this.createEnsembleTree(ensembleList));
         this.createEnsembleTree(ensembleList);
         this.render();
     }
 
     setVariableList(variableList) {
-        this.variableTree = variableList;
+        this.createVariableTree(variableList);
         this.render();
     }
 
     createEnsembleTree(ensembleList) {
-        console.log(ensembleList);
         this.ensembleTree = [];
         for(var idx = 0; idx < ensembleList.length; idx++) {
             var element = ensembleList[idx];
@@ -42,36 +40,74 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
             
             this.ensembleTree.push(dict);
         }
-        /*ensembleList.forEach(function(element, idx) {
-            var dict = {};
-            dict.title = element.ensembleId;
-            var children = [];
-            element.simulations.forEach(function(sim) {
-                var childDict = {};
-                childDict.title = sim;
-                childDict.checkbox = false;
-                children.push(childDict);
-            });
-            dict.children = children;
-            if(idx = 0) {
-                dict.selected = true;
-            }
-            else {
-                dict.selected = false;
-            }
-            
-            this.ensembleTree.push(dict);
-        });*/
-        console.log(this.ensembleTree);
     }
 
     createVariableTree(variableList) {
-        return variableList;
+        this.variableTree = [];
+        var dict = {};
+        dict.title = "Sediment";
+        dict.children = [];
+        this.variableTree.push(dict);
+        dict = {};
+        dict.title = "Solid";
+        dict.children = [];
+        this.variableTree.push(dict);
+        dict = {};
+        dict.title = "Solute";
+        dict.children = [];
+        this.variableTree.push(dict);
+        for(var idx = 0; idx < variableList.length; idx++) {
+            var element = variableList[idx];
+            var name = element.name;
+            var type = element.type;
+            var specie = element.specie;
+            var id = element._id;
+            if(type.toLowerCase() != "element") {
+                switch(type.toLowerCase()) {
+                    case "solid":
+                        type = "Solid";
+                        break;
+                    case "solute":
+                        type = "Solute";
+                        break;
+                    case "sediment":
+                        type = "Sediment";
+                        break;
+                    default:
+                        break;
+                }
+                this.variableTree.forEach(function(rootNode, idx) {
+                    if(rootNode.title == type) {
+                        var wasAddedVarLevel = false;
+                        rootNode.children.forEach(function (varNode, idx) {
+                            if(varNode.title == name) {
+                                if(type != "Sediment") {
+                                    wasAddedVarLevel = true;
+                                    varNode.children.push({title: specie, key: id});
+                                }
+                            }
+                        });
+                        if(!wasAddedVarLevel) {
+                            if(type != "Sediment") {
+                                rootNode.children.push({
+                                    title: name,
+                                    children: [{title: specie, key: id}]
+                                });
+                            }
+                            else {
+                                rootNode.children.push({ title: name, key: id });
+                            }
+                        }
+                    }
+                });
+
+            }
+        }
     }
 
     appendToPanel(panel, id) {
         this.panel = panel;
-        panel.append("<div id=" + id + "-accordion width=\"100%\">" +
+        panel.append("<div id=" + id + "-accordion width=\"100%\" height=\"100%\">" +
                         "<h3>Ensemble List</h3>" +
                             "<div id=" + id + "-ensemblecontainer><div id=\"" + id + "-ensembletree\" class=\"\"></div></div>" +
                         "<h3>Variable List</h3>" +

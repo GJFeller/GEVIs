@@ -48,6 +48,45 @@ class BackendRequests {
         });  
     }
 
+    getSolidVariables(ensembleId) {
+        var $this = this;
+        return new Promise(function(resolve, reject) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onload = function() {
+                resolve(JSON.parse(this.responseText));
+            };
+            xhttp.onerror = reject;
+            xhttp.open("GET", $this.url + "/getSolidVariables/"+ensembleId, true);
+            xhttp.send();
+        });
+    }
+
+    getSoluteVariables(ensembleId) {
+        var $this = this;
+        return new Promise(function(resolve, reject) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onload = function() {
+                resolve(JSON.parse(this.responseText));
+            };
+            xhttp.onerror = reject;
+            xhttp.open("GET", $this.url + "/getSoluteVariables/"+ensembleId, true);
+            xhttp.send();
+        });
+    }
+
+    getSedimentVariables(ensembleId) {
+        var $this = this;
+        return new Promise(function(resolve, reject) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onload = function() {
+                resolve(JSON.parse(this.responseText));
+            };
+            xhttp.onerror = reject;
+            xhttp.open("GET", $this.url + "/getSedimentVariables/"+ensembleId, true);
+            xhttp.send();
+        });
+    }
+
     getTemporalData(xIdx, yIdx, zIdx, simulationId, varId, ensembleId) {
         var $this = this;
         return new Promise(function(resolve, reject) {
