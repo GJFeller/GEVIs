@@ -17,6 +17,7 @@ class BackendRequests {
             //xhttp.withCredentials = true;
             //xhttp.setRequestHeader("Access-Control-Allow-Headers", "X-Requested-With, Content-Type");
             xhttp.open("GET", $this.url + "/getAllEnsembles", true);
+            console.log("Accessing " + xhttp.responseURL);
             xhttp.send();
         });    
     }
