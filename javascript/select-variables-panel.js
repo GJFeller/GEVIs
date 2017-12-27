@@ -83,7 +83,7 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                             if(varNode.title == name) {
                                 if(type != "Sediment") {
                                     wasAddedVarLevel = true;
-                                    varNode.children.push({title: specie, key: id});
+                                    varNode.children.push({title: specie, key: id, temporal: false, multivariate: false, spatial: false});
                                 }
                             }
                         });
@@ -91,11 +91,11 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                             if(type != "Sediment") {
                                 rootNode.children.push({
                                     title: name,
-                                    children: [{title: specie, key: id}]
+                                    children: [{title: specie, key: id, temporal: false, multivariate: false, spatial: false}]
                                 });
                             }
                             else {
-                                rootNode.children.push({ title: name, key: id });
+                                rootNode.children.push({ title: name, key: id, temporal: false, multivariate: false, spatial: false });
                             }
                         }
                     }
@@ -120,15 +120,15 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                                     "<col width=\"25%\">" +
                                 "</colgroup>" +
                                 "<thead>" +
-                                    "<tr><th></th><th>Temporal</th><th>Spatial</th><th>Multivariate</th></tr>" +
+                                    "<tr><th></th><th style=\"text-align:center\">Temporal</th><th style=\"text-align:center\">Multivariate</th><th style=\"text-align:center\">Spatial</th></tr>" +
                                 "</thead>" +
                                 "<tbody>" +
-                                    "<tr>" +
+                                    "<!--<tr>" +
                                         "<td></td>" +
-                                        "<td class=\"alignCenter\"><input name=\"cb1\" type=\"checkbox\"></td>" +
-                                        "<td class=\"alignCenter\"><input name=\"cb2\" type=\"checkbox\"></td>" +
-                                        "<td class=\"alignCenter\"><input name=\"cb3\" type=\"checkbox\"></td>" +
-                                    "</tr>" +
+                                        "<td><input name=\"cb1\" type=\"checkbox\"></td>" +
+                                        "<td><input name=\"cb2\" type=\"checkbox\"></td>" +
+                                        "<td><input name=\"cb3\" type=\"checkbox\"></td>" +
+                                    "</tr>-->" +
                                 "</tbody>" +
                             "</table>" +
                         "<div>" + 
@@ -164,11 +164,32 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
         });
 
         this.variablesFancyTree = $("#" + this.id + "-variabletree").fancytree({
-            extensions: ["glyph"],
+            extensions: ["glyph", "table"],
             selectMode: 3,
             icon: false,
             glyph: glyph_opts,
-            source: this.variableTree
+            source: this.variableTree,
+            table: {
+                indentation: 10,
+                nodeColumnIdx: 0
+              },                          
+            renderColumns: function(event, data) {
+                var node = data.node,
+                $tdList = $(node.tr).find(">td");
+                node.checkbox = false;
+                if(node.getLevel() !== 1) {
+                    $('<input />', { type: 'checkbox', id: 'cb1', value: node.data.temporal })
+                        .appendTo($tdList.eq(1));
+                    $('<input />', { type: 'checkbox', id: 'cb2', value: node.data.multivariate })
+                        .appendTo($tdList.eq(2));
+                    $('<input />', { type: 'checkbox', id: 'cb3', value: node.data.spatial })
+                        .appendTo($tdList.eq(3));
+                    
+                    $tdList.eq(1).attr("align", "center");
+                    $tdList.eq(2).attr("align", "center");
+                    $tdList.eq(3).attr("align", "center");
+                }
+            }                
         });
         this.render();
     }
