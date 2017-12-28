@@ -178,12 +178,40 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                 $tdList = $(node.tr).find(">td");
                 node.checkbox = false;
                 if(node.getLevel() !== 1) {
-                    $('<input />', { type: 'checkbox', id: 'cb1', value: node.data.temporal })
+                    var id1 = "cb1-" + node.getIndexHier();
+                    var id2 = "cb2-" + node.getIndexHier();
+                    var id3 = "cb3-" + node.getIndexHier();
+                    $("<input />", { type: "checkbox", id: id1, value: node.data.temporal })
+                        .change(function() {
+                            if(this.checked) {
+                                $("input[id*=\""+this.id+"\"]").prop("checked", true);
+                            }
+                            else {
+                                $("input[id*=\""+this.id+"\"]").prop("checked", false);
+                            }
+                        })
                         .appendTo($tdList.eq(1));
-                    $('<input />', { type: 'checkbox', id: 'cb2', value: node.data.multivariate })
+                    $("<input />", { type: "checkbox", id: id2, value: node.data.multivariate })
+                        .change(function() {
+                            if(this.checked) {
+                                $("input[id*=\""+this.id+"\"]").prop("checked", true);
+                            }
+                            else {
+                                $("input[id*=\""+this.id+"\"]").prop("checked", false);
+                            }
+                        })
                         .appendTo($tdList.eq(2));
-                    $('<input />', { type: 'checkbox', id: 'cb3', value: node.data.spatial })
+                    $("<input />", { type: "checkbox", id: id3, value: node.data.spatial })
+                        .change(function() {
+                            if(this.checked) {
+                                $("input[id*=\""+this.id+"\"]").prop("checked", true);
+                            }
+                            else {
+                                $("input[id*=\""+this.id+"\"]").prop("checked", false);
+                            }
+                        })
                         .appendTo($tdList.eq(3));
+                    
                     
                     $tdList.eq(1).attr("align", "center");
                     $tdList.eq(2).attr("align", "center");
