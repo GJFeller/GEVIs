@@ -181,33 +181,63 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                     var id1 = "cb1-" + node.getIndexHier();
                     var id2 = "cb2-" + node.getIndexHier();
                     var id3 = "cb3-" + node.getIndexHier();
-                    $("<input />", { type: "checkbox", id: id1, value: node.data.temporal })
+                    $("<input />", { type: "checkbox", id: id1, checked: node.data.temporal })
                         .change(function() {
                             if(this.checked) {
                                 $("input[id*=\""+this.id+"\"]").prop("checked", true);
+                                if($("input[id*=\""+this.id+"\"]").length > 0) {
+                                    node.children.forEach(function (elem) {
+                                        elem.data.temporal = true;
+                                    });
+                                }
                             }
                             else {
                                 $("input[id*=\""+this.id+"\"]").prop("checked", false);
+                                if($("input[id*=\""+this.id+"\"]").length > 0) {
+                                    node.children.forEach(function (elem) {
+                                        elem.data.temporal = false;
+                                    });
+                                }
                             }
                         })
                         .appendTo($tdList.eq(1));
-                    $("<input />", { type: "checkbox", id: id2, value: node.data.multivariate })
+                    $("<input />", { type: "checkbox", id: id2, checked: node.data.multivariate })
                         .change(function() {
                             if(this.checked) {
                                 $("input[id*=\""+this.id+"\"]").prop("checked", true);
+                                if($("input[id*=\""+this.id+"\"]").length > 0) {
+                                    node.children.forEach(function (elem) {
+                                        elem.data.multivariate = true;
+                                    });
+                                }
                             }
                             else {
                                 $("input[id*=\""+this.id+"\"]").prop("checked", false);
+                                if($("input[id*=\""+this.id+"\"]").length > 0) {
+                                    node.children.forEach(function (elem) {
+                                        elem.data.multivariate = false;
+                                    });
+                                }
                             }
                         })
                         .appendTo($tdList.eq(2));
-                    $("<input />", { type: "checkbox", id: id3, value: node.data.spatial })
+                    $("<input />", { type: "checkbox", id: id3, checked: node.data.spatial })
                         .change(function() {
                             if(this.checked) {
                                 $("input[id*=\""+this.id+"\"]").prop("checked", true);
+                                if($("input[id*=\""+this.id+"\"]").length > 0) {
+                                    node.children.forEach(function (elem) {
+                                        elem.data.spatial = true;
+                                    });
+                                }
                             }
                             else {
                                 $("input[id*=\""+this.id+"\"]").prop("checked", false);
+                                if($("input[id*=\""+this.id+"\"]").length > 0) {
+                                    node.children.forEach(function (elem) {
+                                        elem.data.spatial = false;
+                                    });
+                                }
                             }
                         })
                         .appendTo($tdList.eq(3));
