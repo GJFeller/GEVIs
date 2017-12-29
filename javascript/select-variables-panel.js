@@ -16,6 +16,10 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
         this.render();
     }
 
+    getVariableTree() {
+        return this.variableTree;
+    }
+
     createEnsembleTree(ensembleList) {
         this.ensembleTree = [];
         for(var idx = 0; idx < ensembleList.length; idx++) {
