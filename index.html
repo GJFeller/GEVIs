@@ -43,6 +43,8 @@
             <!-- Fancytree library -->
             <script src="http://cdn.jsdelivr.net/npm/jquery.fancytree@2.23/dist/jquery.fancytree-all.js"></script>
 
+            <script src="javascript/external/EventEmitter.min.js"></script>
+
             <script src="javascript/windows-system.js"></script>
 
             <script src="javascript/abstract-panel-builder.js"></script>
@@ -80,6 +82,20 @@
         
         <!--<div class ="toolTip" style="display: none;"></div>-->
         <script>
+            // Create the event.
+            var varChangeEvent = new Event('changed-var-selection');
+
+            // Define that the event name is 'build'.
+            varChangeEvent.initEvent('changed-var-selection', true, true);
+
+            // Listen for the event.
+            document.addEventListener('changed-var-selection', function (e) {
+                    console.log("evento disparado");
+                    // e.target matches elem
+            }, false);
+            //elem.addEventListener('changed-var-selection', function (e) {
+            // e.target matches elem
+            //}, false);
             var backendConnection = new BackendRequests();
             function testCallback(panel, id) {
                 panel.append("<h2>Teste</h2><p>Um teste</p>");
@@ -93,7 +109,7 @@
             $(document).ready(function(){
                 var selectVariablesPanel = new SelectVariablesPanel([], 'panel1-1')
                 rootWindow = new Window('panel1-1', 'Selecao de Variaveis', null, selectVariablesPanel);
-
+                
                 backendConnection.getListEnsembles()
                     .then(function(result) {
                         console.log(result);

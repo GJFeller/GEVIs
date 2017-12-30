@@ -203,6 +203,7 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                                     });
                                 }
                             }
+                            document.dispatchEvent(varChangeEvent);
                         })
                         .appendTo($tdList.eq(1));
                     $("<input />", { type: "checkbox", id: id2, checked: node.data.multivariate })
@@ -223,6 +224,7 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                                     });
                                 }
                             }
+                            document.dispatchEvent(varChangeEvent);
                         })
                         .appendTo($tdList.eq(2));
                     $("<input />", { type: "checkbox", id: id3, checked: node.data.spatial })
@@ -243,6 +245,7 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                                     });
                                 }
                             }
+                            document.dispatchEvent(varChangeEvent);
                         })
                         .appendTo($tdList.eq(3));
                     
