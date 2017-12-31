@@ -3,12 +3,18 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
         super();
         this.createEnsembleTree(ensembleList);
         this.id = id;
+        this.ensembleList = ensembleList;
         this.variableTree = [];      
     }
 
     setEnsembleList(ensembleList) {
+        this.ensembleList = ensembleList;
         this.createEnsembleTree(ensembleList);
         this.render();
+    }
+
+    getEnsembleList() {
+        return this.ensembleList;
     }
 
     setVariableList(variableList) {
