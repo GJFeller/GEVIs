@@ -14,15 +14,18 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
     }
 
     getRemoteData() {
+        this.data.splice(0,this.data.length)
         var simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
         console.log(simulationList);
         for(var i = 0; i < simulationList.length; i++) {
-            for(var j = 0; j < this.varList.length; j++) {
-                backendConnection.getMultivariateData(0, 0, 0, 0, simulationList[i], this.varList[j].id)
-                    .then(function(result) {
-                        console.log(result);
-                    });
+            var variableStringList = this.varList[0].id;
+            for(var j = 1; j < this.varList.length; j++) {
+                variableStringList = variableStringList + "," + this.varList[j].id;
             }
+            backendConnection.getMultivariateData(0, 0, 0, 0, simulationList[i], variableStringList)
+            .then(function(result) {
+                this.data.push(result);
+            });
         }
         //backendConnection.getMultivariateData(0, 0, 0, 0, )
         //console.log(backendConnection);
