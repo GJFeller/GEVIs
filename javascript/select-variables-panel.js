@@ -17,6 +17,7 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
     }
 
     getVariableTree() {
+        console.log(this.variableTree);
         return this.variableTree;
     }
 
@@ -110,6 +111,7 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
     }
 
     appendToPanel(panel, id) {
+        var $this = this;
         this.panel = panel;
         panel.append("<div id=" + id + "-accordion width=\"100%\" height=\"100%\">" +
                         "<h3>Ensemble List</h3>" +
@@ -181,28 +183,41 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                 var node = data.node,
                 $tdList = $(node.tr).find(">td");
                 node.checkbox = false;
+                var $tree = this;
                 if(node.getLevel() !== 1) {
                     var id1 = "cb1-" + node.getIndexHier();
                     var id2 = "cb2-" + node.getIndexHier();
                     var id3 = "cb3-" + node.getIndexHier();
                     $("<input />", { type: "checkbox", id: id1, checked: node.data.temporal })
                         .change(function() {
+                            console.log($tree);
                             if(this.checked) {
                                 $("input[id*=\""+this.id+"\"]").prop("checked", true);
                                 if($("input[id*=\""+this.id+"\"]").length > 0) {
-                                    node.children.forEach(function (elem) {
-                                        elem.data.temporal = true;
-                                    });
+                                    if(node.children !== null) {
+                                        node.children.forEach(function (elem) {
+                                            elem.data.temporal = true;
+                                        });
+                                    }
+                                    else {
+                                        node.data.temporal = true;
+                                    }
                                 }
                             }
                             else {
                                 $("input[id*=\""+this.id+"\"]").prop("checked", false);
                                 if($("input[id*=\""+this.id+"\"]").length > 0) {
-                                    node.children.forEach(function (elem) {
-                                        elem.data.temporal = false;
-                                    });
+                                    if(node.children !== null) {
+                                        node.children.forEach(function (elem) {
+                                            elem.data.temporal = false;
+                                        });
+                                    }
+                                    else {
+                                        node.data.temporal = false;
+                                    }
                                 }
                             }
+                            $this.variableTree = $tree.rootNode.children;
                             document.dispatchEvent(varChangeEvent);
                         })
                         .appendTo($tdList.eq(1));
@@ -211,19 +226,30 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                             if(this.checked) {
                                 $("input[id*=\""+this.id+"\"]").prop("checked", true);
                                 if($("input[id*=\""+this.id+"\"]").length > 0) {
-                                    node.children.forEach(function (elem) {
-                                        elem.data.multivariate = true;
-                                    });
+                                    if(node.children !== null) {
+                                        node.children.forEach(function (elem) {
+                                            elem.data.multivariate = true;
+                                        });
+                                    }
+                                    else {
+                                        node.data.multivariate = true;
+                                    }
                                 }
                             }
                             else {
                                 $("input[id*=\""+this.id+"\"]").prop("checked", false);
                                 if($("input[id*=\""+this.id+"\"]").length > 0) {
-                                    node.children.forEach(function (elem) {
-                                        elem.data.multivariate = false;
-                                    });
+                                    if(node.children !== null) {
+                                        node.children.forEach(function (elem) {
+                                            elem.data.multivariate = false;
+                                        });
+                                    }
+                                    else {
+                                        node.data.multivariate = false;
+                                    }
                                 }
                             }
+                            $this.variableTree = $tree.rootNode.children;
                             document.dispatchEvent(varChangeEvent);
                         })
                         .appendTo($tdList.eq(2));
@@ -232,19 +258,30 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                             if(this.checked) {
                                 $("input[id*=\""+this.id+"\"]").prop("checked", true);
                                 if($("input[id*=\""+this.id+"\"]").length > 0) {
-                                    node.children.forEach(function (elem) {
-                                        elem.data.spatial = true;
-                                    });
+                                    if(node.children !== null) {
+                                        node.children.forEach(function (elem) {
+                                            elem.data.spatial = true;
+                                        });
+                                    }
+                                    else {
+                                        node.data.spatial = true;
+                                    }
                                 }
                             }
                             else {
                                 $("input[id*=\""+this.id+"\"]").prop("checked", false);
                                 if($("input[id*=\""+this.id+"\"]").length > 0) {
-                                    node.children.forEach(function (elem) {
-                                        elem.data.spatial = false;
-                                    });
+                                    if(node.children !== null) {
+                                        node.children.forEach(function (elem) {
+                                            elem.data.spatial = false;
+                                        });
+                                    }
+                                    else {
+                                        node.data.spatial = false;
+                                    }
                                 }
                             }
+                            $this.variableTree = $tree.rootNode.children;
                             document.dispatchEvent(varChangeEvent);
                         })
                         .appendTo($tdList.eq(3));

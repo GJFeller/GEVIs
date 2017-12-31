@@ -43,8 +43,6 @@
             <!-- Fancytree library -->
             <script src="http://cdn.jsdelivr.net/npm/jquery.fancytree@2.23/dist/jquery.fancytree-all.js"></script>
 
-            <script src="javascript/external/EventEmitter.min.js"></script>
-
             <script src="javascript/windows-system.js"></script>
 
             <script src="javascript/abstract-panel-builder.js"></script>
@@ -82,6 +80,7 @@
         
         <!--<div class ="toolTip" style="display: none;"></div>-->
         <script>
+            var selectVariablesPanel = new SelectVariablesPanel([], 'panel1-1');
             // Create the event.
             var varChangeEvent = new Event('changed-var-selection');
 
@@ -91,7 +90,48 @@
             // Listen for the event.
             document.addEventListener('changed-var-selection', function (e) {
                     console.log("evento disparado");
-                    // e.target matches elem
+                    var varTree = selectVariablesPanel.getVariableTree();
+                    var selectedTemporalVar = [];
+                    var selectedMultivariateVar = [];
+                    var selectedSpatialVar = [];
+                    for(var i = 0; i < varTree.length; i++) {
+                        var type = varTree[i].title.toLowerCase();
+                        varTree[i].children.forEach(element => {
+                            var variable = element.title;
+                            if(type == "sediment") {
+                                var specie = type;
+                                if(element.data.temporal) {
+                                    selectedTemporalVar.push({type: type, variable: variable, specie: specie});
+                                }
+                                if(element.data.multivariate) {
+                                    selectedMultivariateVar.push({type: type, variable: variable, specie: specie});
+                                }
+                                if(element.data.spatial) {
+                                    selectedSpatialVar.push({type: type, variable: variable, specie: specie});
+                                }
+                            }
+                            else {
+                                element.children.forEach(leaf => {
+                                    var specie = leaf.title;
+                                    if(leaf.data.temporal) {
+                                        selectedTemporalVar.push({type: type, variable: variable, specie: specie});
+                                    }
+                                    if(leaf.data.multivariate) {
+                                        selectedMultivariateVar.push({type: type, variable: variable, specie: specie});
+                                    }
+                                    if(leaf.data.spatial) {
+                                        selectedSpatialVar.push({type: type, variable: variable, specie: specie});
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    console.log("Selected temporal variables:");
+                    console.log(selectedTemporalVar);
+                    console.log("Selected multivariate variables");
+                    console.log(selectedMultivariateVar);
+                    console.log("Selected spatial variables");
+                    console.log(selectedSpatialVar);
             }, false);
             //elem.addEventListener('changed-var-selection', function (e) {
             // e.target matches elem
@@ -107,7 +147,7 @@
             var rootWindow;
             /* Initialization of System */
             $(document).ready(function(){
-                var selectVariablesPanel = new SelectVariablesPanel([], 'panel1-1')
+                
                 rootWindow = new Window('panel1-1', 'Selecao de Variaveis', null, selectVariablesPanel);
                 
                 backendConnection.getListEnsembles()
