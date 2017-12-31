@@ -3,14 +3,24 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
         super();
         this.id = id;
         this.data = data;
-        
+        this.varList = [];
     }
 
     appendToPanel(panel, id) {
         this.panel = panel;
         panel.append("<svg id=" + id + "-scatter width=\"100%\" height=\"100%\"></svg>");
         this.id = id;
-        this.render()
+        this.render();
+    }
+
+    getRemoteData() {
+        console.log(backendConnection);
+    }
+
+    setVariableList(varList) {
+        this.varList = varList;
+        this.getRemoteData();
+        this.render();
     }
 
     render() {
@@ -19,7 +29,6 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
         var margin = {top: 30, right: 30, bottom: 30, left: 50};
         var padding = 20;
         var numberVariables = 4;
-        console.log(margin);
         var sizeW = width / numberVariables;
         var sizeH = height / numberVariables;
 

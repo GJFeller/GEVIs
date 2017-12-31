@@ -17,7 +17,6 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
     }
 
     getVariableTree() {
-        console.log(this.variableTree);
         return this.variableTree;
     }
 
@@ -67,6 +66,7 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
             var type = element.type;
             var specie = element.specie;
             var id = element._id;
+            var unit = element.unit;
             if(type.toLowerCase() != "element") {
                 switch(type.toLowerCase()) {
                     case "solid":
@@ -88,7 +88,7 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                             if(varNode.title == name) {
                                 if(type != "Sediment") {
                                     wasAddedVarLevel = true;
-                                    varNode.children.push({title: specie, key: id, temporal: false, multivariate: false, spatial: false});
+                                    varNode.children.push({title: specie, key: id, temporal: false, multivariate: false, spatial: false, unit: unit});
                                 }
                             }
                         });
@@ -96,11 +96,11 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                             if(type != "Sediment") {
                                 rootNode.children.push({
                                     title: name,
-                                    children: [{title: specie, key: id, temporal: false, multivariate: false, spatial: false}]
+                                    children: [{title: specie, key: id, temporal: false, multivariate: false, spatial: false, unit: unit}]
                                 });
                             }
                             else {
-                                rootNode.children.push({ title: name, key: id, temporal: false, multivariate: false, spatial: false });
+                                rootNode.children.push({title: name, key: id, temporal: false, multivariate: false, spatial: false, unit: unit});
                             }
                         }
                     }

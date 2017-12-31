@@ -81,6 +81,7 @@
         <!--<div class ="toolTip" style="display: none;"></div>-->
         <script>
             var selectVariablesPanel = new SelectVariablesPanel([], 'panel1-1');
+            var scatterPlotMatrix = new ScatterplotMatrix({});
             // Create the event.
             var varChangeEvent = new Event('changed-var-selection');
 
@@ -98,29 +99,31 @@
                         var type = varTree[i].title.toLowerCase();
                         varTree[i].children.forEach(element => {
                             var variable = element.title;
+                            var unit = element.data.unit;
                             if(type == "sediment") {
                                 var specie = type;
                                 if(element.data.temporal) {
-                                    selectedTemporalVar.push({type: type, variable: variable, specie: specie});
+                                    selectedTemporalVar.push({type: type, variable: variable, specie: specie, id: element.key, unit: unit});
                                 }
                                 if(element.data.multivariate) {
-                                    selectedMultivariateVar.push({type: type, variable: variable, specie: specie});
+                                    selectedMultivariateVar.push({type: type, variable: variable, specie: specie, id: element.key, unit: unit});
                                 }
                                 if(element.data.spatial) {
-                                    selectedSpatialVar.push({type: type, variable: variable, specie: specie});
+                                    selectedSpatialVar.push({type: type, variable: variable, specie: specie, id: element.key, unit: unit});
                                 }
                             }
                             else {
                                 element.children.forEach(leaf => {
                                     var specie = leaf.title;
+                                    var unit = leaf.data.unit;
                                     if(leaf.data.temporal) {
-                                        selectedTemporalVar.push({type: type, variable: variable, specie: specie});
+                                        selectedTemporalVar.push({type: type, variable: variable, specie: specie, id: leaf.key, unit: unit});
                                     }
                                     if(leaf.data.multivariate) {
-                                        selectedMultivariateVar.push({type: type, variable: variable, specie: specie});
+                                        selectedMultivariateVar.push({type: type, variable: variable, specie: specie, id: leaf.key, unit: unit});
                                     }
                                     if(leaf.data.spatial) {
-                                        selectedSpatialVar.push({type: type, variable: variable, specie: specie});
+                                        selectedSpatialVar.push({type: type, variable: variable, specie: specie, id: leaf.key, unit: unit});
                                     }
                                 });
                             }
@@ -132,6 +135,8 @@
                     console.log(selectedMultivariateVar);
                     console.log("Selected spatial variables");
                     console.log(selectedSpatialVar);
+                    scatterPlotMatrix.setVariableList(selectedMultivariateVar);
+                    console.log(scatterPlotMatrix);
             }, false);
             //elem.addEventListener('changed-var-selection', function (e) {
             // e.target matches elem
@@ -145,11 +150,12 @@
             var windowSystem = $("#windows-system");
             /* Creating new window*/
             var rootWindow;
+            var scatterWindow;
             /* Initialization of System */
             $(document).ready(function(){
                 
                 rootWindow = new Window('panel1-1', 'Selecao de Variaveis', null, selectVariablesPanel);
-                
+                scatterWindow = new Window('panel1-1-1', 'Scatter Plot Matrix', rootWindow, scatterPlotMatrix);
                 backendConnection.getListEnsembles()
                     .then(function(result) {
                         console.log(result);
