@@ -105,12 +105,10 @@ class BackendRequests {
         return new Promise(function(resolve, reject) {
             var xhttp = new XMLHttpRequest();
             xhttp.onload = function() {
-                console.log(this.responseText);
                 resolve(JSON.parse(this.responseText));
             };
             xhttp.onerror = reject;
             xhttp.open("GET", $this.url + "/getMultivariateData/"+xIdx+"/"+yIdx+"/"+zIdx+"/"+time+"/"+simulationId+"/"+varIdList, true);
-            console.log($this.url + "/getMultivariateData/"+xIdx+"/"+yIdx+"/"+zIdx+"/"+time+"/"+simulationId+"/"+varIdList);
             xhttp.send();
         });  
     }
