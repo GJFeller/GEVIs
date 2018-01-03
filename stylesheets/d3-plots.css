@@ -1,0 +1,41 @@
+svg {
+    font: 10px sans-serif;
+    padding: 10px;
+}
+
+.axisSPLOTM,
+.frameSPLOTM {
+    shape-rendering: crispEdges;
+}
+
+.axisSPLOTM line {
+    stroke: #ddd;
+}
+
+.axisSPLOTM path {
+    display: none;
+}
+
+.cellSPLOTM text {
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.frameSPLOTM {
+    fill: none;
+    stroke: #aaa;
+}
+
+circle {
+    fill-opacity: .7;
+}
+
+circle.hiddenSPLOTM {
+    fill: #ccc !important;
+}
+
+.extent {
+    fill: #000;
+    fill-opacity: .125;
+    stroke: #fff;
+}
