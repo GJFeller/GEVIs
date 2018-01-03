@@ -88,6 +88,8 @@
             // Create the event.
             var varChangeEvent = new Event('changed-var-selection');
 
+            var scatterWindow = null;
+
             // Define that the event name is 'build'.
             varChangeEvent.initEvent('changed-var-selection', true, true);
 
@@ -138,7 +140,12 @@
                     console.log(selectedMultivariateVar);
                     console.log("Selected spatial variables");
                     console.log(selectedSpatialVar);
-                    scatterPlotMatrix.setVariableList(selectedMultivariateVar);
+                    if(selectedMultivariateVar.length > 0) {
+                        if(scatterWindow === null) {
+                            scatterWindow = new Window('panel1-1-1', 'Multivariate Visualization', rootWindow, scatterPlotMatrix);
+                        }
+                        scatterPlotMatrix.setVariableList(selectedMultivariateVar);
+                    }
                     console.log(scatterPlotMatrix);
             }, false);
             //elem.addEventListener('changed-var-selection', function (e) {
@@ -153,12 +160,11 @@
             var windowSystem = $("#windows-system");
             /* Creating new window*/
             var rootWindow;
-            var scatterWindow;
             /* Initialization of System */
             $(document).ready(function(){
                 
-                rootWindow = new Window('panel1-1', 'Selecao de Variaveis', null, selectVariablesPanel);
-                scatterWindow = new Window('panel1-1-1', 'Scatter Plot Matrix', rootWindow, scatterPlotMatrix);
+                rootWindow = new Window('panel1-1', 'Variable Selection', null, selectVariablesPanel);
+                //scatterWindow = new Window('panel1-1-1', 'Scatter Plot Matrix', rootWindow, scatterPlotMatrix);
                 backendConnection.getListEnsembles()
                     .then(function(result) {
                         console.log(result);

@@ -147,10 +147,17 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
             var cell = svg.selectAll(".cellSPLOTM")
                 .data(cross(variables, variables))
             .enter().append("g")
-                .attr("class", "cellSPLOTM")
+                .attr("class", "cellSPLOTM");
+                /*.attr("transform", function(d) { return "translate(" + ((d.i) * size + margin.left) + "," + d.j * size + ")"; })
+                .each(plot);*/
+
+            cell.filter(function(d) { return d.i !== d.j; })
                 .attr("transform", function(d) { return "translate(" + ((d.i) * size + margin.left) + "," + d.j * size + ")"; })
                 .each(plot);
 
+            cell.filter(function(d) { return d.i === d.j; })
+                .attr("transform", function(d) { return "translate(" + ((d.i) * size + margin.left) + "," + d.j * size + ")"; })
+                .each(plotHistogram);
             // Titles for the diagonal.
             cell.filter(function(d) { return d.i === d.j; }).append("text")
                 .attr("x", padding)
@@ -225,8 +232,8 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                     .attr("cx", function(d) { return x(d[p.x]); })
                     .attr("cy", function(d) { return y(d[p.y]); })
                     .attr("r", 4)
-                    .attr("test-x", function(d) {return d[p.x]; })
-                    .attr("test-y", function(d) {return d[p.y]; })
+                    .attr("x-value", function(d) {return d[p.x]; })
+                    .attr("y-value", function(d) {return d[p.y]; })
                     .style("fill", function(d) { return d3.rgb(0,0,255); });
             }
 
@@ -237,6 +244,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                 y.domain(domainByVariable[p.y]);
             
                 cell.append("rect")
+                    .attr("class", "frameSPLOTM")
                     .attr("x", padding / 2)
                     .attr("y", padding / 2)
                     .attr("width", size - padding)
