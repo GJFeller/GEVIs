@@ -102,6 +102,8 @@
             document.addEventListener('window-closed', function (e) {
                 if(e.windowObj == scatterWindow)
                     scatterWindow = null;
+                if(e.windowObj == temporalWindow)
+                    temporalWindow = null;
             });
 
             // Listen for the event.
