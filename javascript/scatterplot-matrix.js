@@ -141,7 +141,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                 .data(variables)
             .enter().append("g")
                 .attr("class", "y axisSPLOTM")
-                .attr("transform", function(d, i) { return "translate(0" + margin.left + "," + i * size + ")";})
+                .attr("transform", function(d, i) { return "translate(" + margin.left + "," + i * size + ")";})
                 .each(function(d) { y.domain(domainByVariable[d]); d3.select(this).call(yAxis); });
 
             var cell = svg.selectAll(".cellSPLOTM")
