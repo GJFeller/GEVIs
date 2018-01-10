@@ -123,6 +123,8 @@ class Window {
                 .removeAttr("disabled")
                 .on("click", function() {
                     $this.removeWindow();
+                    windowClosed.windowObj = $this;
+                    document.dispatchEvent(windowClosed);
                 });
         }
         
@@ -143,6 +145,7 @@ class Window {
         maxHeight = this.MAX_HEIGHT;
     
         /* Setting up the panel */
+        var lightbox_resize = false;
         $( "#" + newID)
             .draggable({
                 handle: ".panel-heading",
@@ -162,9 +165,13 @@ class Window {
             .resizable({
                 resize: function(){
                     //var aPanel = $(this).parents(".panel")[0];
-                    Window.centerLine($this.id);
-                    if($this.panelContent instanceof AbstractPanelBuilder)
-                        $this.panelContent.resizePanel($(this).width(), $(this).height());
+                    if (lightbox_resize)
+                        clearTimeout(lightbox_resize);
+                    lightbox_resize = setTimeout(function() {
+                        Window.centerLine($this.id);
+                        if($this.panelContent instanceof AbstractPanelBuilder)
+                            $this.panelContent.resizePanel($(this).width(), $(this).height());
+                    }, 500);                
                 },
                 aspectRatio: true,
                 maxHeight: maxHeight,

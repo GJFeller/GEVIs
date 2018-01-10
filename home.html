@@ -86,12 +86,19 @@
             var selectVariablesPanel = new SelectVariablesPanel([], 'panel1-1');
             var scatterPlotMatrix = new ScatterplotMatrix([]);
             // Create the event.
+            var windowClosed = new Event('window-closed');
             var varChangeEvent = new Event('changed-var-selection');
 
             var scatterWindow = null;
 
             // Define that the event name is 'build'.
+            windowClosed.initEvent('window-closed', true, true);
             varChangeEvent.initEvent('changed-var-selection', true, true);
+
+            document.addEventListener('window-closed', function (e) {
+                if(e.windowObj == scatterWindow)
+                    scatterWindow = null;
+            });
 
             // Listen for the event.
             document.addEventListener('changed-var-selection', function (e) {
