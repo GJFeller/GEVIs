@@ -10,11 +10,11 @@ class Window {
         this.parent = parent;
         //this.callback = callback;
         /* Initial values of panel Height and Width */
-        this.INITIAL_HEIGHT = 250;
+        this.INITIAL_HEIGHT = 350;
         this.INITIAL_WIDTH = 350;
 
         /* Max values of panel Height and Width */
-        this.MAX_HEIGHT = 720;
+        this.MAX_HEIGHT = 1080;
         this.MAX_WIDTH = 1080;
 
         /* Constant values of icon Height and Width */

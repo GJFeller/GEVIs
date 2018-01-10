@@ -141,7 +141,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                 .data(variables)
             .enter().append("g")
                 .attr("class", "y axisSPLOTM")
-                .attr("transform", function(d, i) { return "translate(" + margin.left + "," + i * size + ")";})
+                .attr("transform", function(d, i) { return "translate(0" + margin.left + "," + i * size + ")";})
                 .each(function(d) { y.domain(domainByVariable[d]); d3.select(this).call(yAxis); });
 
             var cell = svg.selectAll(".cellSPLOTM")
@@ -157,7 +157,8 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
 
             cell.filter(function(d) { return d.i === d.j; })
                 .attr("transform", function(d) { return "translate(" + ((d.i) * size + margin.left) + "," + d.j * size + ")"; })
-                .each(plotHistogram);
+                .each(plot);
+                //.each(plotHistogram);
             // Titles for the diagonal.
             cell.filter(function(d) { return d.i === d.j; }).append("text")
                 .attr("x", padding)
@@ -379,7 +380,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
     }
 
     resizePanel(width, height) {
-
+        this.render();
     }
 
 }
