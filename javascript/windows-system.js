@@ -162,7 +162,7 @@ class Window {
                 height: initialHeight,
                 width: initialWidth
             })
-            .resizable({
+            /*.resizable({
                 resize: function(){
                     //var aPanel = $(this).parents(".panel")[0];
                     if (lightbox_resize)
@@ -178,9 +178,41 @@ class Window {
                 maxWidth: maxWidth,
                 minHeight: minHeight,
                 minWidth: minWidth
-            });
-        
+            });*/
 
+            $("#" + newID)
+                    .find(".panel-body")
+                    .wrap('<div/>')
+                        .css({'overflow':'scroll'})
+                        .parent()
+                            .css({'display':'inline-block',
+                                'overflow':'hidden',
+                                'height':function(){return $('.panel-body',this).height();},
+                                'width':  function(){return $('.panel-body',this).width();},
+                                'paddingBottom':'12px',
+                                'paddingRight':'12px'
+                                
+                                }).resizable({
+                                    resize: function(){
+                                        //var aPanel = $(this).parents(".panel")[0];
+                                        if (lightbox_resize)
+                                            clearTimeout(lightbox_resize);
+                                        lightbox_resize = setTimeout(function() {
+                                            Window.centerLine($this.id);
+                                            if($this.panelContent instanceof AbstractPanelBuilder)
+                                                $this.panelContent.resizePanel($(this).width(), $(this).height());
+                                        }, 500);                
+                                    },
+                                    aspectRatio: true,
+                                    maxHeight: maxHeight,
+                                    maxWidth: maxWidth,
+                                    minHeight: minHeight,
+                                    minWidth: minWidth
+                                })
+                                    .find('.panel-body')
+                                    .css({overflow:'auto',
+                                            width:'100%',
+                                            height:'100%'});
     }
 
     

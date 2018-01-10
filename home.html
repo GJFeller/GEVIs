@@ -53,6 +53,8 @@
 
             <script src="javascript/select-variables-panel.js"></script>
 
+            <script src="javascript/temporal-vis-panel.js"></script>
+
             <!-- Windows System CSS -->
             <link rel="stylesheet" href="stylesheets/windows-system.css">
             <link rel="stylesheet" href="stylesheets/font-awesome.css">
@@ -85,11 +87,13 @@
         <script>
             var selectVariablesPanel = new SelectVariablesPanel([], 'panel1-1');
             var scatterPlotMatrix = new ScatterplotMatrix([]);
+            var temporalVisPanel = new TemporalVisPanel([]);
             // Create the event.
             var windowClosed = new Event('window-closed');
             var varChangeEvent = new Event('changed-var-selection');
 
             var scatterWindow = null;
+            var temporalWindow = null;
 
             // Define that the event name is 'build'.
             windowClosed.initEvent('window-closed', true, true);
@@ -153,15 +157,15 @@
                         }
                         scatterPlotMatrix.setVariableList(selectedMultivariateVar);
                     }
-                    console.log(scatterPlotMatrix);
+                    if(selectedTemporalVar.length > 0) {
+                        if(temporalWindow === null) {
+                            temporalWindow = new Window('panel1-1-2', 'Temporal Visualization', rootWindow, temporalVisPanel);
+                        }
+                    }
+                    //console.log(scatterPlotMatrix);
             }, false);
-            //elem.addEventListener('changed-var-selection', function (e) {
-            // e.target matches elem
-            //}, false);
+
             var backendConnection = new BackendRequests();
-            function testCallback(panel, id) {
-                panel.append("<h2>Teste</h2><p>Um teste</p>");
-            }
             var count = 0;
             /* Getting the document body */
             var windowSystem = $("#windows-system");
@@ -181,50 +185,12 @@
                                 console.log(result2);
                                 selectVariablesPanel.setVariableList(result2);
                             });
-                            /*.catch(function() {
-                                console.log("Erro ao acessar o backend");
-                            });*/
-                        /*backendConnection.getAllVariables(result[0]["ensembleId"])
-                            .then(function(result2) {
-                                console.log(result2);
-                            })
-                            .catch(function() {
-                                console.log("Erro ao acessar o backend");
-                            });*/
                     })
                     .catch(function() {
                         console.log("Erro ao acessar o backend");
                     });
-                //initWindow();
-                //resizeTimeline();
-                /* Check limits whenever a resize event was trigger */
-                //$(window).on('resize', function(){
-                //    hideToolTipCluster();
-                //    checkLimits();
-                //});
-                /* Binding event to minimize buttons */
-                //windowSystem.on("click", ".btn-minimize", minimizeWindow);
-                /* Binding event to remove buttons */
-                //windowSystem.on("click", ".btn-remove", function(){
-                //    var id = $(this).parents(".panel").attr("id");
-                //    removeWindow(id, true);
-                //});
-                /* Binding event to scatter plot settings buttons */
-                //windowSystem.on("click", ".btn-settings-scatterplot", checkChildrenScatterPlot);
-                /* Binding event to minimized window */
-                //windowSystem.on("dblclick", ".fa-window-maximize", maximizeWindow);
-                /* Avoid to close settings menu */
-                //windowSystem.on('click', '.panel-settings', function(event){
-                //    event.stopPropagation();
-                //});
             });
         
-            function sayHello() {
-                count++;
-                var scatterPlotMatrix = new ScatterplotMatrix({});
-                console.log(scatterPlotMatrix);
-                var newWindow = new Window('panel1-1-' + count, 'Teste', rootWindow, scatterPlotMatrix);
-            }
 
             
         </script>
