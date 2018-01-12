@@ -30,9 +30,6 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                 variableStringList = variableStringList + "," + this.varList[j].id;
             }
             promises.push(backendConnection.getMultivariateData(0, 0, 0, 0, simulationList[i], variableStringList));
-            /*.then(function(result) {
-                this.data.push(result);
-            });*/
         }
         Promise.all(promises)
             .then(function(values) {

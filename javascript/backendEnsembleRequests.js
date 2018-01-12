@@ -2,7 +2,7 @@ class BackendRequests {
     constructor() {
         //this.url = "http://ensemblemongobackend.azurewebsites.net";
         this.url = "http://gcevt-backend.herokuapp.com";
-        //this.url = "http://localhost:8002";
+        //this.url = "http://localhost:4000";
     }
 
     getListEnsembles() {
@@ -95,6 +95,7 @@ class BackendRequests {
                 resolve(JSON.parse(this.responseText));
             };
             xhttp.onerror = reject;
+            console.log($this.url + "/getTemporalVarData/"+xIdx+"/"+yIdx+"/"+zIdx+"/"+simulationId+"/"+varId+"/"+ensembleId);
             xhttp.open("GET", $this.url + "/getTemporalVarData/"+xIdx+"/"+yIdx+"/"+zIdx+"/"+simulationId+"/"+varId+"/"+ensembleId, true);
             xhttp.send();
         });  

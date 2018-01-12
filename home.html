@@ -163,6 +163,7 @@
                         if(temporalWindow === null) {
                             temporalWindow = new Window('panel1-1-2', 'Temporal Visualization', rootWindow, temporalVisPanel);
                         }
+                        temporalVisPanel.setVariableList(selectedTemporalVar);
                     }
                     //console.log(scatterPlotMatrix);
             }, false);
