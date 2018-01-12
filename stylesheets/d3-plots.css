@@ -38,3 +38,16 @@ circle.hiddenSPLOTM {
     fill-opacity: .125;
     stroke: #fff;
 }
+
+.axisLPLOT path,
+.axisLPLOT line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+}
+    
+.line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+}

@@ -72,7 +72,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                 $this.render();
             })
             .catch(function () {
-               console.log("Erro ao recuperar dados"); 
+               //console.log("Erro ao recuperar dados"); 
             });
         
     }
@@ -123,6 +123,106 @@ class TemporalVisPanel extends AbstractPanelBuilder {
 
     render() {
 
+        var margin = {top: 20, right: 80, bottom: 30, left: 50};
+        var $this = this;
+        var width = this.panel.width() - margin.left - margin.right;
+        var height = 500;
+
+        console.log($this.data);
+        var xDomain = [],
+            yDomainByVariable = {},
+            variablesIterable = $this.data.keys(),
+            variables = [],
+            numberVariables = $this.data.size;
+
+        console.log(numberVariables);
+        if(numberVariables > 0) {
+            var minX = 9000000;
+            var maxX = -900000;
+            // Get Min and Max of each variable
+            for(let variable of variablesIterable) {
+                variables.push(variable);
+            //variables.forEach(function(variable) {
+                var minVar = 9000000;
+                var maxVar = -900000;
+                var varData = $this.data.get(variable);
+                var simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
+                simulationList.forEach(function(simulation) {
+                    var simData = varData.get(simulation);
+                    var timeExtent = d3.extent(simData, function(d) {
+                        return d.time;
+                    });
+                    var varExtent = d3.extent(simData, function(d) {
+                        return d.value;
+                    });
+                    if(minX >= timeExtent[0]) {
+                        minX = timeExtent[0];
+                    }
+                    if(maxX <= timeExtent[1]) {
+                        maxX = timeExtent[1];
+                    }
+
+                    if(minVar >= varExtent[0]) {
+                        minVar = varExtent[0];
+                    }
+                    if(maxVar <= varExtent[1]) {
+                        maxVar = varExtent[1];
+                    }
+                });
+                yDomainByVariable[variable] = [minVar, maxVar];
+            }/*);*/
+
+            xDomain = [minX, maxX];
+
+            console.log(xDomain);
+            console.log(yDomainByVariable);
+
+            var x = d3.scale.linear()
+                .range([0, width]);
+            
+            var y = d3.scale.linear()
+                .range([height, 0]);
+            
+            var color = d3.scale.category10();
+
+            var xAxis = d3.svg.axis()
+                .scale(x)
+                .orient("bottom")
+                .ticks(6);
+
+            var yAxis = d3.svg.axis()
+                .scale(y)
+                .orient("left")
+                .ticks(6);
+
+            var svg = d3.select("#"+this.id+"-temporal");
+
+            svg.selectAll('*').remove();
+
+            svg.attr("width", width + margin.left + margin.right)
+                .attr("height", height * $this.data.size)
+            .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            // Set the ticks to stretch across all plots
+            //xAxis.tickSize(size * numberVariables);
+
+            console.log(variables);
+
+            svg.selectAll(".x.axisLPLOT")
+                .data(variables)
+            .enter().append("g")
+                .attr("class", "x axisLPLOT")
+                .attr("transform", function(d, i) { return "translate(" + margin.left + "," + height * i + ")";})
+                .each(function(d) { x.domain(xDomain); d3.select(this).call(xAxis); });
+
+            svg.selectAll(".y.axisLPLOT")
+                .data(variables)
+            .enter().append("g")
+                .attr("class", "y axisLPLOT")
+                .attr("transform", function(d, i) { return "translate(" + margin.left + "," + height * i + ")";})
+                .each(function(d) { y.domain(yDomainByVariable[d]); d3.select(this).call(yAxis); });
+        }
     }
 
     resizePanel() {

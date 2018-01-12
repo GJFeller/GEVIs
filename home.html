@@ -87,7 +87,7 @@
         <script>
             var selectVariablesPanel = new SelectVariablesPanel([], 'panel1-1');
             var scatterPlotMatrix = new ScatterplotMatrix([]);
-            var temporalVisPanel = new TemporalVisPanel([]);
+            var temporalVisPanel = new TemporalVisPanel(new Map());
             // Create the event.
             var windowClosed = new Event('window-closed');
             var varChangeEvent = new Event('changed-var-selection');

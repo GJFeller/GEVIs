@@ -79,6 +79,8 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                 });
             });
 
+            console.log(domainByVariable);
+
             var size = 0;
             if(height < width) {
                 size = height / numberVariables;
@@ -126,6 +128,8 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
             // Set the ticks to stretch across all plots
             xAxis.tickSize(size * numberVariables);
             yAxis.tickSize(-size * numberVariables); // negative so ticks go right
+
+            console.log(variables);
 
             svg.selectAll(".x.axisSPLOTM")
                 .data(variables)

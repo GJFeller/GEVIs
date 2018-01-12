@@ -95,7 +95,7 @@ class BackendRequests {
                 resolve(JSON.parse(this.responseText));
             };
             xhttp.onerror = reject;
-            console.log($this.url + "/getTemporalVarData/"+xIdx+"/"+yIdx+"/"+zIdx+"/"+simulationId+"/"+varId+"/"+ensembleId);
+            //console.log($this.url + "/getTemporalVarData/"+xIdx+"/"+yIdx+"/"+zIdx+"/"+simulationId+"/"+varId+"/"+ensembleId);
             xhttp.open("GET", $this.url + "/getTemporalVarData/"+xIdx+"/"+yIdx+"/"+zIdx+"/"+simulationId+"/"+varId+"/"+ensembleId, true);
             xhttp.send();
         });  
