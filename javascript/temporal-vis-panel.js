@@ -8,7 +8,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
 
     appendToPanel(panel, id) {
         this.panel = panel;
-        panel.append("<svg id=" + id + "-temporal width=\"100%\" height=\"100%\"></svg>");
+        panel.append("<div id=" + id + "-temporal width=\"100%\" height=\"100%\"></svg>");
         this.id = id;
         this.render();
     }
@@ -126,7 +126,10 @@ class TemporalVisPanel extends AbstractPanelBuilder {
         var margin = {top: 20, right: 80, bottom: 30, left: 50};
         var $this = this;
         var width = this.panel.width() - margin.left - margin.right;
-        var height = 500;
+        var height = this.panel.height();
+
+        var formatSiPrefix = d3.format("3e");
+        //var heightEachPlot = height - margin.top - margin.bottom;
 
         console.log($this.data);
         var xDomain = [],
@@ -183,45 +186,98 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             var y = d3.scale.linear()
                 .range([height, 0]);
             
+            x.domain(xDomain);
+            
             var color = d3.scale.category10();
 
+            color.domain(Array.from($this.data.get(variables[0]).keys()));
             var xAxis = d3.svg.axis()
                 .scale(x)
-                .orient("bottom")
-                .ticks(6);
+                .orient("bottom");
 
             var yAxis = d3.svg.axis()
                 .scale(y)
                 .orient("left")
-                .ticks(6);
+                .tickFormat(formatSiPrefix);
+            
+            var line = d3.svg.line()
+                .interpolate("basis")
+                .x(function(d) {
+                  return x(d.time);
+                })
+                .y(function(d) {
+                  return y(d.value);
+                });
 
-            var svg = d3.select("#"+this.id+"-temporal");
+            var div = d3.select("#"+this.id+"-temporal");
 
-            svg.selectAll('*').remove();
+            console.log(div);
 
-            svg.attr("width", width + margin.left + margin.right)
+            div.selectAll('svg').remove();
+
+            var svg = div.selectAll('svg')
+                .data(variables)
+            .enter().append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+                .attr("transform", function(d, i) { return "translate(" + margin.left + "," + margin.top + ")";});
+
+            //var svg = div.selectAll('svg');
+            //console.log(svg);
+
+            svg.append("g")
+                .attr("class", "x axisLPLOT")
+                .attr("transform", "translate(" + 0 + "," + height + ")")
+                .call(xAxis);
+            
+            svg.append("g")
+                .attr("class", "y axisLPLOT")
+                .each(function(d) { y.domain(yDomainByVariable[d]); d3.select(this).call(yAxis); });
+            
+            var simulation = svg.selectAll(".sim")
+                .data(function(d){
+                    console.log(Array.from($this.data.get(d).entries()));
+                    return Array.from($this.data.get(d).entries()); 
+                })
+            .enter().append("g")
+                .attr("class", "sim");
+            
+            simulation.append("path")
+                .attr("class", "line")
+                .attr("d", function(d) {
+                    return line(d[1]);
+                })
+                .style("stroke", function(d) {
+                    console.log(d);
+                    return color(d[0]);
+                });
+
+            
+            //svg.each(function(d))
+            /*svg.attr("width", width + margin.left + margin.right)
                 .attr("height", height * $this.data.size)
             .append("g")
-                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");*/
 
             // Set the ticks to stretch across all plots
             //xAxis.tickSize(size * numberVariables);
 
             console.log(variables);
 
-            svg.selectAll(".x.axisLPLOT")
+            /*svg.selectAll(".x.axisLPLOT")
                 .data(variables)
             .enter().append("g")
                 .attr("class", "x axisLPLOT")
-                .attr("transform", function(d, i) { return "translate(" + margin.left + "," + height * i + ")";})
+                .attr("transform", function(d, i) { return "translate(" + margin.left + "," + heightEachPlot * (i+1) + ")";})
                 .each(function(d) { x.domain(xDomain); d3.select(this).call(xAxis); });
 
             svg.selectAll(".y.axisLPLOT")
                 .data(variables)
             .enter().append("g")
                 .attr("class", "y axisLPLOT")
-                .attr("transform", function(d, i) { return "translate(" + margin.left + "," + height * i + ")";})
-                .each(function(d) { y.domain(yDomainByVariable[d]); d3.select(this).call(yAxis); });
+                .attr("transform", function(d, i) { return "translate(" + margin.left + "," + heightEachPlot * i + ")";})
+                .each(function(d) { y.domain(yDomainByVariable[d]); d3.select(this).call(yAxis); });*/
         }
     }
 
