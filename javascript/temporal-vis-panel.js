@@ -22,7 +22,6 @@ class TemporalVisPanel extends AbstractPanelBuilder {
         this.varList.forEach(function (variable, idx) {
             varNameList[idx] = variable.variable + "-" + variable.specie;
         });
-        console.log(selectVariablesPanel.getEnsembleList()[0]);
         var ensembleId = selectVariablesPanel.getEnsembleList()[0]._id;
         var simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
         var promises = [];
@@ -39,7 +38,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                 values.forEach(function (elem) {
                     if(elem.length > 0)
                     {
-                        //console.log(elem);
+                        
                         elem.forEach(function (aRow) {
                             var data = {};
                             data.simulationId = aRow.simulationId;
@@ -51,7 +50,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                                     }
                                 }
                             });
-                            //console.log(data);
+                            
                             dataList.push(data);
                         });
                         //var data = {};
@@ -65,14 +64,13 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                             }
                         });
                         dataList.push(data);
-                        console.log(data);*/
+                        */
                     }
                 });
                 $this.data = $this.reformatDataList(dataList);
                 $this.render();
             })
             .catch(function () {
-               //console.log("Erro ao recuperar dados"); 
             });
         
     }
@@ -83,7 +81,6 @@ class TemporalVisPanel extends AbstractPanelBuilder {
     }
 
     reformatDataList(dataList) {
-        //console.log(this.varList);
         var varStringList = [];
         this.varList.forEach(function (variable) {
             varStringList.push(variable.variable + "-" + variable.specie);
@@ -104,10 +101,9 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             var simulationId = data.simulationId;
             var time = data.time;
             varStringList.forEach(function (variable) {
-                chartMap.get(variable).get(simulationId).push({time: time, value: data[variable]});
+                chartMap.get(variable).get(simulationId).push({time: time, value: data[variable], variable: variable});
             });
         });
-        //console.log(chartMap);
 
         varStringList.forEach(function (variable) {
             simulationList.forEach(function (simulation) {
@@ -117,7 +113,6 @@ class TemporalVisPanel extends AbstractPanelBuilder {
 
             });
         });
-        console.log(chartMap);
         return chartMap;
     }
 
@@ -126,19 +121,17 @@ class TemporalVisPanel extends AbstractPanelBuilder {
         var margin = {top: 20, right: 80, bottom: 30, left: 50};
         var $this = this;
         var width = this.panel.width() - margin.left - margin.right;
-        var height = this.panel.height();
+        var height = this.panel.height() - 20;
 
-        var formatSiPrefix = d3.format("3e");
+        var formatSiPrefix = d3.format(".3n");
         //var heightEachPlot = height - margin.top - margin.bottom;
 
-        console.log($this.data);
         var xDomain = [],
             yDomainByVariable = {},
             variablesIterable = $this.data.keys(),
             variables = [],
             numberVariables = $this.data.size;
 
-        console.log(numberVariables);
         if(numberVariables > 0) {
             var minX = 9000000;
             var maxX = -900000;
@@ -177,14 +170,16 @@ class TemporalVisPanel extends AbstractPanelBuilder {
 
             xDomain = [minX, maxX];
 
-            console.log(xDomain);
-            console.log(yDomainByVariable);
 
             var x = d3.scale.linear()
                 .range([0, width]);
             
-            var y = d3.scale.linear()
-                .range([height, 0]);
+            var y = new Map();
+            variables.forEach(function(variable) {
+                y.set(variable, d3.scale.linear().range([height, 0]));
+            });
+            /*var y = d3.scale.linear()
+                .range([height, 0]);*/
             
             x.domain(xDomain);
             
@@ -195,23 +190,25 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                 .scale(x)
                 .orient("bottom");
 
-            var yAxis = d3.svg.axis()
-                .scale(y)
-                .orient("left")
-                .tickFormat(formatSiPrefix);
+            var yAxis = new Map();
+            variables.forEach(function(variable) {
+                yAxis.set(variable, d3.svg.axis().scale(y.get(variable)).orient("left").tickFormat(formatSiPrefix));
+            });
+
             
             var line = d3.svg.line()
                 .interpolate("basis")
                 .x(function(d) {
-                  return x(d.time);
+                    return x(d.time);
                 })
                 .y(function(d) {
-                  return y(d.value);
+                    var yax = y.get(d.variable);
+                    return yax(d.value);
                 });
 
             var div = d3.select("#"+this.id+"-temporal");
 
-            console.log(div);
+            
 
             div.selectAll('svg').remove();
 
@@ -223,8 +220,6 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             .append("g")
                 .attr("transform", function(d, i) { return "translate(" + margin.left + "," + margin.top + ")";});
 
-            //var svg = div.selectAll('svg');
-            //console.log(svg);
 
             svg.append("g")
                 .attr("class", "x axisLPLOT")
@@ -233,11 +228,18 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             
             svg.append("g")
                 .attr("class", "y axisLPLOT")
-                .each(function(d) { y.domain(yDomainByVariable[d]); d3.select(this).call(yAxis); });
+                .each(function(d) { y.get(d).domain(yDomainByVariable[d]); d3.select(this).call(yAxis.get(d)); })
+                .append("text")
+                .attr("fill", "#000")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", "0.71em")
+                .attr("text-anchor", "end")
+                .style("font-size", "10px")
+                .text(function(d){ return d; });
             
             var simulation = svg.selectAll(".sim")
                 .data(function(d){
-                    console.log(Array.from($this.data.get(d).entries()));
                     return Array.from($this.data.get(d).entries()); 
                 })
             .enter().append("g")
@@ -249,7 +251,6 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                     return line(d[1]);
                 })
                 .style("stroke", function(d) {
-                    console.log(d);
                     return color(d[0]);
                 });
 
@@ -262,8 +263,6 @@ class TemporalVisPanel extends AbstractPanelBuilder {
 
             // Set the ticks to stretch across all plots
             //xAxis.tickSize(size * numberVariables);
-
-            console.log(variables);
 
             /*svg.selectAll(".x.axisLPLOT")
                 .data(variables)
