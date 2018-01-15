@@ -43,9 +43,10 @@ class Window {
         if (typeof icon === 'undefined') { icon = false; }
         var lines =  d3.selectAll("line").filter(".class-" + panelID);
         var sizeLines = lines.size();
-    
+        
         for (var i = 0; i < sizeLines; i++)
         {
+            //console.log(lines);
             var aLine = $("#" + lines[0][i].id);
             var lineID = lines[0][i].id.split("_");
             if (lineID[0] === panelID)

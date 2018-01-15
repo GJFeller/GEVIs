@@ -8,7 +8,15 @@ class TemporalVisPanel extends AbstractPanelBuilder {
 
     appendToPanel(panel, id) {
         this.panel = panel;
-        panel.append("<div id=" + id + "-temporal width=\"100%\" height=\"100%\"></svg>");
+        panel.append("<div id=" + id + "-temporal width=\"100%\" height=\"100%\"></div>"/*<div id=\"legend\" class=\"right-panel\" width=\"20%\" height=\"100%\"></div>"*/);
+        
+        panel.css({'width':'80%', 'float':'left'});
+        this.wholePanel = $("#" + id)
+            .find(".ui-resizable")
+            .append("<div id=" + id + "-legend></div>");
+        console.log(panel);
+        this.legendPanel = $("#" + id + "-legend")
+        this.legendPanel.css({'margin-left': this.panel.width() + 5, 'width': this.wholePanel.width() - 16 - this.panel.width(), 'height': '100%', 'overflow': 'scroll'});
         this.id = id;
         this.render();
     }
@@ -118,10 +126,10 @@ class TemporalVisPanel extends AbstractPanelBuilder {
 
     render() {
 
-        var margin = {top: 20, right: 80, bottom: 30, left: 50};
+        var margin = {top: 20, right: 20, bottom: 30, left: 50};
         var $this = this;
         var width = this.panel.width() - margin.left - margin.right;
-        var height = this.panel.height() - 20;
+        var height = this.panel.height() - margin.top - margin.bottom;
 
         var formatSiPrefix = d3.format(".3n");
         //var heightEachPlot = height - margin.top - margin.bottom;
@@ -183,7 +191,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             
             x.domain(xDomain);
             
-            var color = d3.scale.category10();
+            var color = d3.scale.category20();
 
             color.domain(Array.from($this.data.get(variables[0]).keys()));
             var xAxis = d3.svg.axis()
@@ -215,7 +223,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             var svg = div.selectAll('svg')
                 .data(variables)
             .enter().append("svg")
-                .attr("width", width + margin.left + margin.right)
+                .attr("width", this.panel.width() - 10)
                 .attr("height", height + margin.top + margin.bottom)
             .append("g")
                 .attr("transform", function(d, i) { return "translate(" + margin.left + "," + margin.top + ")";});
@@ -247,12 +255,62 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             
             simulation.append("path")
                 .attr("class", "line")
-                .attr("d", function(d) {
+                .attr("d", d => line(d[1])/*function(d) {
                     return line(d[1]);
-                })
-                .style("stroke", function(d) {
+                }*/)
+                .style("stroke", d => color(d[0])/*function(d) {
                     return color(d[0]);
+                }*/);
+
+
+            this.legendPanel.css({'margin-left': this.panel.width() + 5, 'width': this.wholePanel.width() - 16 - this.panel.width(), 'height': '100%', 'overflow': 'scroll'});
+            var legendDiv = d3.select("#"+this.id+"-legend");
+
+            //legendDiv.css({"margin-left": $this.panel.width});
+
+            /*legendDiv.style('margin-left', this.panel.width)
+                    .attr('width', '20%');*/
+            console.log(this.legendPanel);
+            console.log(legendDiv);
+
+            legendDiv.selectAll('svg').remove();
+
+            var legendSvgHeight = simulationList.length * 20;
+            var legendSvg = legendDiv.append("svg")
+                .attr("width", this.legendPanel.width())
+                .attr("height", legendSvgHeight);
+            
+
+            var legend = legendSvg.selectAll('.legend')
+                .data(simulationList)
+            .enter().append('g')
+                .attr("class", "legend")
+                .attr("transform", function(d, i)
+                {
+                    return "translate(0," + i * 20 + ")";
                 });
+
+            legend.append('rect')
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", 10)
+                .attr("height", 10)
+                .style("fill", function(d,i) {
+                    return color(d)
+                });
+
+            legend.append('text')
+                .attr("x", 20)
+                .attr("y", 10)
+                .text(function(d, i) {
+                    return d;
+                })
+                .style("text-anchor", "start")
+                .style("font-size", 12);
+
+                /*.attr("transform", function(d, i) { return "translate(" + margin.left + "," + margin.top + ")";});*/
+
+
 
             
             //svg.each(function(d))
@@ -281,6 +339,6 @@ class TemporalVisPanel extends AbstractPanelBuilder {
     }
 
     resizePanel() {
-        
+        this.render();
     }
 }
