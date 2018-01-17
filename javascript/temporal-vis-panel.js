@@ -197,7 +197,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             console.log(bez);
             var color = d3.scale.ordinal()
                 .range(bez)
-                .domain(Array.from($this.data.get(variables[0]).keys()));
+                .domain(simulationList);
             /*var color = d3.scale.category20();
 
             color.domain(Array.from($this.data.get(variables[0]).keys()));*/
@@ -303,6 +303,8 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                 .attr("width", 10)
                 .attr("height", 10)
                 .style("fill", function(d,i) {
+                    console.log(d);
+                    console.log(color(d));
                     return color(d)
                 });
 
