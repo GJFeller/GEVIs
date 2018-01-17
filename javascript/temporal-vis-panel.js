@@ -191,9 +191,16 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             
             x.domain(xDomain);
             
-            var color = d3.scale.category20();
+            console.log(chroma);
+            var bez = chroma.scale('RdYlBu')
+                .colors(simulationList.length);
+            console.log(bez);
+            var color = d3.scale.ordinal()
+                .range(bez)
+                .domain(Array.from($this.data.get(variables[0]).keys()));
+            /*var color = d3.scale.category20();
 
-            color.domain(Array.from($this.data.get(variables[0]).keys()));
+            color.domain(Array.from($this.data.get(variables[0]).keys()));*/
             var xAxis = d3.svg.axis()
                 .scale(x)
                 .orient("bottom");
