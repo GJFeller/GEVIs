@@ -140,6 +140,12 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             variables = [],
             numberVariables = $this.data.size;
 
+        var div = d3.select("#"+this.id+"-temporal");
+
+            
+
+        div.selectAll('svg').remove();
+
         if(numberVariables > 0) {
             var minX = 9000000;
             var maxX = -900000;
@@ -221,11 +227,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                     return yax(d.value);
                 });
 
-            var div = d3.select("#"+this.id+"-temporal");
-
             
-
-            div.selectAll('svg').remove();
 
             var svg = div.selectAll('svg')
                 .data(variables)
@@ -277,8 +279,6 @@ class TemporalVisPanel extends AbstractPanelBuilder {
 
             /*legendDiv.style('margin-left', this.panel.width)
                     .attr('width', '20%');*/
-            console.log(this.legendPanel);
-            console.log(legendDiv);
 
             legendDiv.selectAll('svg').remove();
 
@@ -303,8 +303,6 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                 .attr("width", 10)
                 .attr("height", 10)
                 .style("fill", function(d,i) {
-                    console.log(d);
-                    console.log(color(d));
                     return color(d)
                 });
 

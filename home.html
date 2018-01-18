@@ -101,10 +101,14 @@
             varChangeEvent.initEvent('changed-var-selection', true, true);
 
             document.addEventListener('window-closed', function (e) {
-                if(e.windowObj == scatterWindow)
+                if(e.windowObj == scatterWindow) {
                     scatterWindow = null;
-                if(e.windowObj == temporalWindow)
+                    selectedMultivariateVar.splice(0, selectedMultivariateVar.length);
+                }
+                if(e.windowObj == temporalWindow) {
                     temporalWindow = null;
+                    selectedTemporalVar.splice(0, selectedTemporalVar.length);
+                }
             });
 
             // Listen for the event.

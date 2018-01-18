@@ -66,6 +66,10 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
         var height = this.panel.height();
         var margin = {top: 30, right: 30, bottom: 30, left: 50};
         var padding = 20;
+
+        var svg = d3.select("#"+this.id+"-scatter");
+
+        svg.selectAll('*').remove();
         //console.log(this.data);
         if(this.data.length > 0) {
             var domainByVariable = {},
@@ -116,9 +120,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                 .on("brush", brushmove)
                 .on("brushend", brushend);;
             
-            var svg = d3.select("#"+this.id+"-scatter");
-
-            svg.selectAll('*').remove();
+            
 
             svg.attr("width", size * numberVariables + padding + margin.left + margin.right)
                 .attr("height", size * numberVariables + padding + margin.top + margin.bottom)

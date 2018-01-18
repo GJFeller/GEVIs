@@ -198,8 +198,10 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                         .change(function() {
                             console.log($tree);
                             if(this.checked) {
-                                $("input[id*=\""+this.id+"\"]").prop("checked", true);
-                                if($("input[id*=\""+this.id+"\"]").length > 0) {
+                                $("input[id=\""+this.id+"\"]").prop("checked", true);
+                                $("input[id*=\""+this.id+".\"]").prop("checked", true);
+                                //console.log($("input[id*=\""+this.id+".\"]"));
+                                if($("input[id=\""+this.id+"\"]").length > 0) {
                                     if(node.children !== null) {
                                         node.children.forEach(function (elem) {
                                             elem.data.temporal = true;
@@ -211,8 +213,9 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                                 }
                             }
                             else {
-                                $("input[id*=\""+this.id+"\"]").prop("checked", false);
-                                if($("input[id*=\""+this.id+"\"]").length > 0) {
+                                $("input[id=\""+this.id+"\"]").prop("checked", false);
+                                $("input[id*=\""+this.id+".\"]").prop("checked", false);
+                                if($("input[id=\""+this.id+"\"]").length > 0) {
                                     if(node.children !== null) {
                                         node.children.forEach(function (elem) {
                                             elem.data.temporal = false;
@@ -230,8 +233,10 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                     $("<input />", { type: "checkbox", id: id2, checked: node.data.multivariate })
                         .change(function() {
                             if(this.checked) {
-                                $("input[id*=\""+this.id+"\"]").prop("checked", true);
-                                if($("input[id*=\""+this.id+"\"]").length > 0) {
+                                $("input[id=\""+this.id+"\"]").prop("checked", true);
+                                $("input[id*=\""+this.id+".\"]").prop("checked", true);
+                                //console.log($("input[id*=\""+this.id+".\"]"));
+                                if($("input[id=\""+this.id+"\"]").length > 0) {
                                     if(node.children !== null) {
                                         node.children.forEach(function (elem) {
                                             elem.data.multivariate = true;
@@ -243,8 +248,9 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                                 }
                             }
                             else {
-                                $("input[id*=\""+this.id+"\"]").prop("checked", false);
-                                if($("input[id*=\""+this.id+"\"]").length > 0) {
+                                $("input[id=\""+this.id+"\"]").prop("checked", false);
+                                $("input[id*=\""+this.id+".\"]").prop("checked", false);
+                                if($("input[id=\""+this.id+"\"]").length > 0) {
                                     if(node.children !== null) {
                                         node.children.forEach(function (elem) {
                                             elem.data.multivariate = false;
@@ -262,8 +268,10 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                     $("<input />", { type: "checkbox", id: id3, checked: node.data.spatial })
                         .change(function() {
                             if(this.checked) {
-                                $("input[id*=\""+this.id+"\"]").prop("checked", true);
-                                if($("input[id*=\""+this.id+"\"]").length > 0) {
+                                $("input[id=\""+this.id+"\"]").prop("checked", true);
+                                $("input[id*=\""+this.id+".\"]").prop("checked", true);
+                                //console.log($("input[id*=\""+this.id+".\"]"));
+                                if($("input[id=\""+this.id+"\"]").length > 0) {
                                     if(node.children !== null) {
                                         node.children.forEach(function (elem) {
                                             elem.data.spatial = true;
@@ -275,8 +283,9 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                                 }
                             }
                             else {
-                                $("input[id*=\""+this.id+"\"]").prop("checked", false);
-                                if($("input[id*=\""+this.id+"\"]").length > 0) {
+                                $("input[id=\""+this.id+"\"]").prop("checked", false);
+                                $("input[id*=\""+this.id+".\"]").prop("checked", false);
+                                if($("input[id=\""+this.id+"\"]").length > 0) {
                                     if(node.children !== null) {
                                         node.children.forEach(function (elem) {
                                             elem.data.spatial = false;
