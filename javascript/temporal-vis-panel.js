@@ -283,10 +283,25 @@ class TemporalVisPanel extends AbstractPanelBuilder {
 
             legendDiv.selectAll('svg').remove();
 
-            var legendSvgHeight = simulationList.length * 20;
+            var legendElementHeight = 20;
+
+            var legendElementMaxRowCount = Math.floor(this.legendPanel.height() / legendElementHeight);
+            var legendElementWidth = 90;
+
+            var legendSvgHeight = simulationList.length * legendElementHeight;
+            var columnCount = Math.ceil(legendSvgHeight / this.legendPanel.height());
+            var panelWidth = legendElementWidth * columnCount;
+
+            console.log(this.legendPanel.height())
+            console.log(legendElementMaxRowCount);
+            console.log(legendSvgHeight);
+            console.log(columnCount);
+            console.log(panelWidth);
+
+
             var legendSvg = legendDiv.append("svg")
-                .attr("width", this.legendPanel.width())
-                .attr("height", legendSvgHeight);
+                .attr("width", panelWidth)
+                .attr("height", this.legendPanel.height());
             
 
             var legend = legendSvg.selectAll('.legend')
@@ -295,7 +310,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                 .attr("class", "legend")
                 .attr("transform", function(d, i)
                 {
-                    return "translate(0," + i * 20 + ")";
+                    return "translate("+ Math.floor(i/legendElementMaxRowCount) * legendElementWidth + "," + (i % legendElementMaxRowCount)  * 20 + ")";
                 });
 
             legend.append('rect')
