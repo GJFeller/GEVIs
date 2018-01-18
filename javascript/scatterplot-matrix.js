@@ -161,7 +161,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
 
             cell.filter(function(d) { return d.i === d.j; })
                 .attr("transform", function(d) { return "translate(" + ((d.i) * size + margin.left) + "," + d.j * size + ")"; })
-                .each(plot);
+                .each(plotHistogram);
                 //.each(plotHistogram);
             // Titles for the diagonal.
             cell.filter(function(d) { return d.i === d.j; }).append("text")
