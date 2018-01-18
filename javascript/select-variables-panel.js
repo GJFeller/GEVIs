@@ -347,4 +347,90 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
     resizePanel(width, height) {
 
     }
+
+    unmarkColumnCheckboxes(column) {
+        console.log(this.variableTree);
+        this.variableTree.forEach(function(rootNode, idx) {
+            rootNode.children.forEach(function(varNode) {
+                // If is sediment, so no children
+                /*if(varNode.children.length === 0) {
+                    if(column === "temporal") {
+                        varNode.data.temporal = false;
+                    }
+                    else {
+                        if(column === "multivariate") {
+                            varNode.data.multivariate = false;
+                        }
+                        else {
+                            varNode.data.spatial = false;
+                        }
+                    }
+                }
+                else {
+                    varNode.children.forEach(function(specieNode) {
+                        if(column === "temporal") {
+                            specieNode.data.temporal = false;
+                        }
+                        else {
+                            if(column === "multivariate") {
+                                specieNode.data.multivariate = false;
+                            }
+                            else {
+                                specieNode.data.spatial = false;
+                            }
+                        }
+                    });
+                }*/
+                if(column === "temporal") {
+                    var id = "cb1-" + varNode.getIndexHier();
+                    $("input[id=\""+id+"\"]").prop("checked", false);
+                    $("input[id*=\""+id+".\"]").prop("checked", false);
+                    if($("input[id=\""+id+"\"]").length > 0) {
+                        if(varNode.children !== null) {
+                            varNode.children.forEach(function (elem) {
+                                elem.data.temporal = false;
+                            });
+                        }
+                        else {
+                            varNode.data.temporal = false;
+                        }
+                    }
+                    //console.log(varNode.getIndexHier());
+                    //varNode.tr.childNodes[1].childNodes[0].checked = false;
+                }
+                else {
+                    if(column === "multivariate") {
+                        var id = "cb2-" + varNode.getIndexHier();
+                        $("input[id=\""+id+"\"]").prop("checked", false);
+                        $("input[id*=\""+id+".\"]").prop("checked", false);
+                        if($("input[id=\""+id+"\"]").length > 0) {
+                            if(varNode.children !== null) {
+                                varNode.children.forEach(function (elem) {
+                                    elem.data.multivariate = false;
+                                });
+                            }
+                            else {
+                                varNode.data.multivariate = false;
+                            }
+                        }
+                    }
+                    else {
+                        var id = "cb3-" + varNode.getIndexHier();
+                        $("input[id=\""+id+"\"]").prop("checked", false);
+                        $("input[id*=\""+id+".\"]").prop("checked", false);
+                        if($("input[id=\""+id+"\"]").length > 0) {
+                            if(varNode.children !== null) {
+                                varNode.children.forEach(function (elem) {
+                                    elem.data.spatial = false;
+                                });
+                            }
+                            else {
+                                varNode.data.spatial = false;
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    }
 }

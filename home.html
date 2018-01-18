@@ -103,11 +103,11 @@
             document.addEventListener('window-closed', function (e) {
                 if(e.windowObj == scatterWindow) {
                     scatterWindow = null;
-                    selectedMultivariateVar.splice(0, selectedMultivariateVar.length);
+                    selectVariablesPanel.unmarkColumnCheckboxes("multivariate");
                 }
                 if(e.windowObj == temporalWindow) {
                     temporalWindow = null;
-                    selectedTemporalVar.splice(0, selectedTemporalVar.length);
+                    selectVariablesPanel.unmarkColumnCheckboxes("temporal");
                 }
             });
 
