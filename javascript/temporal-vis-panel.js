@@ -1,9 +1,10 @@
 class TemporalVisPanel extends AbstractPanelBuilder {
-    constructor(data, id) {
+    constructor(data, id, window) {
         super();
         this.id = id;
         this.data = data;
         this.varList = [];
+        this.window = window;
     }
 
     appendToPanel(panel, id) {
@@ -347,5 +348,9 @@ class TemporalVisPanel extends AbstractPanelBuilder {
 
     resizePanel() {
         this.render();
+    }
+
+    setWindow(window) {
+        this.window = window;
     }
 }

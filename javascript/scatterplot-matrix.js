@@ -1,9 +1,10 @@
 class ScatterplotMatrix extends AbstractPanelBuilder {
-    constructor(data, id) {
+    constructor(data, id, window) {
         super();
         this.id = id;
         this.data = data;
         this.varList = [];
+        this.window = window;
     }
 
     appendToPanel(panel, id) {
@@ -384,6 +385,10 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
 
     resizePanel(width, height) {
         this.render();
+    }
+
+    setWindow(window) {
+        this.window = window;
     }
 
 }

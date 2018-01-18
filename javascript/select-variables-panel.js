@@ -1,10 +1,11 @@
 class SelectVariablesPanel extends AbstractPanelBuilder {
-    constructor(ensembleList, id) {
+    constructor(ensembleList, id, window) {
         super();
         this.createEnsembleTree(ensembleList);
         this.id = id;
         this.ensembleList = ensembleList;
-        this.variableTree = [];      
+        this.variableTree = []; 
+        this.window = window;     
     }
 
     setEnsembleList(ensembleList) {
@@ -346,6 +347,10 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
 
     resizePanel(width, height) {
 
+    }
+
+    setWindow(window) {
+        this.window = window;
     }
 
     unmarkColumnCheckboxes(column) {

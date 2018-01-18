@@ -22,6 +22,8 @@ class Window {
         this.WIDTH_ICON = 28;
 
         this.createNewChild(id, title, parent, panelContent);
+
+        this.panelContent.setWindow(this);
     }
 
     static getCenter(obj) {
@@ -337,6 +339,13 @@ class Window {
         for(var i = 0, len = lines.size(); i < len; i++) {
             $("#" + lines[0][i].id).remove();
         }
+    }
+
+    resizeWindow(width, height) {
+        $( "#" + newID).css({
+            width: width,
+            height: height
+        })
     }
 
 }

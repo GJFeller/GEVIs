@@ -12,6 +12,9 @@ class AbstractPanelBuilder {
         if(this.resizePanel === undefined) {
             throw new TypeError("Must override resizePanel(width, height)");
         }
+        if(this.setWindow === undefined) {
+            throw new TypeError("Must override setWindow(window)");
+        }
     }
 
     
