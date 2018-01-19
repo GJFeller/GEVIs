@@ -5,19 +5,22 @@ class TemporalVisPanel extends AbstractPanelBuilder {
         this.data = data;
         this.varList = [];
         this.window = window;
+        this.legendElementWidth = 95;
+        this.isLegendColumn = true;
     }
 
     appendToPanel(panel, id) {
         this.panel = panel;
         panel.append("<div id=" + id + "-temporal width=\"100%\" height=\"100%\"></div>"/*<div id=\"legend\" class=\"right-panel\" width=\"20%\" height=\"100%\"></div>"*/);
         
-        panel.css({'width':'80%', 'float':'left'});
+        
         this.wholePanel = $("#" + id)
             .find(".ui-resizable")
             .append("<div id=" + id + "-legend></div>");
+        panel.css({'width':this.wholePanel.width() - 16 - this.legendElementWidth, 'float':'left'});
         console.log(panel);
         this.legendPanel = $("#" + id + "-legend")
-        this.legendPanel.css({'margin-left': this.panel.width() + 5, 'width': this.wholePanel.width() - 16 - this.panel.width(), 'height': '100%', 'overflow': 'scroll'});
+        this.legendPanel.css({'margin-left': this.panel.width() + 5, 'width': this.legendElementWidth, 'height': '100%', 'overflow': 'scroll'});
         this.id = id;
         this.render();
     }
@@ -273,7 +276,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                 }*/);
 
 
-            this.legendPanel.css({'margin-left': this.panel.width() + 5, 'width': this.wholePanel.width() - 16 - this.panel.width(), 'height': '100%', 'overflow': 'scroll'});
+            this.legendPanel.css({'margin-left': this.panel.width() + 5, 'width': this.legendElementWidth, 'height': '100%', 'overflow': 'scroll'});
             var legendDiv = d3.select("#"+this.id+"-legend");
 
             //legendDiv.css({"margin-left": $this.panel.width});
@@ -286,11 +289,11 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             var legendElementHeight = 20;
 
             var legendElementMaxRowCount = Math.floor(this.legendPanel.height() / legendElementHeight);
-            var legendElementWidth = 90;
+            //var legendElementWidth = 90;
 
             var legendSvgHeight = simulationList.length * legendElementHeight;
             var columnCount = Math.ceil(legendSvgHeight / this.legendPanel.height());
-            var panelWidth = legendElementWidth * columnCount;
+            var panelWidth = this.legendElementWidth * columnCount;
 
             console.log(this.legendPanel.height())
             console.log(legendElementMaxRowCount);
@@ -299,37 +302,72 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             console.log(panelWidth);
 
 
-            var legendSvg = legendDiv.append("svg")
-                .attr("width", panelWidth)
-                .attr("height", this.legendPanel.height());
-            
+            if(this.isLegendColumn) {
+                var legendSvg = legendDiv.append("svg")
+                    .attr("width", panelWidth)
+                    .attr("height", this.legendPanel.height());
+                
+                
+                var legend = legendSvg.selectAll('.legend')
+                    .data(simulationList)
+                .enter().append('g')
+                    .attr("class", "legend")
+                    .attr("transform", function(d, i)
+                    {
+                        return "translate("+ Math.floor(i/legendElementMaxRowCount) * $this.legendElementWidth + "," + (i % legendElementMaxRowCount)  * legendElementHeight + ")";
+                    });
 
-            var legend = legendSvg.selectAll('.legend')
-                .data(simulationList)
-            .enter().append('g')
-                .attr("class", "legend")
-                .attr("transform", function(d, i)
-                {
-                    return "translate("+ Math.floor(i/legendElementMaxRowCount) * legendElementWidth + "," + (i % legendElementMaxRowCount)  * 20 + ")";
-                });
+                legend.append('rect')
+                    .attr("x", 0)
+                    .attr("y", 0)
+                    .attr("width", 10)
+                    .attr("height", 10)
+                    .style("fill", function(d,i) {
+                        return color(d)
+                    });
 
-            legend.append('rect')
-                .attr("x", 0)
-                .attr("y", 0)
-                .attr("width", 10)
-                .attr("height", 10)
-                .style("fill", function(d,i) {
-                    return color(d)
-                });
+                legend.append('text')
+                    .attr("x", 20)
+                    .attr("y", 10)
+                    .text(function(d, i) {
+                        return d;
+                    })
+                    .style("text-anchor", "start")
+                    .style("font-size", 12);
+            } else {
 
-            legend.append('text')
-                .attr("x", 20)
-                .attr("y", 10)
-                .text(function(d, i) {
-                    return d;
-                })
-                .style("text-anchor", "start")
-                .style("font-size", 12);
+                var legendSvg = legendDiv.append("svg")
+                    .attr("width", this.legendPanel.width())
+                    .attr("height", legendSvgHeight);
+                
+
+                var legend = legendSvg.selectAll('.legend')
+                    .data(simulationList)
+                .enter().append('g')
+                    .attr("class", "legend")
+                    .attr("transform", function(d, i)
+                    {
+                        return "translate(0," + i * legendElementHeight + ")";
+                    });
+
+                legend.append('rect')
+                    .attr("x", 0)
+                    .attr("y", 0)
+                    .attr("width", 10)
+                    .attr("height", 10)
+                    .style("fill", function(d,i) {
+                        return color(d)
+                    });
+
+                legend.append('text')
+                    .attr("x", 20)
+                    .attr("y", 10)
+                    .text(function(d, i) {
+                        return d;
+                    })
+                    .style("text-anchor", "start")
+                    .style("font-size", 12);
+            }
 
                 /*.attr("transform", function(d, i) { return "translate(" + margin.left + "," + margin.top + ")";});*/
 
@@ -362,6 +400,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
     }
 
     resizePanel() {
+        this.panel.css({'width':this.wholePanel.width() - 16 - this.legendElementWidth, 'float':'left'});
         this.render();
     }
 

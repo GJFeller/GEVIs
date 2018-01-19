@@ -153,8 +153,7 @@ class Window {
             .draggable({
                 handle: ".panel-heading",
                 stack: ".panel, .fa-window-maximize",
-                containment: [10,10, workspace.width() - initialWidth - 10 , 
-                    workspace.height() - initialHeight - 90],
+                containment: workspace,
                 drag: function(){
                     Window.centerLine($this.id);
                 },
@@ -206,7 +205,7 @@ class Window {
                                                 $this.panelContent.resizePanel($(this).width(), $(this).height());
                                         }, 500);                
                                     },
-                                    aspectRatio: true,
+                                    aspectRatio: false,
                                     maxHeight: maxHeight,
                                     maxWidth: maxWidth,
                                     minHeight: minHeight,
@@ -292,6 +291,7 @@ class Window {
             var iconID = activeIcons[i].id.replace("icon-", "");
             d3.selectAll("line").filter(".class-" + iconID).style("stroke-dasharray", ("3, 3"));
         }
+        this.panelContent.render();
     }
 
     createNewIcon() {
@@ -342,10 +342,12 @@ class Window {
     }
 
     resizeWindow(width, height) {
-        $( "#" + newID).css({
-            width: width,
-            height: height
-        })
+        $( "#" + this.id)
+            .find(".panel-body")
+            .css({
+                width: width,
+                height: height
+            });
     }
 
 }
