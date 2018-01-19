@@ -10,7 +10,7 @@
             <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
             <!-- Fancytree minified CSS -->
-            <link href="http://cdn.jsdelivr.net/npm/jquery.fancytree@2.23/dist/skin-bootstrap/ui.fancytree.css" rel="stylesheet">
+            <link href="https://cdn.jsdelivr.net/npm/jquery.fancytree@2.23/dist/skin-bootstrap/ui.fancytree.css" rel="stylesheet">
             
             <!-- jQuery library -->
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
@@ -33,7 +33,7 @@
             <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
 
             <!-- D3-tip library -->
-            <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+            <script src="https://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
         
             <!-- Bootstrap-slider CSS -->
             <!--<link rel ="stylesheet" href= "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.8.1/css/bootstrap-slider.css">-->
@@ -42,7 +42,11 @@
             <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
 
             <!-- Fancytree library -->
-            <script src="http://cdn.jsdelivr.net/npm/jquery.fancytree@2.23/dist/jquery.fancytree-all.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/jquery.fancytree@2.23/dist/jquery.fancytree-all.js"></script>
+
+            <!-- Three.JS library -->
+            <script src="https://threejs.org/build/three.js"></script>
+            <script src="https://threejs.org/examples/js/Detector.js"></script>
 
             <script src="javascript/windows-system.js"></script>
 
@@ -55,6 +59,8 @@
             <script src="javascript/select-variables-panel.js"></script>
 
             <script src="javascript/temporal-vis-panel.js"></script>
+
+            <script src="javascript/spatial-vis-panel.js"></script>
 
             <!-- Windows System CSS -->
             <link rel="stylesheet" href="stylesheets/windows-system.css">
@@ -89,12 +95,14 @@
             var selectVariablesPanel = new SelectVariablesPanel([], 'panel1-1');
             var scatterPlotMatrix = new ScatterplotMatrix([]);
             var temporalVisPanel = new TemporalVisPanel(new Map());
+            var spatialVisPanel = new SpatialVisualizationPanel([]);
             // Create the event.
             var windowClosed = new Event('window-closed');
             var varChangeEvent = new Event('changed-var-selection');
 
             var scatterWindow = null;
             var temporalWindow = null;
+            var spatialWindow = null;
 
             // Define that the event name is 'build'.
             windowClosed.initEvent('window-closed', true, true);
@@ -108,6 +116,10 @@
                 if(e.windowObj == temporalWindow) {
                     temporalWindow = null;
                     selectVariablesPanel.unmarkColumnCheckboxes("temporal");
+                }
+                if(e.windowObj == spatialWindow) {
+                    spatialWindow = null;
+                    selectVariablesPanel.unmarkColumnCheckboxes("spatial");
                 }
             });
 
@@ -183,6 +195,7 @@
             $(document).ready(function(){
                 
                 rootWindow = new Window('panel1-1', 'Variable Selection', null, selectVariablesPanel);
+                spatialWindow = new Window('panel1-1-3', 'Spatial Visualization', rootWindow, spatialVisPanel);
                 //scatterWindow = new Window('panel1-1-1', 'Scatter Plot Matrix', rootWindow, scatterPlotMatrix);
                 backendConnection.getListEnsembles()
                     .then(function(result) {
