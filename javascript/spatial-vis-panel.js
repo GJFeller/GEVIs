@@ -52,9 +52,11 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
         var $this = this;
         var objects = [];
+        var wireframe = null;
         var geometry = new THREE.Geometry();
         // initialize object to perform world/screen calculations
         var projector = new THREE.Projector();
+
 
         var INTERSECTED = null;
         var baseMap = new THREE.TextureLoader().load( '../texture/text.jpg' );
@@ -62,7 +64,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         baseMap.anisotropy = 16;
         var baseMaterial = new THREE.MeshPhongMaterial( { map: baseMap, side: THREE.DoubleSide } );
 
-        var highlightedMap = new THREE.TextureLoader().load( '../texture/textMouseover.jpg' );
+        var highlightedMap = new THREE.TextureLoader().load( '../texture/textSelected.jpg' );
         highlightedMap.wrapS = highlightedMap.wrapT = THREE.RepeatWrapping;
         highlightedMap.anisotropy = 16;
         var highlightedMaterial = new THREE.MeshPhongMaterial( { map: highlightedMap, side: THREE.DoubleSide } );
@@ -140,7 +142,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     
 
                     $this.scene = new THREE.Scene();
-                    $this.scene.background = new THREE.Color(0xfff4e6);
+                    $this.scene.background = new THREE.Color(0x000000);
                     $this.axisScene = new THREE.Scene();
                     //$this.axisScene.background = new THREE.Color(0x000000);
 
@@ -164,12 +166,23 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     geometry.faceVertexUvs[0] = uvCoord;
                     geometry.uvsNeedUpdate = true;
 
+                    geometry.computeBoundingSphere();
+
                     for(var i = 0; i < $this.cellQuantity; i++) {
                         object = new THREE.Mesh( geometry, baseMaterial );
                         object.position.set(2*($this.cellQuantity/2 - i - 0.5), 0, 0 );
                         $this.scene.add(object);
                         objects.push(object);
                     }
+
+                    
+                    
+                    var geo = new THREE.EdgesGeometry( geometry ); // or WireframeGeometry( geometry )
+
+                    var mat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 2 } );
+
+                    wireframe = new THREE.LineSegments( geo, mat );
+				    
 
                     var dir = new THREE.Vector3( 1, 0, 0 );
 
@@ -195,7 +208,6 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     $this.renderer = new THREE.WebGLRenderer( { antialias: true } );
                     $this.renderer.setPixelRatio( window.devicePixelRatio );
                     $this.renderer.autoClear = false;
-                    //$this.renderer.setSize( container.width(), container.height() );
 
                     container.append( $this.renderer.domElement );
 
@@ -203,13 +215,6 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                     $this.controls = new THREE.OrbitControls( $this.camera, $this.renderer.domElement );
                     $this.controlsAxes = new THREE.OrbitControls( $this.axisCamera, $this.renderer.domElement );
-                    /*$this.controls.rotateSpeed = 5.0;
-                    $this.controls.zoomSpeed = 1.2;
-                    $this.controls.panSpeed = 0.8;
-                    $this.controls.noZoom = false;
-                    $this.controls.noPan = false;
-                    $this.controls.staticMoving = true;
-                    $this.controls.dynamicDampingFactor = 0.3;*/
 
                     $this.renderInitialized = true;
 
@@ -249,20 +254,21 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     {
                         if(INTERSECTED==null) {
                             INTERSECTED = intersects[ 0 ];
-                            INTERSECTED.object.material = highlightedMaterial;
+                            if(wireframe !== null) {
+                                wireframe.position.set(INTERSECTED.object.position.x, INTERSECTED.object.position.y, INTERSECTED.object.position.z);
+                                $this.scene.add( wireframe );
+                            }
                         }
                         else {
-                            INTERSECTED.object.material= baseMaterial;
-                            INTERSECTED.object.geometry.colorsNeedUpdate=true;
+                            $this.scene.remove( wireframe );
                             INTERSECTED = intersects[ 0 ];
-                            INTERSECTED.object.material = highlightedMaterial;	
+                            wireframe.position.set(INTERSECTED.object.position.x, INTERSECTED.object.position.y, INTERSECTED.object.position.z);
+                            $this.scene.add( wireframe );	
                         }
-                        INTERSECTED.object.geometry.colorsNeedUpdate=true;
                     }
                     else {
                         if(INTERSECTED) {
-                            INTERSECTED.object.material= baseMaterial;
-                            INTERSECTED.object.geometry.colorsNeedUpdate=true;
+                            $this.scene.remove(wireframe);
                         }
                         INTERSECTED = null;
                     }
@@ -283,7 +289,6 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     $this.renderer.clear();
                     $this.renderer.setSize( container.width(), container.height() );
                     $this.renderer.setViewport( 0, 0, container.width(), container.height() );
-                    //$this.renderer.setScissor( 0, 0, container.width(), container.height()  );
                     $this.renderer.render( $this.scene, $this.camera );
 
                     $this.renderer.clearDepth();
@@ -294,7 +299,6 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 					var left   = axesRect.left;
                     var top    = axesRect.top;
                     $this.renderer.setViewport( left, top, width, height );
-                    //$this.renderer.setScissor( left, top, width, height );
                     $this.renderer.render( $this.axisScene, $this.axisCamera );
 
                 }
