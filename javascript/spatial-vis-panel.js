@@ -18,7 +18,6 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
     appendToPanel(panel, id) {
         this.panel = panel;
         panel.css({'overflow': 'hidden'});
-        //panel.append("<canvas id=" + id + "-spatial width=\"100%\" height=\"100%\"></canvas>");
         this.id = id;
         this.render();
     }
@@ -27,10 +26,22 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
         var $this = this;
         var objects = [];
+        var geometry = new THREE.Geometry();
+        // initialize object to perform world/screen calculations
+        var projector = new THREE.Projector();
+
+        var INTERSECTED = null;
+        var baseMap = new THREE.TextureLoader().load( '../texture/text.jpg' );
+        baseMap.wrapS = baseMap.wrapT = THREE.RepeatWrapping;
+        baseMap.anisotropy = 16;
+        var baseMaterial = new THREE.MeshPhongMaterial( { map: baseMap, side: THREE.DoubleSide } );
+
+        var highlightedMap = new THREE.TextureLoader().load( '../texture/textMouseover.jpg' );
+        highlightedMap.wrapS = highlightedMap.wrapT = THREE.RepeatWrapping;
+        highlightedMap.anisotropy = 16;
+        var highlightedMaterial = new THREE.MeshPhongMaterial( { map: highlightedMap, side: THREE.DoubleSide } );
         if(!this.renderInitialized) {
             if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
-            //var this.camera, this.scene, this.renderer, stats;
 
             var cubeVertices = [
                 // front
@@ -88,8 +99,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
             animate();
             
             function init() {
-
-                
+        
                 console.log(container.width());
                 $this.camera = new THREE.PerspectiveCamera( 100, container.width() / container.height(), 1, 2000 );
                 $this.camera.position.x = 0;
@@ -115,145 +125,30 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                 var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
                 $this.camera.add( pointLight );
                 $this.scene.add( $this.camera );
-                $this.camera.lookAt( $this.scene.position );
-
-                var map = new THREE.TextureLoader().load( '../texture/text.jpg' );
-                map.wrapS = map.wrapT = THREE.RepeatWrapping;
-                map.anisotropy = 16;
-
-                var material = new THREE.MeshPhongMaterial( { map: map, side: THREE.DoubleSide } );
-                //var material = new THREE.MeshBasicMaterial({color: 0x633005});
-
-                var geometry = new THREE.Geometry();
+                $this.camera.lookAt( $this.scene.position );               
 
                 geometry.vertices = cubeVertices;
                 geometry.faces = faces;
                 geometry.computeFaceNormals();
 
                 geometry.faceVertexUvs[0] = uvCoord;
-
-                /*geometry.faces.forEach(function(face) {
-
-                    var uvs = [];
-                    var ids = [ 'a', 'b', 'c'];
-                    for( var i = 0; i < ids.length; i++ ) {
-                        var vertex = geometry.vertices[ face[ ids[ i ] ] ].clone();
-
-                        var n = vertex.normalize();
-                        var yaw = .5 - Math.atan( n.z, - n.x ) / ( 2.0 * Math.PI );
-                        var pitch = .5 - Math.asin( n.y ) / Math.PI;
-
-                        var u = yaw,
-                            v = pitch;
-                        uvs.push( new THREE.Vector2( u, v ) );
-                    }
-                    geometry.faceVertexUvs[ 0 ].push( uvs );
-                });*/
-
                 geometry.uvsNeedUpdate = true;
 
-                console.log(geometry.faceVertexUvs);
-
-                /*var triangles = THREE.ShapeUtils.triangulateShape( cubeVertices, holes );
-                for( var i = 0; i < triangles.length; i++ ) {
-                    geometry.faces.push( new THREE.Face3( triangles[i][0], triangles[i][1], triangles[i][2] ));
-                }*/
-
                 for(var i = 0; i < 10; i++) {
-                    object = new THREE.Mesh( geometry, material );
+                    object = new THREE.Mesh( geometry, baseMaterial );
                     object.position.set(2*(10/2 - i - 0.5), 0, 0 );
                     $this.scene.add(object);
                     objects.push(object);
                 }
-                
+              
                 $this.raycaster = new THREE.Raycaster();
                 $this.mouse = new THREE.Vector2();
-
-                /*var material = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 2, transparent: true } );
-				$this.line = new THREE.Line( geometry, material );
-				$this.scene.add( $this.line );*/
-
-                /*var axisHelper = new THREE.AxisHelper( 100 );
-                axisHelper.position.set(-100, 0, 0);
-                $this.scene.add( axisHelper );*/
                 //
-
-                /*object = new THREE.Mesh( new THREE.SphereGeometry( 75, 20, 10 ), material );
-                object.position.set( - 300, 0, 200 );
-                $this.scene.add( object );
-
-                object = new THREE.Mesh( new THREE.IcosahedronGeometry( 75, 1 ), material );
-                object.position.set( - 100, 0, 200 );
-                $this.scene.add( object );
-
-                object = new THREE.Mesh( new THREE.OctahedronGeometry( 75, 2 ), material );
-                object.position.set( 100, 0, 200 );
-                $this.scene.add( object );
-
-                object = new THREE.Mesh( new THREE.TetrahedronGeometry( 75, 0 ), material );
-                object.position.set( 300, 0, 200 );
-                $this.scene.add( object );
-
-                //
-
-                object = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 4, 4 ), material );
-                object.position.set( - 300, 0, 0 );
-                $this.scene.add( object );*/
-
-                /*object = new THREE.Mesh( new THREE.BoxGeometry( 100, 100, 100, 4, 4, 4 ), material );
-                object.position.set( - 100, 0, 200 );
-                $this.scene.add( object );*/
-
-                /*object = new THREE.Mesh( new THREE.CircleGeometry( 50, 20, 0, Math.PI * 2 ), material );
-                object.position.set( 100, 0, 0 );
-                $this.scene.add( object );
-
-                object = new THREE.Mesh( new THREE.RingGeometry( 10, 50, 20, 5, 0, Math.PI * 2 ), material );
-                object.position.set( 300, 0, 0 );
-                $this.scene.add( object );
-
-                //
-
-                object = new THREE.Mesh( new THREE.CylinderGeometry( 25, 75, 100, 40, 5 ), material );
-                object.position.set( - 300, 0, - 200 );
-                $this.scene.add( object );*/
-
-                /*var points = [];
-
-                for ( var i = 0; i < 50; i ++ ) {
-
-                    points.push( new THREE.Vector2( Math.sin( i * 0.2 ) * Math.sin( i * 0.1 ) * 15 + 50, ( i - 5 ) * 2 ) );
-
-                }*/
-
-                /*object = new THREE.Mesh( new THREE.LatheGeometry( points, 20 ), material );
-                object.position.set( - 100, 0, - 200 );
-                $this.scene.add( object );
-
-                object = new THREE.Mesh( new THREE.TorusGeometry( 50, 20, 20, 20 ), material );
-                object.position.set( 100, 0, - 200 );
-                $this.scene.add( object );
-
-                object = new THREE.Mesh( new THREE.TorusKnotGeometry( 50, 10, 50, 20 ), material );
-                object.position.set( 300, 0, - 200 );
-                $this.scene.add( object );*/
-
-                //
-
                 $this.renderer = new THREE.WebGLRenderer( { antialias: true } );
                 $this.renderer.setPixelRatio( window.devicePixelRatio );
                 $this.renderer.setSize( container.width(), container.height() );
 
                 container.append( $this.renderer.domElement );
-
-
-
-                //stats = new Stats();
-                //container.appendChild( stats.dom );
-
-                //
-
-                //container[0].addEventListener( 'resize', onWindowResize, false );
 
                 $this.renderer.domElement.addEventListener('mousemove', onMouseMove, false);
 
@@ -273,8 +168,45 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
             function onMouseMove(event) {
                 event.preventDefault();
 
-                $this.mouse.x = ( event.clientX  );
-				$this.mouse.y = - ( event.clientY );
+                // update the mouse variable
+                var rect = $this.renderer.domElement.getBoundingClientRect()
+	            $this.mouse.x = ( (event.clientX - rect.left) / container.width() ) * 2 - 1;
+	            $this.mouse.y = - ( (event.clientY - rect.top) / container.height() ) * 2 + 1;
+
+                // find intersections
+
+	            // create a Ray with origin at the mouse position
+	            //   and direction into the scene (camera direction)
+                var vector = new THREE.Vector3( $this.mouse.x, $this.mouse.y, 1 );
+                projector.vector = vector;
+	            projector.vector.unproject( $this.camera );
+	            var ray = new THREE.Raycaster( $this.camera.position, vector.sub( $this.camera.position ).normalize() );
+
+	            // create an array containing all objects in the scene with which the ray intersects
+	            var intersects = ray.intersectObjects( objects );
+	
+	            // if there is one (or more) intersections
+	            if ( intersects.length > 0 )
+	            {
+                    if(INTERSECTED==null) {
+                        INTERSECTED = intersects[ 0 ];
+			            INTERSECTED.object.material = highlightedMaterial;
+                    }
+                    else {
+                        INTERSECTED.object.material= baseMaterial;
+			            INTERSECTED.object.geometry.colorsNeedUpdate=true;
+			            INTERSECTED = intersects[ 0 ];
+			            INTERSECTED.object.material = highlightedMaterial;	
+                    }
+                    INTERSECTED.object.geometry.colorsNeedUpdate=true;
+                }
+                else {
+                    if(INTERSECTED) {
+                        INTERSECTED.object.material= baseMaterial;
+			            INTERSECTED.object.geometry.colorsNeedUpdate=true;
+                    }
+                    INTERSECTED = null;
+                }
             }
 
             //
@@ -284,58 +216,12 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                 requestAnimationFrame( animate );
 
                 render();
-                //stats.update();
+                $this.controls.update();
 
             }
 
             function render() {
-
-                /*var timer = Date.now() * 0.0001;
-
-                $this.camera.position.x = Math.cos( timer ) * 8;
-                $this.camera.position.z = Math.sin( timer ) * 8;
-
-                $this.camera.lookAt( $this.scene.position );*/
-
-                /*$this.scene.traverse( function( object ) {
-
-                    if ( object.isMesh === true ) {
-
-                        object.rotation.x = timer * 5;
-                        object.rotation.y = timer * 2.5;
-
-                    }
-
-                } );*/
-
-                $this.raycaster.setFromCamera( $this.mouse, $this.camera );
-
-                var intersects = $this.raycaster.intersectObjects( objects );
-
-                if ( intersects.length > 0 ) {
-                    var intersect = intersects[ 0 ];
-                    console.log(intersect);
-                    //console.log($this.mouse);
-					/*var face = intersect.face;
-					var linePosition = $this.line.geometry.attributes.position;
-					var meshPosition = objects.geometry.attributes.position;
-					linePosition.copyAt( 0, meshPosition, face.a );
-					linePosition.copyAt( 1, meshPosition, face.b );
-					linePosition.copyAt( 2, meshPosition, face.c );
-					linePosition.copyAt( 3, meshPosition, face.a );
-					objects.updateMatrix();
-					$this.line.geometry.applyMatrix( objects.matrix );
-					$this.line.visible = true;*/
-				} else {
-                    console.log("No intersect");
-                    //console.log($this.mouse);
-					//$this.line.visible = false;
-				}
-
-                $this.controls.update();
-
                 $this.renderer.render( $this.scene, $this.camera );
-
             }
         }
     }
@@ -345,7 +231,6 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.camera.updateProjectionMatrix();
 
         this.renderer.setSize( this.panel.width(), this.panel.height() );
-        //this.render();
     }
 
     setWindow(window) {
