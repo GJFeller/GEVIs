@@ -114,5 +114,33 @@ class BackendRequests {
         });  
     }
 
+    getCellQuantity(ensembleId) {
+        var $this = this;
+        return new Promise(function(resolve, reject) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onload = function() {
+                resolve(this.responseText);
+            };
+            xhttp.onerror = reject;
+            //console.log($this.url + "/getTemporalVarData/"+xIdx+"/"+yIdx+"/"+zIdx+"/"+simulationId+"/"+varId+"/"+ensembleId);
+            xhttp.open("GET", $this.url + "/getCellQuantity/"+ensembleId, true);
+            xhttp.send();
+        });
+    }
+
+    getTimeEnd(ensembleId) {
+        var $this = this;
+        return new Promise(function(resolve, reject) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onload = function() {
+                resolve(this.responseText);
+            };
+            xhttp.onerror = reject;
+            //console.log($this.url + "/getTemporalVarData/"+xIdx+"/"+yIdx+"/"+zIdx+"/"+simulationId+"/"+varId+"/"+ensembleId);
+            xhttp.open("GET", $this.url + "/getTimeEnd/"+ensembleId, true);
+            xhttp.send();
+        });
+    }
+
 
 }
