@@ -17,6 +17,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.mouse = null;
         this.line = null;
         this.cellQuantity = null;
+        this.selectedCells = [];
 
         this.getRemoteData();
     }
@@ -52,6 +53,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
         var $this = this;
         var objects = [];
+        var selectedObjects = [];
+        var selectedIndexes = [];
         var wireframe = null;
         var geometry = new THREE.Geometry();
         // initialize object to perform world/screen calculations
@@ -212,6 +215,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     container.append( $this.renderer.domElement );
 
                     $this.renderer.domElement.addEventListener('mousemove', onMouseMove, false);
+                    $this.renderer.domElement.addEventListener('mousedown', onMouseDown, false);
 
                     $this.controls = new THREE.OrbitControls( $this.camera, $this.renderer.domElement );
                     $this.controlsAxes = new THREE.OrbitControls( $this.axisCamera, $this.renderer.domElement );
@@ -272,6 +276,50 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         }
                         INTERSECTED = null;
                     }
+                }
+
+                function onMouseDown(event) {
+                    event.preventDefault();
+
+                    // update the mouse variable
+                    var rect = $this.renderer.domElement.getBoundingClientRect()
+                    $this.mouse.x = ( (event.clientX - rect.left) / container.width() ) * 2 - 1;
+                    $this.mouse.y = - ( (event.clientY - rect.top) / container.height() ) * 2 + 1;
+
+                    // find intersections
+
+                    // create a Ray with origin at the mouse position
+                    //   and direction into the scene (camera direction)
+                    var vector = new THREE.Vector3( $this.mouse.x, $this.mouse.y, 1 );
+                    projector.vector = vector;
+                    projector.vector.unproject( $this.camera );
+                    var ray = new THREE.Raycaster( $this.camera.position, vector.sub( $this.camera.position ).normalize() );
+
+                    // create an array containing all objects in the scene with which the ray intersects
+                    var intersects = ray.intersectObjects( objects );
+
+                    // if there is one (or more) intersections
+                    if ( intersects.length > 0 )
+                    {
+                        var obj = intersects[ 0 ].object;
+                        console.log(obj);
+                        var idx = selectedObjects.indexOf(obj);
+                        var oIdx = objects.indexOf(obj);
+                        if(idx < 0) {
+                            obj.material = highlightedMaterial;
+                            selectedObjects.push(obj);
+                            
+                            $this.selectedCells.push(oIdx);
+                        } 
+                        else {
+                            obj.material = baseMaterial;
+                            selectedObjects.splice(idx, 1);
+                            var sIdx = $this.selectedCells.indexOf(oIdx);
+                            $this.selectedCells.splice(sIdx, 1);
+                        }
+                        console.log($this.selectedCells);
+                    }
+                    
                 }
 
                 //
