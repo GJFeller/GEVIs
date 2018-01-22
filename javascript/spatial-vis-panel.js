@@ -41,7 +41,6 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
             .then(function(values) {
                 $this.cellQuantity = values[0];
                 console.log($this.cellQuantity);
-                //$this.cellQuantity = 5;
                 $this.render();
             })
             .catch(function () {
@@ -304,7 +303,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         var obj = intersects[ 0 ].object;
                         console.log(obj);
                         var idx = selectedObjects.indexOf(obj);
-                        var oIdx = objects.indexOf(obj);
+                        var oIdx = $this.cellQuantity - 1 - objects.indexOf(obj);
                         if(idx < 0) {
                             obj.material = highlightedMaterial;
                             selectedObjects.push(obj);
