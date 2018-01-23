@@ -11,6 +11,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.scene = null;
         this.axisScene = null;
         this.axisCamera = null;
+        this.legendScene = null;
+        this.legendCamera = null;
         this.controls = null;
         this.controlsAxes = null;
         this.raycaster = null;
@@ -58,7 +60,18 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         var geometry = new THREE.Geometry();
         // initialize object to perform world/screen calculations
         var projector = new THREE.Projector();
+        var colorMap = 'rainbow';
+        var legendLayout = 'vertical';
+        var numberOfColors = 512;
+        var lut = new THREE.Lut( colorMap, numberOfColors );
+        
 
+        //Test purpose
+		lut.setMax( 2000 );
+        lut.setMin( 0 );
+        
+        var legend = lut.setLegendOn();
+        
 
         var INTERSECTED = null;
         /*var baseMap = new THREE.TextureLoader().load( '../texture/text.jpg' );
@@ -143,11 +156,17 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     $this.axisCamera.position.x = 0;
                     $this.axisCamera.position.y = 0;
                     $this.axisCamera.position.z = 5;
+
+                    $this.legendCamera = new THREE.PerspectiveCamera( 50, 1, 1, 2000 );
+                    $this.legendCamera.position.x = 0;
+                    $this.legendCamera.position.y = 0;
+                    $this.legendCamera.position.z = 5;
                     
 
                     $this.scene = new THREE.Scene();
-                    $this.scene.background = new THREE.Color(0x000000);
+                    $this.scene.background = new THREE.Color(0x59B0E8);
                     $this.axisScene = new THREE.Scene();
+                    $this.legendScene = new THREE.Scene();
                     //$this.axisScene.background = new THREE.Color(0x000000);
 
                     var light, object;
@@ -155,13 +174,16 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
                     $this.scene.add( ambientLight );
                     $this.axisScene.add(ambientLight);
+                    $this.legendScene.add(ambientLight);
 
                     var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
                     $this.camera.add( pointLight );
                     $this.scene.add( $this.camera );
                     $this.axisScene.add($this.axisCamera);
+                    $this.legendScene.add($this.legendCamera);
                     $this.camera.lookAt( $this.scene.position );   
-                    $this.axisCamera.lookAt($this.axisScene.position);            
+                    $this.axisCamera.lookAt($this.axisScene.position); 
+                    $this.legendCamera.lookAt(0, 0, 0);           
 
                     geometry.vertices = cubeVertices;
                     geometry.faces = faces;
@@ -213,6 +235,20 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     var axis = new THREE.AxesHelper(2);
                     $this.axisScene.add(axis);
                    
+                    // Legend
+                    legend = lut.setLegendOn({'layout': legendLayout, 'position': {'x': 0, 'y': 0, 'z' : 0}});
+                    var labels = lut.setLegendLabels({'title': 'Test', 'um': 'hue', 'ticks': 5, 'fontsize': 45});
+                    $this.legendScene.add( legend );
+                    $this.legendScene.add ( labels['title'] );
+
+                    for ( var i = 0; i < Object.keys( labels[ 'ticks' ] ).length; i++ ) {
+
+                        $this.legendScene.add ( labels[ 'ticks' ][ i ] );
+                        $this.legendScene.add ( labels[ 'lines' ][ i ] );
+
+                    }
+
+                    //console.log($this.scene);
                 
                     $this.raycaster = new THREE.Raycaster();
                     $this.mouse = new THREE.Vector2();
@@ -357,6 +393,15 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     var top    = axesRect.top;
                     $this.renderer.setViewport( left, top, width, height );
                     $this.renderer.render( $this.axisScene, $this.axisCamera );
+
+                    $this.renderer.clearDepth();
+                    var legendRect = {left: container.width()-150, right: container.width(), top: 0, bottom: 150};
+                    var width  = legendRect.right - legendRect.left;
+					var height = legendRect.bottom - legendRect.top;
+					var left   = legendRect.left;
+                    var top    = legendRect.top;
+                    $this.renderer.setViewport( left, top, width, height );
+                    $this.renderer.render( $this.legendScene, $this.legendCamera );
 
                 }
             }
