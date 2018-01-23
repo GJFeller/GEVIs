@@ -54,7 +54,9 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
         var $this = this;
         var objects = [];
+        var wireframes = [];
         var selectedObjects = [];
+        var selectedWireframes = [];
         var selectedIndexes = [];
         var wireframe = null;
         var geometry = new THREE.Geometry();
@@ -83,8 +85,9 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         highlightedMap.wrapS = highlightedMap.wrapT = THREE.RepeatWrapping;
         highlightedMap.anisotropy = 16;
         var highlightedMaterial = new THREE.MeshPhongMaterial( { map: highlightedMap, side: THREE.DoubleSide } );*/
-        var baseMaterial = new THREE.MeshPhongMaterial( { color: 0x874000, side: THREE.DoubleSide } );
-        var highlightedMaterial = new THREE.MeshPhongMaterial( { color: 0xFFDC00, side: THREE.DoubleSide } );
+        var baseMaterial = new THREE.MeshPhongMaterial( { color: 0x915D0A, side: THREE.DoubleSide } );
+        var highlightedMaterial = new THREE.LineBasicMaterial( { color: 0xCCCCCC, linewidth: 2 } );
+        var wireframeMaterial = new THREE.LineBasicMaterial( { color: 0x000000, linewidth: 1 } );
         if(!this.renderInitialized) {
             if(this.cellQuantity !== null) {
                 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -171,13 +174,19 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                     var light, object;
 
-                    var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
+                    var ambientLight = new THREE.AmbientLight( 0x111111);
                     $this.scene.add( ambientLight );
                     $this.axisScene.add(ambientLight);
                     $this.legendScene.add(ambientLight);
 
                     var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
-                    $this.camera.add( pointLight );
+                    var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+
+				    directionalLight.position.x = 0;
+				    directionalLight.position.y = 1;
+				    directionalLight.position.z = 0;
+				    directionalLight.position.normalize();
+                    $this.camera.add( directionalLight );
                     $this.scene.add( $this.camera );
                     $this.axisScene.add($this.axisCamera);
                     $this.legendScene.add($this.legendCamera);
@@ -203,17 +212,18 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         $this.scene.add(object);
                         objects.push(object);
 
-                        var mat = new THREE.LineBasicMaterial( { color: 0x000000, linewidth: 1 } );
-                        var cellWireframe = new THREE.LineSegments(geo, mat);
+                        
+                        var cellWireframe = new THREE.LineSegments(geo, wireframeMaterial);
                         cellWireframe.position.set(2*($this.cellQuantity/2 - i - 0.5), 0, 0 )
                         $this.scene.add(cellWireframe);
+                        wireframes.push(cellWireframe);
 
                     }
 
                     
                     
                     
-                    var mat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 2 } );
+                    var mat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 3 } );
 
                     wireframe = new THREE.LineSegments( geo, mat );
 				    
@@ -349,15 +359,19 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         var obj = intersects[ 0 ].object;
                         console.log(obj);
                         var idx = selectedObjects.indexOf(obj);
+                        var wIdx = objects.indexOf(obj);
                         var oIdx = $this.cellQuantity - 1 - objects.indexOf(obj);
+                        console.log(wIdx);
+                        console.log(wireframes);
                         if(idx < 0) {
-                            obj.material = highlightedMaterial;
+                            //obj.material = highlightedMaterial;
+                            wireframes[wIdx].material = highlightedMaterial;
                             selectedObjects.push(obj);
                             
                             $this.selectedCells.push(oIdx);
                         } 
                         else {
-                            obj.material = baseMaterial;
+                            wireframes[wIdx].material = wireframeMaterial;
                             selectedObjects.splice(idx, 1);
                             var sIdx = $this.selectedCells.indexOf(oIdx);
                             $this.selectedCells.splice(sIdx, 1);
