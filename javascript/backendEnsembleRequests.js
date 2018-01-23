@@ -114,6 +114,19 @@ class BackendRequests {
         });  
     }
 
+    getSpatialData(time, simulationId, varIdList) {
+        var $this = this;
+        return new Promise(function(resolve, reject) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.onload = function() {
+                resolve(JSON.parse(this.responseText));
+            };
+            xhttp.onerror = reject;
+            xhttp.open("GET", $this.url + "/getSpatialData/"+time+"/"+simulationId+"/"+varIdList, true);
+            xhttp.send();
+        });  
+    }
+
     getCellQuantity(ensembleId) {
         var $this = this;
         return new Promise(function(resolve, reject) {

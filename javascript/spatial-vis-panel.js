@@ -31,7 +31,49 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.render();
     }
 
+    setVariableList(varList) {
+        this.varList = varList;
+        this.getRemoteData();
+    }
+
     getRemoteData() {
+        var $this = this;
+        if(this.data instanceof Array)
+            this.data.splice(0,this.data.length);
+        
+        var varNameList = [];
+        this.varList.forEach(function (variable, idx) {
+            varNameList[idx] = variable.variable + "-" + variable.specie;
+        });
+        var ensembleId = selectVariablesPanel.getEnsembleList()[0]._id;
+        var simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
+        
+        var promises = [];
+        backendConnection.getCellQuantity(ensembleId)
+            .then(function(cellQty) {
+                $this.cellQuantity = cellQty[0];
+                console.log($this.cellQuantity);
+                if($this.varList.length > 0) {
+                    for(var i = 0; i < simulationList.length; i++) {
+                        var variableStringList = $this.varList[0].id;
+                        for(var j = 1; j < $this.varList.length; j++) {
+                            variableStringList = variableStringList + "," + $this.varList[j].id;
+                        }
+                        promises.push(backendConnection.getSpatialData(0, simulationList[i], variableStringList));
+                    }
+                    Promise.all(promises)
+                        .then(function(values) {
+                            console.log(values);
+                        })
+                        .catch(function () {
+                        });
+                }
+                $this.render();
+            })
+        
+    }
+
+    /*getRemoteData() {
         var $this = this;
         if(this.data instanceof Array)
             this.data.splice(0,this.data.length);
@@ -48,7 +90,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
             .catch(function () {
             });
 
-    }
+    }*/
 
     render() {
 
