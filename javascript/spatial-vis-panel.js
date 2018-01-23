@@ -61,7 +61,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
 
         var INTERSECTED = null;
-        var baseMap = new THREE.TextureLoader().load( '../texture/text.jpg' );
+        /*var baseMap = new THREE.TextureLoader().load( '../texture/text.jpg' );
         baseMap.wrapS = baseMap.wrapT = THREE.RepeatWrapping;
         baseMap.anisotropy = 16;
         var baseMaterial = new THREE.MeshPhongMaterial( { map: baseMap, side: THREE.DoubleSide } );
@@ -69,7 +69,9 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         var highlightedMap = new THREE.TextureLoader().load( '../texture/textSelected.jpg' );
         highlightedMap.wrapS = highlightedMap.wrapT = THREE.RepeatWrapping;
         highlightedMap.anisotropy = 16;
-        var highlightedMaterial = new THREE.MeshPhongMaterial( { map: highlightedMap, side: THREE.DoubleSide } );
+        var highlightedMaterial = new THREE.MeshPhongMaterial( { map: highlightedMap, side: THREE.DoubleSide } );*/
+        var baseMaterial = new THREE.MeshPhongMaterial( { color: 0x874000, side: THREE.DoubleSide } );
+        var highlightedMaterial = new THREE.MeshPhongMaterial( { color: 0xFFDC00, side: THREE.DoubleSide } );
         if(!this.renderInitialized) {
             if(this.cellQuantity !== null) {
                 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -170,17 +172,25 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                     geometry.computeBoundingSphere();
 
+
+                    var geo = new THREE.EdgesGeometry( geometry ); // or WireframeGeometry( geometry )
+
                     for(var i = 0; i < $this.cellQuantity; i++) {
                         object = new THREE.Mesh( geometry, baseMaterial );
                         object.position.set(2*($this.cellQuantity/2 - i - 0.5), 0, 0 );
                         $this.scene.add(object);
                         objects.push(object);
+
+                        var mat = new THREE.LineBasicMaterial( { color: 0x000000, linewidth: 1 } );
+                        var cellWireframe = new THREE.LineSegments(geo, mat);
+                        cellWireframe.position.set(2*($this.cellQuantity/2 - i - 0.5), 0, 0 )
+                        $this.scene.add(cellWireframe);
+
                     }
 
                     
                     
-                    var geo = new THREE.EdgesGeometry( geometry ); // or WireframeGeometry( geometry )
-
+                    
                     var mat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 2 } );
 
                     wireframe = new THREE.LineSegments( geo, mat );
