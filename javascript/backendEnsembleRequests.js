@@ -1,7 +1,7 @@
 class BackendRequests {
     constructor() {
         //this.url = "http://ensemblemongobackend.azurewebsites.net";
-        this.url = "http://gcevt-backend.herokuapp.com";
+        this.url = "https://gcevt-backend.herokuapp.com";
         //this.url = "http://localhost:4000";
     }
 
