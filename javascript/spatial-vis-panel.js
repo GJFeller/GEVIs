@@ -9,6 +9,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.renderer = null;
         this.camera = null;
         this.scene = null;
+        this.scenes = [];
         this.axisScene = null;
         this.axisCamera = null;
         this.legendScene = null;
@@ -33,6 +34,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
     setVariableList(varList) {
         this.varList = varList;
+        this.renderInitialized = false;
+        //this.scenes.splice(0,this.scenes.length);
         this.getRemoteData();
     }
 
@@ -95,6 +98,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
     render() {
 
         var $this = this;
+        console.log($this.panel);
+        this.panel.find("canvas").remove();
         var objects = [];
         var wireframes = [];
         var selectedObjects = [];
@@ -212,7 +217,6 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     $this.scene.background = new THREE.Color(0x59B0E8);
                     $this.axisScene = new THREE.Scene();
                     $this.legendScene = new THREE.Scene();
-                    //$this.axisScene.background = new THREE.Color(0x000000);
 
                     var light, object;
 
