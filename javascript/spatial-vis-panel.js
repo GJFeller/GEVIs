@@ -10,6 +10,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.camera = null;
         this.scene = null;
         this.scenes = [];
+        this.axisScenes = [];
+        this.legendScenes = [];
         this.axisScene = null;
         this.axisCamera = null;
         this.legendScene = null;
@@ -100,6 +102,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         var $this = this;
         console.log($this.panel);
         this.panel.find("canvas").remove();
+        $("body").find("canvas").remove();
         var objects = [];
         var wireframes = [];
         var selectedObjects = [];
@@ -119,10 +122,18 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 		lut.setMax( 2000 );
         lut.setMin( 0 );
         
-        var legend = lut.setLegendOn();
+        var legend = [];
         
+        $this.raycaster = new THREE.Raycaster();
+        $this.mouse = new THREE.Vector2();
 
         var INTERSECTED = null;
+
+        var sceneQty = $this.varList.length;
+        console.log($this.varList.length);
+        if(sceneQty <= 1) {
+            sceneQty = 1;
+        }
         /*var baseMap = new THREE.TextureLoader().load( '../texture/text.jpg' );
         baseMap.wrapS = baseMap.wrapT = THREE.RepeatWrapping;
         baseMap.anisotropy = 16;
@@ -188,6 +199,31 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     [new THREE.Vector2(0.0, 0.0), new THREE.Vector2(1.0, 0.0), new THREE.Vector2(1.0, 1.0)]
                 ];
 
+                geometry.vertices = cubeVertices;
+                geometry.faces = faces;
+                geometry.computeFaceNormals();
+
+                geometry.faceVertexUvs[0] = uvCoord;
+                geometry.uvsNeedUpdate = true;
+
+                geometry.computeBoundingSphere();
+
+                var geo = new THREE.EdgesGeometry( geometry ); // or WireframeGeometry( geometry )
+
+                for(var i = 0; i < $this.cellQuantity; i++) {
+                    var object = new THREE.Mesh( geometry, baseMaterial );
+                    object.position.set(2*($this.cellQuantity/2 - i - 0.5), 0, 0 );
+                    //$this.scene.add(object);
+                    objects.push(object);
+
+                    
+                    var cellWireframe = new THREE.LineSegments(geo, wireframeMaterial);
+                    cellWireframe.position.set(2*($this.cellQuantity/2 - i - 0.5), 0, 0 )
+                    //$this.scene.add(cellWireframe);
+                    wireframes.push(cellWireframe);
+
+                }
+
                 var holes = [];
                 var container = $this.panel;
 
@@ -196,6 +232,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                 
                 function init() {
             
+                    console.log(container);
                     console.log(container.width());
                     $this.camera = new THREE.PerspectiveCamera( 50, container.width() / container.height(), 1, 2000 );
                     $this.camera.position.x = 0;
@@ -218,7 +255,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     $this.axisScene = new THREE.Scene();
                     $this.legendScene = new THREE.Scene();
 
-                    var light, object;
+                    var light;
 
                     var ambientLight = new THREE.AmbientLight( 0x111111);
                     $this.scene.add( ambientLight );
@@ -240,29 +277,15 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     $this.axisCamera.lookAt($this.axisScene.position); 
                     $this.legendCamera.lookAt(0, 0, 0);           
 
-                    geometry.vertices = cubeVertices;
-                    geometry.faces = faces;
-                    geometry.computeFaceNormals();
-
-                    geometry.faceVertexUvs[0] = uvCoord;
-                    geometry.uvsNeedUpdate = true;
-
-                    geometry.computeBoundingSphere();
+                    
 
 
-                    var geo = new THREE.EdgesGeometry( geometry ); // or WireframeGeometry( geometry )
+                    
 
                     for(var i = 0; i < $this.cellQuantity; i++) {
-                        object = new THREE.Mesh( geometry, baseMaterial );
-                        object.position.set(2*($this.cellQuantity/2 - i - 0.5), 0, 0 );
-                        $this.scene.add(object);
-                        objects.push(object);
+                        $this.scene.add(objects[i]);
+                        $this.scene.add(wireframes[i]);
 
-                        
-                        var cellWireframe = new THREE.LineSegments(geo, wireframeMaterial);
-                        cellWireframe.position.set(2*($this.cellQuantity/2 - i - 0.5), 0, 0 )
-                        $this.scene.add(cellWireframe);
-                        wireframes.push(cellWireframe);
 
                     }
 
@@ -306,15 +329,17 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                     //console.log($this.scene);
                 
-                    $this.raycaster = new THREE.Raycaster();
-                    $this.mouse = new THREE.Vector2();
+                    
                     //
                     $this.renderer = new THREE.WebGLRenderer( { antialias: true } );
                     $this.renderer.setPixelRatio( window.devicePixelRatio );
                     $this.renderer.autoClear = false;
 
-                    container.append( $this.renderer.domElement );
-
+                    for(var i = 0; i < sceneQty; i++) {
+                        console.log("Pao");
+                        container.append( $this.renderer.domElement );
+                    }
+                    
                     $this.renderer.domElement.addEventListener('mousemove', onMouseMove, false);
                     $this.renderer.domElement.addEventListener('mousedown', onMouseDown, false);
 

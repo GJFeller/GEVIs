@@ -291,7 +291,7 @@ class Window {
             var iconID = activeIcons[i].id.replace("icon-", "");
             d3.selectAll("line").filter(".class-" + iconID).style("stroke-dasharray", ("3, 3"));
         }
-        this.panelContent.render();
+        //this.panelContent.render();
     }
 
     createNewIcon() {
