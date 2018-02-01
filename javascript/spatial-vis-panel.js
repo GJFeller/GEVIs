@@ -25,6 +25,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.line = null;
         this.cellQuantity = null;
         this.selectedCells = [];
+        this.marginSize = 17;
 
         this.getRemoteData();
     }
@@ -254,7 +255,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                         }
 
-                        var camera = new THREE.PerspectiveCamera( 50, container.width() / container.height(), 1, 2000 );
+                        var camera = new THREE.PerspectiveCamera( 50, (container.width()-$this.marginSize) / (container.height()-$this.marginSize), 1, 2000 );
                         camera.position.x = 0;
                         camera.position.y = 0;
                         camera.position.z = $this.cellQuantity*3 + 2;
@@ -306,6 +307,9 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             scene.add(aObject);
                             scene.userData.objects.push(aObject);
                             var aWireframe = Object.assign(wireframes[i]);
+                            var invIdx = $this.cellQuantity - 1 - i;
+                            if($this.selectedCells.indexOf(invIdx) >= 0)
+                                aWireframe.material = highlightedMaterial;
                             scene.add(aWireframe);
                             scene.userData.wireframes.push(aWireframe);
                         }
@@ -403,8 +407,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     // update the mouse variable
                     var rect = event.target.getBoundingClientRect();
                     //console.log(rect);
-                    $this.mouse.x = ( (event.clientX - rect.left) / container.width() ) * 2 - 1;
-                    $this.mouse.y = - ( (event.clientY - rect.top) / container.height() ) * 2 + 1;
+                    $this.mouse.x = ( (event.clientX - rect.left) / (container.width()-$this.marginSize) ) * 2 - 1;
+                    $this.mouse.y = - ( (event.clientY - rect.top) / (container.height()-$this.marginSize) ) * 2 + 1;
 
                     // find intersections
 
@@ -451,8 +455,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     var idx = parseInt(event.target.id);
                     // update the mouse variable
                     var rect = event.target.getBoundingClientRect();
-                    $this.mouse.x = ( (event.clientX - rect.left) / container.width() ) * 2 - 1;
-                    $this.mouse.y = - ( (event.clientY - rect.top) / container.height() ) * 2 + 1;
+                    $this.mouse.x = ( (event.clientX - rect.left) / (container.width()-$this.marginSize) ) * 2 - 1;
+                    $this.mouse.y = - ( (event.clientY - rect.top) / (container.height()-$this.marginSize) ) * 2 + 1;
 
                     // find intersections
 
@@ -464,12 +468,29 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     var ray = new THREE.Raycaster( $this.scenes[idx].userData.camera.position, vector.sub( $this.scenes[idx].userData.camera.position ).normalize() );
                     console.log(idx);
                     // create an array containing all objects in the scene with which the ray intersects
-                    var intersects = ray.intersectObjects( objects );
+                    var intersects = ray.intersectObjects( $this.scenes[idx].userData.objects );
 
                     // if there is one (or more) intersections
                     if ( intersects.length > 0 )
                     {
                         var obj = intersects[ 0 ].object;
+                        var objIdx = $this.scenes[idx].userData.objects.indexOf(obj);
+                        var objInvIdx = $this.cellQuantity - 1 - objIdx;
+                        var sIdx = $this.selectedCells.indexOf(objInvIdx);
+                        if(sIdx < 0) {
+                            for(var i = 0; i < $this.scenes.length; i++) {
+                                $this.scenes[i].userData.wireframes[objIdx].material = highlightedMaterial;
+                            }
+                            $this.selectedCells.push(objInvIdx);
+                        }
+                        else {
+                            for(var i = 0; i < $this.scenes.length; i++) {
+                                $this.scenes[i].userData.wireframes[objIdx].material = wireframeMaterial;
+                            }
+                            $this.selectedCells.splice(sIdx, 1);
+                        }
+                        console.log($this.selectedCells);
+                        /*var obj = intersects[ 0 ].object;
                         console.log(obj);
                         var idx = selectedObjects.indexOf(obj);
                         var wIdx = objects.indexOf(obj);
@@ -489,7 +510,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             var sIdx = $this.selectedCells.indexOf(oIdx);
                             $this.selectedCells.splice(sIdx, 1);
                         }
-                        console.log($this.selectedCells);
+                        console.log($this.selectedCells);*/
                     }
                     
                 }
@@ -510,12 +531,12 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     for(var i = 0; i < $this.renderers.length; i++) {
                         var renderer = $this.renderers[i];
                         //console.log($this.scenes);
-                        renderer.setSize( container.width(), container.height() );
-                        renderer.setViewport( 0, 0, container.width(), container.height() );
+                        renderer.setSize( container.width()-$this.marginSize, container.height()-$this.marginSize );
+                        renderer.setViewport( 0, 0, container.width()-$this.marginSize, container.height()-$this.marginSize );
                         renderer.render($this.scenes[i], $this.scenes[i].userData.camera);
 
                         renderer.clearDepth();
-                        var axesRect = {left: 0, right: 100, bottom: container.height(), top: container.height()-100};
+                        var axesRect = {left: 0, right: 100, bottom: container.height()-$this.marginSize, top: container.height()-100};
                         // set the viewport
 					    var width  = axesRect.right - axesRect.left;
 					    var height = axesRect.bottom - axesRect.top;
@@ -525,7 +546,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         renderer.render($this.axisScenes[i], $this.axisScenes[i].userData.camera);
 
                         renderer.clearDepth();
-                        var legendRect = {left: container.width()-150, right: container.width(), top: 0, bottom: 150};
+                        var legendRect = {left: container.width()-150, right: container.width()-$this.marginSize, top: 0, bottom: 150};
                         var width  = legendRect.right - legendRect.left;
 					    var height = legendRect.bottom - legendRect.top;
 					    var left   = legendRect.left;
