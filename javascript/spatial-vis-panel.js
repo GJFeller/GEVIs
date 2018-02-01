@@ -333,6 +333,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         renderer.setPixelRatio( window.devicePixelRatio );
                         renderer.autoClear = false;
                         renderer.userData = {};
+                        renderer.domElement.id = sceneIdx;
 
                         container.append(renderer.domElement);
                         //console.log(canvas[0]);
@@ -350,6 +351,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
 
                     }
+
+                    console.log($this.scenes);
                     
                     /*$this.renderer = new THREE.WebGLRenderer( { antialias: true } );
                     $this.renderer.setPixelRatio( window.devicePixelRatio );
@@ -381,9 +384,12 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                 function onMouseMove(event) {
                     event.preventDefault();
+                    //console.log(event);
 
+                    var idx = parseInt(event.target.id);
                     // update the mouse variable
-                    var rect = $this.renderer.domElement.getBoundingClientRect()
+                    var rect = event.target.getBoundingClientRect();
+                    //console.log(rect);
                     $this.mouse.x = ( (event.clientX - rect.left) / container.width() ) * 2 - 1;
                     $this.mouse.y = - ( (event.clientY - rect.top) / container.height() ) * 2 + 1;
 
@@ -393,9 +399,9 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     //   and direction into the scene (camera direction)
                     var vector = new THREE.Vector3( $this.mouse.x, $this.mouse.y, 1 );
                     projector.vector = vector;
-                    projector.vector.unproject( $this.camera );
-                    var ray = new THREE.Raycaster( $this.camera.position, vector.sub( $this.camera.position ).normalize() );
-
+                    projector.vector.unproject( $this.scenes[idx].userData.camera );
+                    var ray = new THREE.Raycaster( $this.scenes[idx].userData.camera.position, vector.sub( $this.scenes[idx].userData.camera.position ).normalize() );
+                    console.log(idx);
                     // create an array containing all objects in the scene with which the ray intersects
                     var intersects = ray.intersectObjects( objects );
         
@@ -404,21 +410,22 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     {
                         if(INTERSECTED==null) {
                             INTERSECTED = intersects[ 0 ];
+                            console.log(INTERSECTED);
                             if(wireframe !== null) {
                                 wireframe.position.set(INTERSECTED.object.position.x, INTERSECTED.object.position.y, INTERSECTED.object.position.z);
-                                $this.scene.add( wireframe );
+                                $this.scenes[idx].add( wireframe );
                             }
                         }
                         else {
-                            $this.scene.remove( wireframe );
+                            $this.scenes[idx].remove( wireframe );
                             INTERSECTED = intersects[ 0 ];
                             wireframe.position.set(INTERSECTED.object.position.x, INTERSECTED.object.position.y, INTERSECTED.object.position.z);
-                            $this.scene.add( wireframe );	
+                            $this.scenes[idx].add( wireframe );	
                         }
                     }
                     else {
                         if(INTERSECTED) {
-                            $this.scene.remove(wireframe);
+                            $this.scenes[idx].remove(wireframe);
                         }
                         INTERSECTED = null;
                     }
@@ -426,9 +433,11 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                 function onMouseDown(event) {
                     event.preventDefault();
+                    console.log(event);
 
+                    var idx = parseInt(event.target.id);
                     // update the mouse variable
-                    var rect = $this.renderer.domElement.getBoundingClientRect()
+                    var rect = event.target.getBoundingClientRect();
                     $this.mouse.x = ( (event.clientX - rect.left) / container.width() ) * 2 - 1;
                     $this.mouse.y = - ( (event.clientY - rect.top) / container.height() ) * 2 + 1;
 
@@ -438,9 +447,9 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     //   and direction into the scene (camera direction)
                     var vector = new THREE.Vector3( $this.mouse.x, $this.mouse.y, 1 );
                     projector.vector = vector;
-                    projector.vector.unproject( $this.camera );
-                    var ray = new THREE.Raycaster( $this.camera.position, vector.sub( $this.camera.position ).normalize() );
-
+                    projector.vector.unproject( $this.scenes[idx].userData.camera );
+                    var ray = new THREE.Raycaster( $this.scenes[idx].userData.camera.position, vector.sub( $this.scenes[idx].userData.camera.position ).normalize() );
+                    console.log(idx);
                     // create an array containing all objects in the scene with which the ray intersects
                     var intersects = ray.intersectObjects( objects );
 
