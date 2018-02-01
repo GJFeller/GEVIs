@@ -39,7 +39,10 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
     setVariableList(varList) {
         this.varList = varList;
         this.renderInitialized = false;
-        //this.scenes.splice(0,this.scenes.length);
+        this.renderers.splice(0,this.renderers.length);
+        this.scenes.splice(0,this.scenes.length);
+        this.axisScenes.splice(0,this.axisScenes.length);
+        this.legendScenes.splice(0,this.legendScenes.length);
         this.getRemoteData();
     }
 
@@ -103,10 +106,11 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
         var $this = this;
         console.log($this.panel);
+
         this.panel.find("canvas").remove();
         $("body").find("canvas").remove();
-        var objects = [];
-        var wireframes = [];
+        //var objects = [];
+        //var wireframes = [];
         var selectedObjects = [];
         var selectedWireframes = [];
         var selectedIndexes = [];
@@ -154,83 +158,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
             if(this.cellQuantity !== null) {
                 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-                var cubeVertices = [
-                    // front
-                    new THREE.Vector3(-1.0, -1.0,  1.0),
-                    new THREE.Vector3(1.0, -1.0,  1.0),
-                    new THREE.Vector3(1.0,  1.0,  1.0),
-                    new THREE.Vector3(-1.0,  1.0,  1.0),
-                    // back
-                    new THREE.Vector3(-1.0, -1.0, -1.0),
-                    new THREE.Vector3(1.0, -1.0, -1.0),
-                    new THREE.Vector3(1.0,  1.0, -1.0),
-                    new THREE.Vector3(-1.0,  1.0, -1.0)
-                ];
-
-                var faces = [
-                    // front
-                    new THREE.Face3(0, 1, 2),
-                    new THREE.Face3(2, 3, 0),
-                    // top
-                    new THREE.Face3(1, 5, 6),
-                    new THREE.Face3(6, 2, 1),
-                    // back
-                    new THREE.Face3(7, 6, 5),
-                    new THREE.Face3(5, 4, 7),
-                    // bottom
-                    new THREE.Face3(4, 0, 3),
-                    new THREE.Face3(3, 7, 4),
-                    // left
-                    new THREE.Face3(4, 5, 1),
-                    new THREE.Face3(1, 0, 4),
-                    // right
-                    new THREE.Face3(3, 2, 6),
-                    new THREE.Face3(6, 7, 3),
-                ];
-
-                var uvCoord = [
-                    [new THREE.Vector2(1.0, 1.0), new THREE.Vector2(0.0, 1.0), new THREE.Vector2(0.0, 0.0)],
-                    [new THREE.Vector2(0.0, 0.0), new THREE.Vector2(1.0, 0.0), new THREE.Vector2(1.0, 1.0)],
-                    [new THREE.Vector2(1.0, 1.0), new THREE.Vector2(0.0, 1.0), new THREE.Vector2(0.0, 0.0)],
-                    [new THREE.Vector2(0.0, 0.0), new THREE.Vector2(1.0, 0.0), new THREE.Vector2(1.0, 1.0)],
-                    [new THREE.Vector2(1.0, 1.0), new THREE.Vector2(0.0, 1.0), new THREE.Vector2(0.0, 0.0)],
-                    [new THREE.Vector2(0.0, 0.0), new THREE.Vector2(1.0, 0.0), new THREE.Vector2(1.0, 1.0)],
-                    [new THREE.Vector2(1.0, 1.0), new THREE.Vector2(0.0, 1.0), new THREE.Vector2(0.0, 0.0)],
-                    [new THREE.Vector2(0.0, 0.0), new THREE.Vector2(1.0, 0.0), new THREE.Vector2(1.0, 1.0)],
-                    [new THREE.Vector2(1.0, 1.0), new THREE.Vector2(0.0, 1.0), new THREE.Vector2(0.0, 0.0)],
-                    [new THREE.Vector2(0.0, 0.0), new THREE.Vector2(1.0, 0.0), new THREE.Vector2(1.0, 1.0)],
-                    [new THREE.Vector2(1.0, 1.0), new THREE.Vector2(0.0, 1.0), new THREE.Vector2(0.0, 0.0)],
-                    [new THREE.Vector2(0.0, 0.0), new THREE.Vector2(1.0, 0.0), new THREE.Vector2(1.0, 1.0)]
-                ];
-
-                geometry.vertices = cubeVertices;
-                geometry.faces = faces;
-                geometry.computeFaceNormals();
-
-                geometry.faceVertexUvs[0] = uvCoord;
-                geometry.uvsNeedUpdate = true;
-
-                geometry.computeBoundingSphere();
-
-                var geo = new THREE.EdgesGeometry( geometry ); // or WireframeGeometry( geometry )
-
-                var mat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 3 } );
-
-                wireframe = new THREE.LineSegments( geo, mat );
-
-                for(var i = 0; i < $this.cellQuantity; i++) {
-                    var object = new THREE.Mesh( geometry, baseMaterial );
-                    object.position.set(2*($this.cellQuantity/2 - i - 0.5), 0, 0 );
-                    //$this.scene.add(object);
-                    objects.push(object);
-
-                    
-                    var cellWireframe = new THREE.LineSegments(geo, wireframeMaterial);
-                    cellWireframe.position.set(2*($this.cellQuantity/2 - i - 0.5), 0, 0 )
-                    //$this.scene.add(cellWireframe);
-                    wireframes.push(cellWireframe);
-
-                }
+                
 
                 var holes = [];
                 var container = $this.panel;
@@ -244,6 +172,87 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                         /*var canvas = container.append("<canvas id=\"scene-"+ sceneIdx + "\" width=" + container.width() + " height=" + container.height() + "></canvas>")
                                             .children("canvas:last-child");*/
+
+                        var cubeVertices = [
+                            // front
+                            new THREE.Vector3(-1.0, -1.0,  1.0),
+                            new THREE.Vector3(1.0, -1.0,  1.0),
+                            new THREE.Vector3(1.0,  1.0,  1.0),
+                            new THREE.Vector3(-1.0,  1.0,  1.0),
+                            // back
+                            new THREE.Vector3(-1.0, -1.0, -1.0),
+                            new THREE.Vector3(1.0, -1.0, -1.0),
+                            new THREE.Vector3(1.0,  1.0, -1.0),
+                            new THREE.Vector3(-1.0,  1.0, -1.0)
+                        ];
+
+                        var faces = [
+                            // front
+                            new THREE.Face3(0, 1, 2),
+                            new THREE.Face3(2, 3, 0),
+                            // top
+                            new THREE.Face3(1, 5, 6),
+                            new THREE.Face3(6, 2, 1),
+                            // back
+                            new THREE.Face3(7, 6, 5),
+                            new THREE.Face3(5, 4, 7),
+                            // bottom
+                            new THREE.Face3(4, 0, 3),
+                            new THREE.Face3(3, 7, 4),
+                            // left
+                            new THREE.Face3(4, 5, 1),
+                            new THREE.Face3(1, 0, 4),
+                            // right
+                            new THREE.Face3(3, 2, 6),
+                            new THREE.Face3(6, 7, 3),
+                        ];
+
+                        var uvCoord = [
+                            [new THREE.Vector2(1.0, 1.0), new THREE.Vector2(0.0, 1.0), new THREE.Vector2(0.0, 0.0)],
+                            [new THREE.Vector2(0.0, 0.0), new THREE.Vector2(1.0, 0.0), new THREE.Vector2(1.0, 1.0)],
+                            [new THREE.Vector2(1.0, 1.0), new THREE.Vector2(0.0, 1.0), new THREE.Vector2(0.0, 0.0)],
+                            [new THREE.Vector2(0.0, 0.0), new THREE.Vector2(1.0, 0.0), new THREE.Vector2(1.0, 1.0)],
+                            [new THREE.Vector2(1.0, 1.0), new THREE.Vector2(0.0, 1.0), new THREE.Vector2(0.0, 0.0)],
+                            [new THREE.Vector2(0.0, 0.0), new THREE.Vector2(1.0, 0.0), new THREE.Vector2(1.0, 1.0)],
+                            [new THREE.Vector2(1.0, 1.0), new THREE.Vector2(0.0, 1.0), new THREE.Vector2(0.0, 0.0)],
+                            [new THREE.Vector2(0.0, 0.0), new THREE.Vector2(1.0, 0.0), new THREE.Vector2(1.0, 1.0)],
+                            [new THREE.Vector2(1.0, 1.0), new THREE.Vector2(0.0, 1.0), new THREE.Vector2(0.0, 0.0)],
+                            [new THREE.Vector2(0.0, 0.0), new THREE.Vector2(1.0, 0.0), new THREE.Vector2(1.0, 1.0)],
+                            [new THREE.Vector2(1.0, 1.0), new THREE.Vector2(0.0, 1.0), new THREE.Vector2(0.0, 0.0)],
+                            [new THREE.Vector2(0.0, 0.0), new THREE.Vector2(1.0, 0.0), new THREE.Vector2(1.0, 1.0)]
+                        ];
+
+                        geometry.vertices = cubeVertices;
+                        geometry.faces = faces;
+                        geometry.computeFaceNormals();
+
+                        geometry.faceVertexUvs[0] = uvCoord;
+                        geometry.uvsNeedUpdate = true;
+
+                        geometry.computeBoundingSphere();
+
+                        var geo = new THREE.EdgesGeometry( geometry ); // or WireframeGeometry( geometry )
+
+                        var mat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 3 } );
+
+                        var wireframe = new THREE.LineSegments( geo, mat );
+
+                        var objects = [];
+                        var wireframes = [];
+
+                        for(var i = 0; i < $this.cellQuantity; i++) {
+                            var object = new THREE.Mesh( geometry, baseMaterial );
+                            object.position.set(2*($this.cellQuantity/2 - i - 0.5), 0, 0 );
+                            //$this.scene.add(object);
+                            objects.push(object);
+
+                            
+                            var cellWireframe = new THREE.LineSegments(geo, wireframeMaterial);
+                            cellWireframe.position.set(2*($this.cellQuantity/2 - i - 0.5), 0, 0 )
+                            //$this.scene.add(cellWireframe);
+                            wireframes.push(cellWireframe);
+
+                        }
 
                         var camera = new THREE.PerspectiveCamera( 50, container.width() / container.height(), 1, 2000 );
                         camera.position.x = 0;
@@ -289,12 +298,16 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         axisScene.userData.camera = axisCamera;
                         legendScene.userData.camera = legendCamera;
                         scene.userData.objects = [];
+                        scene.userData.wireframes = [];
+                        scene.userData.wireframe = wireframe;
 
                         for(var i = 0; i < $this.cellQuantity; i++) {
-
-                            scene.add(objects[i]);
-                            scene.userData.objects.push(objects[i]);
-                            scene.add(wireframes[i]);
+                            var aObject = Object.assign(objects[i]);
+                            scene.add(aObject);
+                            scene.userData.objects.push(aObject);
+                            var aWireframe = Object.assign(wireframes[i]);
+                            scene.add(aWireframe);
+                            scene.userData.wireframes.push(aWireframe);
                         }
 
                         var dir = new THREE.Vector3( 1, 0, 0 );
@@ -403,7 +416,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     var ray = new THREE.Raycaster( $this.scenes[idx].userData.camera.position, vector.sub( $this.scenes[idx].userData.camera.position ).normalize() );
                     console.log(idx);
                     // create an array containing all objects in the scene with which the ray intersects
-                    var intersects = ray.intersectObjects( objects );
+                    var intersects = ray.intersectObjects( $this.scenes[idx].userData.objects );
         
                     // if there is one (or more) intersections
                     if ( intersects.length > 0 )
@@ -412,20 +425,20 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             INTERSECTED = intersects[ 0 ];
                             console.log(INTERSECTED);
                             if(wireframe !== null) {
-                                wireframe.position.set(INTERSECTED.object.position.x, INTERSECTED.object.position.y, INTERSECTED.object.position.z);
-                                $this.scenes[idx].add( wireframe );
+                                $this.scenes[idx].userData.wireframe.position.set(INTERSECTED.object.position.x, INTERSECTED.object.position.y, INTERSECTED.object.position.z);
+                                $this.scenes[idx].add( $this.scenes[idx].userData.wireframe );
                             }
                         }
                         else {
-                            $this.scenes[idx].remove( wireframe );
+                            $this.scenes[idx].remove( $this.scenes[idx].userData.wireframe );
                             INTERSECTED = intersects[ 0 ];
-                            wireframe.position.set(INTERSECTED.object.position.x, INTERSECTED.object.position.y, INTERSECTED.object.position.z);
-                            $this.scenes[idx].add( wireframe );	
+                            $this.scenes[idx].userData.wireframe.position.set(INTERSECTED.object.position.x, INTERSECTED.object.position.y, INTERSECTED.object.position.z);
+                            $this.scenes[idx].add( $this.scenes[idx].userData.wireframe );	
                         }
                     }
                     else {
                         if(INTERSECTED) {
-                            $this.scenes[idx].remove(wireframe);
+                            $this.scenes[idx].remove($this.scenes[idx].userData.wireframe);
                         }
                         INTERSECTED = null;
                     }
@@ -496,7 +509,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                     for(var i = 0; i < $this.renderers.length; i++) {
                         var renderer = $this.renderers[i];
-                        //console.log(renderer);
+                        //console.log($this.scenes);
                         renderer.setSize( container.width(), container.height() );
                         renderer.setViewport( 0, 0, container.width(), container.height() );
                         renderer.render($this.scenes[i], $this.scenes[i].userData.camera);
