@@ -7,11 +7,13 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.window = window;
         this.renderInitialized = false;
         this.renderer = null;
+        this.renderers = [];
         this.camera = null;
         this.scene = null;
         this.scenes = [];
         this.axisScenes = [];
         this.legendScenes = [];
+        this.legends = [];
         this.axisScene = null;
         this.axisCamera = null;
         this.legendScene = null;
@@ -29,7 +31,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
     appendToPanel(panel, id) {
         this.panel = panel;
-        panel.css({'overflow': 'hidden'});
+        panel.css({'overflow': 'auto'});
         this.id = id;
         this.render();
     }
@@ -146,6 +148,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         var baseMaterial = new THREE.MeshPhongMaterial( { color: 0x915D0A, side: THREE.DoubleSide } );
         var highlightedMaterial = new THREE.LineBasicMaterial( { color: 0xCCCCCC, linewidth: 2 } );
         var wireframeMaterial = new THREE.LineBasicMaterial( { color: 0x000000, linewidth: 1 } );
+
+        
         if(!this.renderInitialized) {
             if(this.cellQuantity !== null) {
                 if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -210,6 +214,10 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                 var geo = new THREE.EdgesGeometry( geometry ); // or WireframeGeometry( geometry )
 
+                var mat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 3 } );
+
+                wireframe = new THREE.LineSegments( geo, mat );
+
                 for(var i = 0; i < $this.cellQuantity; i++) {
                     var object = new THREE.Mesh( geometry, baseMaterial );
                     object.position.set(2*($this.cellQuantity/2 - i - 0.5), 0, 0 );
@@ -231,120 +239,132 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                 animate();
                 
                 function init() {
-            
-                    console.log(container);
-                    console.log(container.width());
-                    $this.camera = new THREE.PerspectiveCamera( 50, container.width() / container.height(), 1, 2000 );
-                    $this.camera.position.x = 0;
-                    $this.camera.position.y = 0;
-                    $this.camera.position.z = $this.cellQuantity*3 + 2;
 
-                    $this.axisCamera = new THREE.PerspectiveCamera( 50, 1, 1, 2000 );
-                    $this.axisCamera.position.x = 0;
-                    $this.axisCamera.position.y = 0;
-                    $this.axisCamera.position.z = 5;
+                    for(var sceneIdx = 0; sceneIdx < sceneQty; sceneIdx++) {
 
-                    $this.legendCamera = new THREE.PerspectiveCamera( 50, 1, 1, 2000 );
-                    $this.legendCamera.position.x = 0;
-                    $this.legendCamera.position.y = 0;
-                    $this.legendCamera.position.z = 5;
+                        /*var canvas = container.append("<canvas id=\"scene-"+ sceneIdx + "\" width=" + container.width() + " height=" + container.height() + "></canvas>")
+                                            .children("canvas:last-child");*/
+
+                        var camera = new THREE.PerspectiveCamera( 50, container.width() / container.height(), 1, 2000 );
+                        camera.position.x = 0;
+                        camera.position.y = 0;
+                        camera.position.z = $this.cellQuantity*3 + 2;
+
+                        var axisCamera = new THREE.PerspectiveCamera( 50, 1, 1, 2000 );
+                        axisCamera.position.x = 0;
+                        axisCamera.position.y = 0;
+                        axisCamera.position.z = 5;
+
+                        var legendCamera = new THREE.PerspectiveCamera( 50, 1, 1, 2000 );
+                        legendCamera.position.x = 0;
+                        legendCamera.position.y = 0;
+                        legendCamera.position.z = 5;
+
+                        var scene = new THREE.Scene();
+                        scene.background = new THREE.Color(0x59B0E8);
+                        var axisScene = new THREE.Scene();
+                        var legendScene = new THREE.Scene();
+
+                        var ambientLight = new THREE.AmbientLight( 0x111111);
+                        scene.add( ambientLight );
+                        axisScene.add(ambientLight);
+                        legendScene.add(ambientLight);
+
+                        var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
+                        var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+
+                        directionalLight.position.x = 0;
+                        directionalLight.position.y = 1;
+                        directionalLight.position.z = 0;
+                        directionalLight.position.normalize();
+                        camera.add( directionalLight );
+                        scene.add( camera );
+                        axisScene.add(axisCamera);
+                        legendScene.add(legendCamera);
+                        camera.lookAt( scene.position );   
+                        axisCamera.lookAt(axisScene.position); 
+                        legendCamera.lookAt(0, 0, 0);
+
+                        scene.userData.camera = camera;
+                        axisScene.userData.camera = axisCamera;
+                        legendScene.userData.camera = legendCamera;
+                        scene.userData.objects = [];
+
+                        for(var i = 0; i < $this.cellQuantity; i++) {
+
+                            scene.add(objects[i]);
+                            scene.userData.objects.push(objects[i]);
+                            scene.add(wireframes[i]);
+                        }
+
+                        var dir = new THREE.Vector3( 1, 0, 0 );
+
+                        //normalize the direction vector (convert to vector of length 1)
+                        dir.normalize();
+
+                        var origin = new THREE.Vector3( 2*($this.cellQuantity/2 - $this.cellQuantity - 2), 0, 0 );
+                        var length = 2.5;
+                        var hex = 0x0000ff;
+
+                        var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
+                        arrowHelper.setLength(length, 1, 0.75)
+                        scene.add( arrowHelper );
+
+                        // Axes Helper
+                        var axis = new THREE.AxesHelper(2);
+                        axisScene.add(axis);
                     
+                        // Legend
+                        legend = lut.setLegendOn({'layout': legendLayout, 'position': {'x': 0, 'y': 0, 'z' : 0}});
+                        var labels = lut.setLegendLabels({'title': 'Test', 'um': 'hue', 'ticks': 5, 'fontsize': 45});
+                        legendScene.add( legend );
+                        legendScene.add ( labels['title'] );
 
-                    $this.scene = new THREE.Scene();
-                    $this.scene.background = new THREE.Color(0x59B0E8);
-                    $this.axisScene = new THREE.Scene();
-                    $this.legendScene = new THREE.Scene();
+                        for ( var i = 0; i < Object.keys( labels[ 'ticks' ] ).length; i++ ) {
+                            legendScene.add ( labels[ 'ticks' ][ i ] );
+                            legendScene.add ( labels[ 'lines' ][ i ] );
+                        }
 
-                    var light;
+                        $this.scenes.push(scene);
+                        $this.axisScenes.push(axisScene);
+                        $this.legendScenes.push(legendScene);
 
-                    var ambientLight = new THREE.AmbientLight( 0x111111);
-                    $this.scene.add( ambientLight );
-                    $this.axisScene.add(ambientLight);
-                    $this.legendScene.add(ambientLight);
+                        var renderer = new THREE.WebGLRenderer( { antialias: true } );
+                        renderer.setPixelRatio( window.devicePixelRatio );
+                        renderer.autoClear = false;
+                        renderer.userData = {};
 
-                    var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
-                    var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
+                        container.append(renderer.domElement);
+                        //console.log(canvas[0]);
 
-				    directionalLight.position.x = 0;
-				    directionalLight.position.y = 1;
-				    directionalLight.position.z = 0;
-				    directionalLight.position.normalize();
-                    $this.camera.add( directionalLight );
-                    $this.scene.add( $this.camera );
-                    $this.axisScene.add($this.axisCamera);
-                    $this.legendScene.add($this.legendCamera);
-                    $this.camera.lookAt( $this.scene.position );   
-                    $this.axisCamera.lookAt($this.axisScene.position); 
-                    $this.legendCamera.lookAt(0, 0, 0);           
+                        renderer.domElement.addEventListener('mousemove', onMouseMove, false);
+                        renderer.domElement.addEventListener('mousedown', onMouseDown, false);
+                        //renderer.userData.canvas = canvas[0];
 
-                    
+                        var controls = new THREE.OrbitControls( camera, renderer.domElement );
+                        var controlsAxes = new THREE.OrbitControls( axisCamera, renderer.domElement );
+                        renderer.userData.controls = controls;
+                        renderer.userData.controlsAxes = controlsAxes;
 
-
-                    
-
-                    for(var i = 0; i < $this.cellQuantity; i++) {
-                        $this.scene.add(objects[i]);
-                        $this.scene.add(wireframes[i]);
+                        $this.renderers.push(renderer);
 
 
                     }
-
                     
-                    
-                    
-                    var mat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 3 } );
-
-                    wireframe = new THREE.LineSegments( geo, mat );
-				    
-
-                    var dir = new THREE.Vector3( 1, 0, 0 );
-
-                    //normalize the direction vector (convert to vector of length 1)
-                    dir.normalize();
-
-                    var origin = new THREE.Vector3( 2*($this.cellQuantity/2 - $this.cellQuantity - 2), 0, 0 );
-                    var length = 2.5;
-                    var hex = 0x0000ff;
-
-                    var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
-                    arrowHelper.setLength(length, 1, 0.75)
-                    $this.scene.add( arrowHelper );
-
-                    // Axes Helper
-                    var axis = new THREE.AxesHelper(2);
-                    $this.axisScene.add(axis);
-                   
-                    // Legend
-                    legend = lut.setLegendOn({'layout': legendLayout, 'position': {'x': 0, 'y': 0, 'z' : 0}});
-                    var labels = lut.setLegendLabels({'title': 'Test', 'um': 'hue', 'ticks': 5, 'fontsize': 45});
-                    $this.legendScene.add( legend );
-                    $this.legendScene.add ( labels['title'] );
-
-                    for ( var i = 0; i < Object.keys( labels[ 'ticks' ] ).length; i++ ) {
-
-                        $this.legendScene.add ( labels[ 'ticks' ][ i ] );
-                        $this.legendScene.add ( labels[ 'lines' ][ i ] );
-
-                    }
-
-                    //console.log($this.scene);
-                
-                    
-                    //
-                    $this.renderer = new THREE.WebGLRenderer( { antialias: true } );
+                    /*$this.renderer = new THREE.WebGLRenderer( { antialias: true } );
                     $this.renderer.setPixelRatio( window.devicePixelRatio );
                     $this.renderer.autoClear = false;
 
                     for(var i = 0; i < sceneQty; i++) {
                         console.log("Pao");
                         container.append( $this.renderer.domElement );
-                    }
+                    }*/
                     
-                    $this.renderer.domElement.addEventListener('mousemove', onMouseMove, false);
+                    /*$this.renderer.domElement.addEventListener('mousemove', onMouseMove, false);
                     $this.renderer.domElement.addEventListener('mousedown', onMouseDown, false);
 
                     $this.controls = new THREE.OrbitControls( $this.camera, $this.renderer.domElement );
-                    $this.controlsAxes = new THREE.OrbitControls( $this.axisCamera, $this.renderer.domElement );
+                    $this.controlsAxes = new THREE.OrbitControls( $this.axisCamera, $this.renderer.domElement );*/
 
                     $this.renderInitialized = true;
 
@@ -459,12 +479,40 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     requestAnimationFrame( animate );
 
                     render();
-                    $this.controls.update();
+                    //$this.controls.update();
 
                 }
 
                 function render() {
-                    $this.renderer.clear();
+
+                    for(var i = 0; i < $this.renderers.length; i++) {
+                        var renderer = $this.renderers[i];
+                        //console.log(renderer);
+                        renderer.setSize( container.width(), container.height() );
+                        renderer.setViewport( 0, 0, container.width(), container.height() );
+                        renderer.render($this.scenes[i], $this.scenes[i].userData.camera);
+
+                        renderer.clearDepth();
+                        var axesRect = {left: 0, right: 100, bottom: container.height(), top: container.height()-100};
+                        // set the viewport
+					    var width  = axesRect.right - axesRect.left;
+					    var height = axesRect.bottom - axesRect.top;
+					    var left   = axesRect.left;
+                        var top    = axesRect.top;
+                        renderer.setViewport(left, top, width, height);
+                        renderer.render($this.axisScenes[i], $this.axisScenes[i].userData.camera);
+
+                        renderer.clearDepth();
+                        var legendRect = {left: container.width()-150, right: container.width(), top: 0, bottom: 150};
+                        var width  = legendRect.right - legendRect.left;
+					    var height = legendRect.bottom - legendRect.top;
+					    var left   = legendRect.left;
+                        var top    = legendRect.top;
+                        renderer.setViewport( left, top, width, height );
+                        renderer.render( $this.legendScenes[i], $this.legendScenes[i].userData.camera);
+
+                    }
+                    /*$this.renderer.clear();
                     $this.renderer.setSize( container.width(), container.height() );
                     $this.renderer.setViewport( 0, 0, container.width(), container.height() );
                     $this.renderer.render( $this.scene, $this.camera );
@@ -486,7 +534,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 					var left   = legendRect.left;
                     var top    = legendRect.top;
                     $this.renderer.setViewport( left, top, width, height );
-                    $this.renderer.render( $this.legendScene, $this.legendCamera );
+                    $this.renderer.render( $this.legendScene, $this.legendCamera );*/
 
                 }
             }
