@@ -60,6 +60,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         var simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
         
         var promises = [];
+        var dataList = [];
         backendConnection.getCellQuantity(ensembleId)
             .then(function(cellQty) {
                 $this.cellQuantity = cellQty[0];
@@ -75,13 +76,75 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     Promise.all(promises)
                         .then(function(values) {
                             console.log(values);
+                            dataList = values;
+                            $this.data = $this.reformatDataList(dataList);
+                            console.log($this.data);
+                            $this.render();
                         })
                         .catch(function () {
                         });
                 }
-                $this.render();
+                else {
+                    $this.render();
+                }
+                
             })
         
+    }
+
+    reformatDataList(dataList) {
+        //var listVarDataSumary = [];
+        //var varAccumulatedData = [];
+        /*this.varList.forEach(function (variable) {
+            varAccumulatedData.push(variable);
+        });*/
+        var $this = this;
+        var accumulatedCellData = [];
+        dataList.forEach(function (simData, i) {
+            //console.log(simData);
+            simData.forEach(function (dataPoint, j) {
+                var cellData = {};
+                var cellInAccumulated = accumulatedCellData.filter(cell => (cell.xIdx == dataPoint.cell.xIdx) 
+                                                                        && (cell.yIdx == dataPoint.cell.yIdx) 
+                                                                        && (cell.zIdx == dataPoint.cell.zIdx));
+                if(cellInAccumulated.length > 0) {
+                    cellData = cellInAccumulated[0];
+                    dataPoint.variables.forEach(function (varData) {
+                        var currentVar = cellData.variableData.filter(aVar => aVar.variableId == varData.variableId);
+                        if(currentVar.length > 0) {
+                            currentVar[0].accumulatedData.push(varData.value);
+                        } else {
+                            console.log("There is something wrong");
+                        }
+                    });
+                }
+                else {
+                    cellData.xIdx = dataPoint.cell.xIdx;
+                    cellData.yIdx = dataPoint.cell.yIdx;
+                    cellData.zIdx = dataPoint.cell.zIdx;
+                    cellData.variableData = [];
+                    dataPoint.variables.forEach(function (varData) {
+                        var aVarData = {};
+                        //console.log(varData);
+                        //console.log($this.varList);
+                        var varInfo = $this.varList.filter(aVar => aVar.id == varData.variableId);
+                        //console.log(varInfo);
+                        aVarData.variableId = varData.variableId;
+                        aVarData.type = varInfo[0].type;
+                        aVarData.variable = varInfo[0].variable;
+                        aVarData.specie = varInfo[0].specie;
+                        aVarData.unit = varInfo[0].unit;
+                        aVarData.accumulatedData = [];
+                        aVarData.accumulatedData.push(varData.value);
+                        cellData.variableData.push(aVarData);
+                    });
+                    accumulatedCellData.push(cellData);
+                }
+                
+            })
+        });
+
+        return accumulatedCellData;
     }
 
     /*getRemoteData() {
