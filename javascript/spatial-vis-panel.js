@@ -401,6 +401,11 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                         for(var i = 0; i < $this.cellQuantity; i++) {
                             var aObject = Object.assign(objects[i]);
+                            if($this.varList.length > 0) {
+                                var mean = d3.mean(accumulatedVarValues, function(d){ return d; });
+                                console.log(mean);
+                                aObject.material.color = lut.getColor(mean);
+                            }
                             scene.add(aObject);
                             scene.userData.objects.push(aObject);
                             var aWireframe = Object.assign(wireframes[i]);
