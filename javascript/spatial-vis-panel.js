@@ -185,14 +185,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         var colorMap = 'rainbow';
         var legendLayout = 'vertical';
         var numberOfColors = 512;
-        var lut = new THREE.Lut( colorMap, numberOfColors );
         
-
-        //Test purpose
-		lut.setMax( 2000 );
-        lut.setMin( 0 );
-        
-        var legend = [];
         
         $this.raycaster = new THREE.Raycaster();
         $this.mouse = new THREE.Vector2();
@@ -304,6 +297,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         var objects = [];
                         var wireframes = [];
 
+                        
+
                         for(var i = 0; i < $this.cellQuantity; i++) {
                             var object = new THREE.Mesh( geometry, baseMaterial );
                             object.position.set(2*($this.cellQuantity/2 - i - 0.5), 0, 0 );
@@ -365,6 +360,45 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         scene.userData.wireframes = [];
                         scene.userData.wireframe = wireframe;
 
+
+                        var accumulatedVarValues = [];
+                        var lut = new THREE.Lut( colorMap, numberOfColors );
+                        var legend = [];
+                        if($this.varList.length > 0) {
+                            var currentVar = $this.varList[sceneIdx];
+                            console.log(currentVar);
+
+                            
+                            $this.data.forEach(function (cell) {
+                                var varDataInCell = cell.variableData.filter(aVar => aVar.variableId == currentVar.id);
+                                //console.log(varDataInCell[0]);
+                                //accumulatedVarValues.push(varDataInCell[0].accumulatedData);
+                                accumulatedVarValues = [].concat.apply(accumulatedVarValues, varDataInCell[0].accumulatedData);
+                            });
+
+                            console.log(accumulatedVarValues);
+                            var extent = d3.extent(accumulatedVarValues, function(d){ return d; });
+                            console.log(extent);
+
+                            //Test purpose
+                            lut.setMax( extent[1] );
+                            lut.setMin( extent[0] );
+                            
+                            
+                            // Legend
+                            legend = lut.setLegendOn({'layout': legendLayout, 'position': {'x': 0, 'y': 0, 'z' : 0}});
+                            var labels = lut.setLegendLabels({'title': '', 'um': currentVar.unit, 'ticks': 5, 'fontsize': 45});
+                            legendScene.add( legend );
+                            legendScene.add ( labels['title'] );
+
+                            for ( var i = 0; i < Object.keys( labels[ 'ticks' ] ).length; i++ ) {
+                                legendScene.add ( labels[ 'ticks' ][ i ] );
+                                legendScene.add ( labels[ 'lines' ][ i ] );
+                            }
+                        }
+
+                        //console.log(accumulatedVarValues);                     
+
                         for(var i = 0; i < $this.cellQuantity; i++) {
                             var aObject = Object.assign(objects[i]);
                             scene.add(aObject);
@@ -394,16 +428,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         var axis = new THREE.AxesHelper(2);
                         axisScene.add(axis);
                     
-                        // Legend
-                        legend = lut.setLegendOn({'layout': legendLayout, 'position': {'x': 0, 'y': 0, 'z' : 0}});
-                        var labels = lut.setLegendLabels({'title': 'Test', 'um': 'hue', 'ticks': 5, 'fontsize': 45});
-                        legendScene.add( legend );
-                        legendScene.add ( labels['title'] );
-
-                        for ( var i = 0; i < Object.keys( labels[ 'ticks' ] ).length; i++ ) {
-                            legendScene.add ( labels[ 'ticks' ][ i ] );
-                            legendScene.add ( labels[ 'lines' ][ i ] );
-                        }
+                        
 
                         $this.scenes.push(scene);
                         $this.axisScenes.push(axisScene);
