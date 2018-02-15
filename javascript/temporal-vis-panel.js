@@ -37,7 +37,8 @@ class TemporalVisPanel extends AbstractPanelBuilder {
         var ensembleId = selectVariablesPanel.getEnsembleList()[0]._id;
         //var simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
         var simulationList = ["1D-T25-pH4", "1D-T25-pH5", "1D-T25-pH6", "1D-T25-pH7", "1D-T25-pH8", "1D-T25-pH9",
-                              "1D-T80-pH4", "1D-T80-pH5", "1D-T80-pH6", "1D-T80-pH7", "1D-T80-pH8", "1D-T80-pH9"]
+                              "1D-T80-pH4", "1D-T80-pH5", "1D-T80-pH6", "1D-T80-pH7", "1D-T80-pH8", "1D-T80-pH9",
+                              "1D-T160-pH4", "1D-T160-pH5", "1D-T160-pH6", "1D-T160-pH7", "1D-T160-pH8", "1D-T160-pH9"]
         this.simulationList = simulationList;
         var promises = [];
         for(var i = 0; i < simulationList.length; i++) {
