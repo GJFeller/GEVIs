@@ -35,7 +35,10 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             varNameList[idx] = variable.variable + "-" + variable.specie;
         });
         var ensembleId = selectVariablesPanel.getEnsembleList()[0]._id;
-        var simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
+        //var simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
+        var simulationList = ["1D-T25-pH4", "1D-T25-pH5", "1D-T25-pH6", "1D-T25-pH7", "1D-T25-pH8", "1D-T25-pH9",
+                              "1D-T80-pH4", "1D-T80-pH5", "1D-T80-pH6", "1D-T80-pH7", "1D-T80-pH8", "1D-T80-pH9"]
+        this.simulationList = simulationList;
         var promises = [];
         for(var i = 0; i < simulationList.length; i++) {
             var variableStringList = this.varList[0].id;
@@ -160,7 +163,9 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                 var minVar = 9000000;
                 var maxVar = -900000;
                 var varData = $this.data.get(variable);
-                var simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
+                console.log(selectVariablesPanel.getEnsembleList()[0].simulations);
+                //var simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
+                var simulationList = this.simulationList;
                 simulationList.forEach(function(simulation) {
                     var simData = varData.get(simulation);
                     var timeExtent = d3.extent(simData, function(d) {
