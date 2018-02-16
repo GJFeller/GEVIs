@@ -23,7 +23,13 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
         this.varList.forEach(function (variable, idx) {
             varNameList[idx] = variable.variable + "-" + variable.specie;
         });
-        var simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
+        var simulationList = [];
+        if(selectedSimulations.length === 0) {
+            simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
+        }
+        else {
+            simulationList = selectedSimulations;
+        }
         var promises = [];
         for(var i = 0; i < simulationList.length; i++) {
             var variableStringList = this.varList[0].id;

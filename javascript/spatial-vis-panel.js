@@ -57,7 +57,13 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
             varNameList[idx] = variable.variable + "-" + variable.specie;
         });
         var ensembleId = selectVariablesPanel.getEnsembleList()[0]._id;
-        var simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
+        var simulationList = [];
+        if(selectedSimulations.length === 0) {
+            simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
+        }
+        else {
+            simulationList = selectedSimulations;
+        }
         
         var promises = [];
         var dataList = [];
