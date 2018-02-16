@@ -393,7 +393,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             
                             // Legend
                             legend = lut.setLegendOn({'layout': legendLayout, 'position': {'x': 0, 'y': 0, 'z' : 0}});
-                            var labels = lut.setLegendLabels({'title': '', 'um': currentVar.unit, 'ticks': 5, 'fontsize': 45});
+                            var labels = lut.setLegendLabels({'title': '', 'um': currentVar.unit, 'ticks': 5, 'fontsize': 50});
                             legendScene.add( legend );
                             legendScene.add ( labels['title'] );
 
@@ -645,7 +645,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         renderer.render($this.axisScenes[i], $this.axisScenes[i].userData.camera);
 
                         renderer.clearDepth();
-                        var legendRect = {left: container.width()-150, right: container.width()-$this.marginSize, top: 0, bottom: 150};
+                        var legendRect = {left: container.width()-150, right: container.width()-$this.marginSize, top: container.height()-150, bottom: container.height()-$this.marginSize};
                         var width  = legendRect.right - legendRect.left;
 					    var height = legendRect.bottom - legendRect.top;
 					    var left   = legendRect.left;
