@@ -86,7 +86,15 @@ class Window {
         var chart;
         $(".container").append(newElem);
 
-    
+        if(parent !== null) {
+            var div = document.getElementById(parent.id);
+            var parentWidth = div.clientWidth;
+            var parentHeight = div.clientHeight;
+            console.log(parentWidth);
+            console.log(parentHeight);
+
+            newElem.css({'left': parentWidth+100});
+        }
         /* Sets up the panel settings as drag, resize, etc */
         this.setUpPanel(currentId);
 
