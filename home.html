@@ -52,6 +52,8 @@
             <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
             <script src="https://threejs.org/examples/js/utils/GeometryUtils.js"></script>
             <script src="https://threejs.org/examples/js/math/Lut.js"></script>
+            <script src="javascript/external/THREE.TextTexture.js"></script>
+            <script src="javascript/external/THREE.TextSprite.js"></script>
 
             <script src="javascript/windows-system.js"></script>
 
@@ -189,6 +191,9 @@
                         temporalVisPanel.setVariableList(selectedTemporalVar);
                     }
                     if(selectedSpatialVar.length > 0) {
+                        if(spatialWindow === null) {
+                            spatialWindow = new Window('panel1-1-3', 'Spatial Domain', rootWindow, spatialVisPanel);
+                        }
                         spatialVisPanel.setVariableList(selectedSpatialVar);
                     }
                     //console.log(scatterPlotMatrix);

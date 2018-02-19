@@ -89,9 +89,9 @@ class Window {
         if(parent !== null) {
             var div = document.getElementById(parent.id);
             var parentWidth = div.clientWidth;
-            var parentHeight = div.clientHeight;
-            console.log(parentWidth);
-            console.log(parentHeight);
+            //var parentHeight = div.clientHeight;
+            //console.log(parentWidth);
+            //console.log(parentHeight);
 
             newElem.css({'left': parentWidth+100});
         }
