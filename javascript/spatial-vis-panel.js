@@ -13,11 +13,14 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.scenes = [];
         this.axisScenes = [];
         this.legendScenes = [];
+        this.titleScenes = [];
         this.legends = [];
         this.axisScene = null;
         this.axisCamera = null;
         this.legendScene = null;
         this.legendCamera = null;
+        this.titleCamera = null;
+        this.titleScene = null;
         this.controls = null;
         this.controlsAxes = null;
         this.raycaster = null;
@@ -44,6 +47,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.scenes.splice(0,this.scenes.length);
         this.axisScenes.splice(0,this.axisScenes.length);
         this.legendScenes.splice(0,this.legendScenes.length);
+        this.titleScenes.splice(0, this.titleScenes.length);
         this.getRemoteData();
     }
 
@@ -94,7 +98,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     $this.render();
                 }
                 
-            })
+            });
         
     }
 
@@ -336,15 +340,22 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         legendCamera.position.y = 0;
                         legendCamera.position.z = 5;
 
+                        var titleCamera = new THREE.PerspectiveCamera(50, 1, 1, 2000);
+                        titleCamera.position.x = 0;
+                        titleCamera.position.y = 0;
+                        titleCamera.position.z = 5;
+
                         var scene = new THREE.Scene();
                         scene.background = new THREE.Color(0x59B0E8);
                         var axisScene = new THREE.Scene();
                         var legendScene = new THREE.Scene();
+                        var titleScene = new THREE.Scene();
 
                         var ambientLight = new THREE.AmbientLight( 0x111111);
                         scene.add( ambientLight );
                         axisScene.add(ambientLight);
                         legendScene.add(ambientLight);
+                        titleScene.add(ambientLight);
 
                         var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
                         var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
@@ -357,13 +368,16 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         scene.add( camera );
                         axisScene.add(axisCamera);
                         legendScene.add(legendCamera);
+                        titleScene.add(titleCamera);
                         camera.lookAt( scene.position );   
                         axisCamera.lookAt(axisScene.position); 
                         legendCamera.lookAt(0, 0, 0);
+                        titleCamera.lookAt(0, 0, 0);
 
                         scene.userData.camera = camera;
                         axisScene.userData.camera = axisCamera;
                         legendScene.userData.camera = legendCamera;
+                        titleScene.userData.camera = titleCamera;
                         scene.userData.objects = [];
                         scene.userData.wireframes = [];
                         scene.userData.wireframe = wireframe;
@@ -378,7 +392,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                             var varText = currentVar.variable + "-" + currentVar.specie;
                             var sprite = new THREE.TextSprite({
-                                textSize: 1,
+                                textSize: 0.35,
                                 material: {
                                     color: 0x000000
                                 },
@@ -387,8 +401,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                     fontFamily: 'Arial, Helvetica, sans-serif'
                                 }
                             });
-                            sprite.position.set(0, 7, 0);
-                            scene.add(sprite);
+                            sprite.position.set(0, 0, 0);
+                            titleScene.add(sprite);
                             
                             
                             $this.data.forEach(function (cell) {
@@ -460,6 +474,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         $this.scenes.push(scene);
                         $this.axisScenes.push(axisScene);
                         $this.legendScenes.push(legendScene);
+                        $this.titleScenes.push(titleScene);
 
                         var renderer = new THREE.WebGLRenderer( { antialias: true } );
                         renderer.setPixelRatio( window.devicePixelRatio );
@@ -504,61 +519,6 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                     $this.renderInitialized = true;
 
-                }
-
-                function makeTextSprite( message, parameters ) {
-                    if ( parameters === undefined ) parameters = {};
-                    
-                    var fontface = parameters.hasOwnProperty("fontface") ? 
-                        parameters["fontface"] : "Arial";
-                    
-                    var fontsize = parameters.hasOwnProperty("fontsize") ? 
-                        parameters["fontsize"] : 18;
-                    
-                    var borderThickness = parameters.hasOwnProperty("borderThickness") ? 
-                        parameters["borderThickness"] : 4;
-                    
-                    var borderColor = parameters.hasOwnProperty("borderColor") ?
-                        parameters["borderColor"] : { r:0, g:0, b:0, a:1.0 };
-                    
-                    var backgroundColor = parameters.hasOwnProperty("backgroundColor") ?
-                        parameters["backgroundColor"] : { r:255, g:255, b:255, a:1.0 };
-
-                    var spriteAlignment = THREE.SpriteAlignment.topLeft;
-                        
-                    var canvas = document.createElement('canvas');
-                    var context = canvas.getContext('2d');
-                    context.font = "Bold " + fontsize + "px " + fontface;
-                    
-                    // get size data (height depends only on font size)
-                    var metrics = context.measureText( message );
-                    var textWidth = metrics.width;
-                    
-                    // background color
-                    context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + ","
-                                                + backgroundColor.b + "," + backgroundColor.a + ")";
-                    // border color
-                    context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + ","
-                                                + borderColor.b + "," + borderColor.a + ")";
-
-                    context.lineWidth = borderThickness;
-                    roundRect(context, borderThickness/2, borderThickness/2, textWidth + borderThickness, fontsize * 1.4 + borderThickness, 6);
-                    // 1.4 is extra height factor for text below baseline: g,j,p,q.
-                    
-                    // text color
-                    context.fillStyle = "rgba(0, 0, 0, 1.0)";
-
-                    context.fillText( message, borderThickness, fontsize + borderThickness);
-                    
-                    // canvas contents will be used for a texture
-                    var texture = new THREE.Texture(canvas) 
-                    texture.needsUpdate = true;
-
-                    var spriteMaterial = new THREE.SpriteMaterial( 
-                        { map: texture, useScreenCoordinates: false, alignment: spriteAlignment } );
-                    var sprite = new THREE.Sprite( spriteMaterial );
-                    sprite.scale.set(100,50,1.0);
-                    return sprite;	
                 }
 
                 function onWindowResize() {
@@ -724,6 +684,16 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         var top    = legendRect.top;
                         renderer.setViewport( left, top, width, height );
                         renderer.render( $this.legendScenes[i], $this.legendScenes[i].userData.camera);
+
+                        renderer.clearDepth();
+                        //console.log($this.titleScenes);
+                        var titleRect = {left: 0, right: container.width()-$this.marginSize, top: 0, bottom: (container.height()-$this.marginSize)/2};
+                        var width  = titleRect.right - titleRect.left;
+					    var height = titleRect.bottom - titleRect.top;
+					    var left   = titleRect.left;
+                        var top    = titleRect.top;
+                        renderer.setViewport( left, top, width, height );
+                        renderer.render( $this.titleScenes[i], $this.titleScenes[i].userData.camera);
 
                     }
                     /*$this.renderer.clear();
