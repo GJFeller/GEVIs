@@ -13,11 +13,14 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.scenes = [];
         this.axisScenes = [];
         this.legendScenes = [];
+        this.titleScenes = [];
         this.legends = [];
         this.axisScene = null;
         this.axisCamera = null;
         this.legendScene = null;
         this.legendCamera = null;
+        this.titleCamera = null;
+        this.titleScene = null;
         this.controls = null;
         this.controlsAxes = null;
         this.raycaster = null;
@@ -44,6 +47,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.scenes.splice(0,this.scenes.length);
         this.axisScenes.splice(0,this.axisScenes.length);
         this.legendScenes.splice(0,this.legendScenes.length);
+        this.titleScenes.splice(0, this.titleScenes.length);
         this.getRemoteData();
     }
 
@@ -94,7 +98,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     $this.render();
                 }
                 
-            })
+            });
         
     }
 
@@ -176,9 +180,11 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
         var $this = this;
         console.log($this.panel);
-
+        //container.empty();
         this.panel.find("canvas").remove();
         $("body").find("canvas").remove();
+        this.panel.find("div").remove();
+        
         //var objects = [];
         //var wireframes = [];
         var selectedObjects = [];
@@ -213,8 +219,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         highlightedMap.anisotropy = 16;
         var highlightedMaterial = new THREE.MeshPhongMaterial( { map: highlightedMap, side: THREE.DoubleSide } );*/
         var baseMaterial = new THREE.MeshPhongMaterial( { color: 0x915D0A, side: THREE.DoubleSide } );
-        var highlightedMaterial = new THREE.LineBasicMaterial( { color: 0xCCCCCC, linewidth: 2 } );
-        var wireframeMaterial = new THREE.LineBasicMaterial( { color: 0x000000, linewidth: 1 } );
+        var highlightedMaterial = new THREE.LineBasicMaterial( { color: 0xCCCCCC, linewidth: 3 } );
+        var wireframeMaterial = new THREE.LineBasicMaterial( { color: 0x000000, linewidth: 2 } );
 
         
         if(!this.renderInitialized) {
@@ -235,6 +241,9 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                         /*var canvas = container.append("<canvas id=\"scene-"+ sceneIdx + "\" width=" + container.width() + " height=" + container.height() + "></canvas>")
                                             .children("canvas:last-child");*/
+
+                        
+                        
 
                         var cubeVertices = [
                             // front
@@ -334,15 +343,22 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         legendCamera.position.y = 0;
                         legendCamera.position.z = 5;
 
+                        var titleCamera = new THREE.PerspectiveCamera(50, 1, 1, 2000);
+                        titleCamera.position.x = 0;
+                        titleCamera.position.y = 0;
+                        titleCamera.position.z = 5;
+
                         var scene = new THREE.Scene();
                         scene.background = new THREE.Color(0x59B0E8);
                         var axisScene = new THREE.Scene();
                         var legendScene = new THREE.Scene();
+                        var titleScene = new THREE.Scene();
 
                         var ambientLight = new THREE.AmbientLight( 0x111111);
                         scene.add( ambientLight );
                         axisScene.add(ambientLight);
                         legendScene.add(ambientLight);
+                        titleScene.add(ambientLight);
 
                         var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
                         var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
@@ -355,13 +371,16 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         scene.add( camera );
                         axisScene.add(axisCamera);
                         legendScene.add(legendCamera);
+                        titleScene.add(titleCamera);
                         camera.lookAt( scene.position );   
                         axisCamera.lookAt(axisScene.position); 
                         legendCamera.lookAt(0, 0, 0);
+                        titleCamera.lookAt(0, 0, 0);
 
                         scene.userData.camera = camera;
                         axisScene.userData.camera = axisCamera;
                         legendScene.userData.camera = legendCamera;
+                        titleScene.userData.camera = titleCamera;
                         scene.userData.objects = [];
                         scene.userData.wireframes = [];
                         scene.userData.wireframe = wireframe;
@@ -374,15 +393,29 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             var currentVar = $this.varList[sceneIdx];
                             console.log(currentVar);
 
+                            var varText = currentVar.variable + "-" + currentVar.specie;
+                            var sprite = new THREE.TextSprite({
+                                textSize: 0.35,
+                                material: {
+                                    color: 0x000000
+                                },
+                                texture: {
+                                    text: varText,
+                                    fontFamily: 'Arial, Helvetica, sans-serif'
+                                }
+                            });
+                            sprite.position.set(0, 0, 0);
+                            titleScene.add(sprite);
                             
+                            console.log($this.data);
                             $this.data.forEach(function (cell) {
                                 var varDataInCell = cell.variableData.filter(aVar => aVar.variableId == currentVar.id);
-                                //console.log(varDataInCell[0]);
+                                //console.log(varDataInCell);
                                 //accumulatedVarValues.push(varDataInCell[0].accumulatedData);
                                 accumulatedVarValues = [].concat.apply(accumulatedVarValues, varDataInCell[0].accumulatedData);
                             });
 
-                            console.log(accumulatedVarValues);
+                            //console.log(accumulatedVarValues);
                             var extent = d3.extent(accumulatedVarValues, function(d){ return d; });
                             console.log(extent);
 
@@ -393,7 +426,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             
                             // Legend
                             legend = lut.setLegendOn({'layout': legendLayout, 'position': {'x': 0, 'y': 0, 'z' : 0}});
-                            var labels = lut.setLegendLabels({'title': '', 'um': currentVar.unit, 'ticks': 5, 'fontsize': 45});
+                            var labels = lut.setLegendLabels({'title': '', 'um': currentVar.unit, 'ticks': 5, 'fontsize': 50});
                             legendScene.add( legend );
                             legendScene.add ( labels['title'] );
 
@@ -406,11 +439,19 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         //console.log(accumulatedVarValues);                     
 
                         for(var i = 0; i < $this.cellQuantity; i++) {
-                            var aObject = Object.assign(objects[i]);
+                            //var varDataInCell = $this.data[i].variableData.filter(aVar => aVar.variableId == currentVar.id);
+
+                            //console.log(objects[i]);
+                            //var aObject = Object.assign(objects[i]);
+                            var aObject = objects[i].clone();
                             if($this.varList.length > 0) {
-                                var mean = d3.mean(accumulatedVarValues, function(d){ return d; });
-                                console.log(mean);
-                                aObject.material.color = lut.getColor(mean);
+                                var varDataInCell = $this.data[i].variableData.filter(aVar => aVar.variableId == currentVar.id);
+                                //accumulatedVarValues = [].concat(varDataInCell[0].accumulatedData);
+                                console.log(varDataInCell[0].accumulatedData);
+                                var mean = d3.mean(varDataInCell[0].accumulatedData, function(d){ return d; });
+                                var newMaterial = new THREE.MeshPhongMaterial( { color: lut.getColor(mean), side: THREE.DoubleSide } );
+                                //aObject.material.color = lut.getColor(mean);
+                                aObject.material = newMaterial;
                             }
                             scene.add(aObject);
                             scene.userData.objects.push(aObject);
@@ -436,20 +477,58 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         scene.add( arrowHelper );
 
                         // Axes Helper
-                        var axis = new THREE.AxesHelper(2);
+                        var axis = new THREE.AxesHelper(1.5);
                         axisScene.add(axis);
-                    
+                        var axisLabelSize = 0.7;
+                        var xsprite = new THREE.TextSprite({
+                            textSize: axisLabelSize,
+                            material: {
+                                color: 0x000000
+                            },
+                            texture: {
+                                text: 'x',
+                                fontFamily: 'Arial, Helvetica, sans-serif'
+                            }
+                        });
+                        xsprite.position.set(2, 0, 0);
+                        var ysprite = new THREE.TextSprite({
+                            textSize: axisLabelSize,
+                            material: {
+                                color: 0x000000
+                            },
+                            texture: {
+                                text: 'y',
+                                fontFamily: 'Arial, Helvetica, sans-serif'
+                            }
+                        });
+                        ysprite.position.set(0, 2, 0);
+                        var zsprite = new THREE.TextSprite({
+                            textSize: axisLabelSize,
+                            material: {
+                                color: 0x000000
+                            },
+                            texture: {
+                                text: 'z',
+                                fontFamily: 'Arial, Helvetica, sans-serif'
+                            }
+                        });
+                        zsprite.position.set(0, 0, 2);
+                        axisScene.add(xsprite);
+                        axisScene.add(ysprite);
+                        axisScene.add(zsprite);
                         
 
                         $this.scenes.push(scene);
                         $this.axisScenes.push(axisScene);
                         $this.legendScenes.push(legendScene);
+                        $this.titleScenes.push(titleScene);
 
                         var renderer = new THREE.WebGLRenderer( { antialias: true } );
                         renderer.setPixelRatio( window.devicePixelRatio );
                         renderer.autoClear = false;
                         renderer.userData = {};
                         renderer.domElement.id = sceneIdx;
+
 
                         container.append(renderer.domElement);
                         //console.log(canvas[0]);
@@ -645,13 +724,23 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         renderer.render($this.axisScenes[i], $this.axisScenes[i].userData.camera);
 
                         renderer.clearDepth();
-                        var legendRect = {left: container.width()-150, right: container.width()-$this.marginSize, top: 0, bottom: 150};
+                        var legendRect = {left: container.width()-150, right: container.width()-$this.marginSize, top: container.height()-150, bottom: container.height()-$this.marginSize};
                         var width  = legendRect.right - legendRect.left;
 					    var height = legendRect.bottom - legendRect.top;
 					    var left   = legendRect.left;
                         var top    = legendRect.top;
                         renderer.setViewport( left, top, width, height );
                         renderer.render( $this.legendScenes[i], $this.legendScenes[i].userData.camera);
+
+                        renderer.clearDepth();
+                        //console.log($this.titleScenes);
+                        var titleRect = {left: 0, right: container.width()-$this.marginSize, top: 0, bottom: (container.height()-$this.marginSize)/2};
+                        var width  = titleRect.right - titleRect.left;
+					    var height = titleRect.bottom - titleRect.top;
+					    var left   = titleRect.left;
+                        var top    = titleRect.top;
+                        renderer.setViewport( left, top, width, height );
+                        renderer.render( $this.titleScenes[i], $this.titleScenes[i].userData.camera);
 
                     }
                     /*$this.renderer.clear();
