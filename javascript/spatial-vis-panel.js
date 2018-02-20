@@ -477,9 +477,45 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         scene.add( arrowHelper );
 
                         // Axes Helper
-                        var axis = new THREE.AxesHelper(2);
+                        var axis = new THREE.AxesHelper(1.5);
                         axisScene.add(axis);
-                    
+                        var axisLabelSize = 0.7;
+                        var xsprite = new THREE.TextSprite({
+                            textSize: axisLabelSize,
+                            material: {
+                                color: 0x000000
+                            },
+                            texture: {
+                                text: 'x',
+                                fontFamily: 'Arial, Helvetica, sans-serif'
+                            }
+                        });
+                        xsprite.position.set(2, 0, 0);
+                        var ysprite = new THREE.TextSprite({
+                            textSize: axisLabelSize,
+                            material: {
+                                color: 0x000000
+                            },
+                            texture: {
+                                text: 'y',
+                                fontFamily: 'Arial, Helvetica, sans-serif'
+                            }
+                        });
+                        ysprite.position.set(0, 2, 0);
+                        var zsprite = new THREE.TextSprite({
+                            textSize: axisLabelSize,
+                            material: {
+                                color: 0x000000
+                            },
+                            texture: {
+                                text: 'z',
+                                fontFamily: 'Arial, Helvetica, sans-serif'
+                            }
+                        });
+                        zsprite.position.set(0, 0, 2);
+                        axisScene.add(xsprite);
+                        axisScene.add(ysprite);
+                        axisScene.add(zsprite);
                         
 
                         $this.scenes.push(scene);
