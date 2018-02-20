@@ -219,8 +219,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         highlightedMap.anisotropy = 16;
         var highlightedMaterial = new THREE.MeshPhongMaterial( { map: highlightedMap, side: THREE.DoubleSide } );*/
         var baseMaterial = new THREE.MeshPhongMaterial( { color: 0x915D0A, side: THREE.DoubleSide } );
-        var highlightedMaterial = new THREE.LineBasicMaterial( { color: 0xCCCCCC, linewidth: 2 } );
-        var wireframeMaterial = new THREE.LineBasicMaterial( { color: 0x000000, linewidth: 1 } );
+        var highlightedMaterial = new THREE.LineBasicMaterial( { color: 0xCCCCCC, linewidth: 3 } );
+        var wireframeMaterial = new THREE.LineBasicMaterial( { color: 0x000000, linewidth: 2 } );
 
         
         if(!this.renderInitialized) {
@@ -241,6 +241,9 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                         /*var canvas = container.append("<canvas id=\"scene-"+ sceneIdx + "\" width=" + container.width() + " height=" + container.height() + "></canvas>")
                                             .children("canvas:last-child");*/
+
+                        
+                        
 
                         var cubeVertices = [
                             // front
@@ -436,11 +439,18 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         //console.log(accumulatedVarValues);                     
 
                         for(var i = 0; i < $this.cellQuantity; i++) {
-                            var aObject = Object.assign(objects[i]);
+                            console.log(objects[i]);
+                            //var aObject = Object.assign(objects[i]);
+                            var aObject = objects[i].clone();
                             if($this.varList.length > 0) {
+                                
                                 var mean = d3.mean(accumulatedVarValues, function(d){ return d; });
                                 console.log(mean);
-                                aObject.material.color = lut.getColor(mean);
+                                console.log(lut.getColor(mean));
+                                console.log(aObject.material);
+                                var newMaterial = new THREE.MeshPhongMaterial( { color: lut.getColor(mean), side: THREE.DoubleSide } );
+                                //aObject.material.color = lut.getColor(mean);
+                                aObject.material = newMaterial;
                             }
                             scene.add(aObject);
                             scene.userData.objects.push(aObject);
