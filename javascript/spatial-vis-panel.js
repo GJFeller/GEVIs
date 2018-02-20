@@ -407,15 +407,15 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             sprite.position.set(0, 0, 0);
                             titleScene.add(sprite);
                             
-                            
+                            console.log($this.data);
                             $this.data.forEach(function (cell) {
                                 var varDataInCell = cell.variableData.filter(aVar => aVar.variableId == currentVar.id);
-                                //console.log(varDataInCell[0]);
+                                //console.log(varDataInCell);
                                 //accumulatedVarValues.push(varDataInCell[0].accumulatedData);
                                 accumulatedVarValues = [].concat.apply(accumulatedVarValues, varDataInCell[0].accumulatedData);
                             });
 
-                            console.log(accumulatedVarValues);
+                            //console.log(accumulatedVarValues);
                             var extent = d3.extent(accumulatedVarValues, function(d){ return d; });
                             console.log(extent);
 
@@ -439,15 +439,16 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         //console.log(accumulatedVarValues);                     
 
                         for(var i = 0; i < $this.cellQuantity; i++) {
-                            console.log(objects[i]);
+                            //var varDataInCell = $this.data[i].variableData.filter(aVar => aVar.variableId == currentVar.id);
+
+                            //console.log(objects[i]);
                             //var aObject = Object.assign(objects[i]);
                             var aObject = objects[i].clone();
                             if($this.varList.length > 0) {
-                                
-                                var mean = d3.mean(accumulatedVarValues, function(d){ return d; });
-                                console.log(mean);
-                                console.log(lut.getColor(mean));
-                                console.log(aObject.material);
+                                var varDataInCell = $this.data[i].variableData.filter(aVar => aVar.variableId == currentVar.id);
+                                //accumulatedVarValues = [].concat(varDataInCell[0].accumulatedData);
+                                console.log(varDataInCell[0].accumulatedData);
+                                var mean = d3.mean(varDataInCell[0].accumulatedData, function(d){ return d; });
                                 var newMaterial = new THREE.MeshPhongMaterial( { color: lut.getColor(mean), side: THREE.DoubleSide } );
                                 //aObject.material.color = lut.getColor(mean);
                                 aObject.material = newMaterial;
