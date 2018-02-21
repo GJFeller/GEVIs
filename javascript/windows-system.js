@@ -21,6 +21,8 @@ class Window {
         this.HEIGHT_ICON = 28;
         this.WIDTH_ICON = 28;
 
+        this.children = [];
+
         this.createNewChild(id, title, parent, panelContent);
 
         this.panelContent.setWindow(this);
@@ -357,6 +359,17 @@ class Window {
                 width: width,
                 height: height
             });
+    }
+
+    addChild(window) {
+        this.children.push(window);
+    }
+
+    removeChild(window) {
+        var index = this.children.indexOf(window);
+        if(index > -1) {
+            this.children.splice(index, 1);
+        }
     }
 
 }

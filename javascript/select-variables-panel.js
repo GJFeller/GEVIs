@@ -83,7 +83,7 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
         var $this = this;
         this.panel = panel;
         panel.append("<div>" +
-                        "<table id=" + id + "-variabletree width=\"100%\">" +
+                        "<table id=" + id + "-variabletree class=\"var-table\" width=\"100%\">" +
                             "<colgroup>" +
                                 "<col width=\"25%\">" +
                                 "<col width=\"25%\">" +

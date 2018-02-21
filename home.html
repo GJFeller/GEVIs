@@ -75,6 +75,10 @@
             <link rel="stylesheet" href="stylesheets/windows-system.css">
             <link rel="stylesheet" href="stylesheets/font-awesome.css">
 
+
+            <!-- General CSS -->
+            <link rel="stylesheet" href="stylesheets/gcevt.css">
+
             <!-- D3 Plots CSS -->
             <link rel="stylesheet" href="stylesheets/d3-plots.css">
 
@@ -199,6 +203,9 @@
                             spatialWindow = new Window('panel1-1-3', 'Spatial Domain', variablesWindow, spatialVisPanel);
                         }
                         spatialVisPanel.setVariableList(selectedSpatialVar);
+                    }
+                    else {
+                        spatialVisPanel.setVariableList([]);
                     }
                     //console.log(scatterPlotMatrix);
             }, false);
