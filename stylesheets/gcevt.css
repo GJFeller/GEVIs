@@ -1,0 +1,22 @@
+/* .var-table {
+    border: 1px solid #888;
+} */
+
+.var-table table {
+    border-collapse: collapse;
+}
+
+
+
+.var-table tr, .var-table th {
+    border-bottom: 1px solid #ccc;
+}
+
+.var-table table tr td:last-child,
+.var-table table tr th:last-child {
+    border-right: 0;
+}
+
+.var-table tr:hover {
+    background-color: #ffa;
+}
