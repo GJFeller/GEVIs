@@ -60,10 +60,12 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.varList.forEach(function (variable, idx) {
             varNameList[idx] = variable.variable + "-" + variable.specie;
         });
-        var ensembleId = selectVariablesPanel.getEnsembleList()[0]._id;
+        /*var ensembleId = selectEnsemblePanel.getEnsembleList()[0]._id;*/
+        var ensembleId = selectedEnsembles[0]._id;
         var simulationList = [];
         if(selectedSimulations.length === 0) {
-            simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
+            //simulationList = selectEnsemblePanel.getEnsembleList()[0].simulations;
+            simulationList = selectedEnsembles[0].simulations;
         }
         else {
             simulationList = selectedSimulations;

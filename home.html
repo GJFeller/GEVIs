@@ -65,6 +65,8 @@
 
             <script src="javascript/select-variables-panel.js"></script>
 
+            <script src="javascript/select-ensemble-panel.js"></script>
+
             <script src="javascript/temporal-vis-panel.js"></script>
 
             <script src="javascript/spatial-vis-panel.js"></script>
@@ -99,7 +101,9 @@
         
         <!--<div class ="toolTip" style="display: none;"></div>-->
         <script>
+            var selectedEnsembles = [];
             var selectedSimulations = [];
+            var selectEnsemblePanel = new SelectEnsemblePanel([], 'panel1');
             var selectVariablesPanel = new SelectVariablesPanel([], 'panel1-1');
             var scatterPlotMatrix = new ScatterplotMatrix([]);
             var temporalVisPanel = new TemporalVisPanel(new Map());
@@ -180,19 +184,19 @@
                     console.log(selectedSpatialVar);
                     if(selectedMultivariateVar.length > 0) {
                         if(scatterWindow === null) {
-                            scatterWindow = new Window('panel1-1-1', 'Multivariate Visualization', rootWindow, scatterPlotMatrix);
+                            scatterWindow = new Window('panel1-1-1', 'Multivariate Visualization', variablesWindow, scatterPlotMatrix);
                         }
                         scatterPlotMatrix.setVariableList(selectedMultivariateVar);
                     }
                     if(selectedTemporalVar.length > 0) {
                         if(temporalWindow === null) {
-                            temporalWindow = new Window('panel1-1-2', 'Temporal Visualization', rootWindow, temporalVisPanel);
+                            temporalWindow = new Window('panel1-1-2', 'Temporal Visualization', variablesWindow, temporalVisPanel);
                         }
                         temporalVisPanel.setVariableList(selectedTemporalVar);
                     }
                     if(selectedSpatialVar.length > 0) {
                         if(spatialWindow === null) {
-                            spatialWindow = new Window('panel1-1-3', 'Spatial Domain', rootWindow, spatialVisPanel);
+                            spatialWindow = new Window('panel1-1-3', 'Spatial Domain', variablesWindow, spatialVisPanel);
                         }
                         spatialVisPanel.setVariableList(selectedSpatialVar);
                     }
@@ -205,22 +209,25 @@
             var windowSystem = $("#windows-system");
             /* Creating new window*/
             var rootWindow;
+            var variablesWindow;
             /* Initialization of System */
             $(document).ready(function(){
                 
-                rootWindow = new Window('panel1-1', 'Variable Selection', null, selectVariablesPanel);
-                
+                rootWindow = new Window(selectEnsemblePanel.id, 'Ensemble List', null, selectEnsemblePanel);
+                variablesWindow = new Window(selectVariablesPanel.id, 'Variable Selection', rootWindow, selectVariablesPanel);
                 //scatterWindow = new Window('panel1-1-1', 'Scatter Plot Matrix', rootWindow, scatterPlotMatrix);
                 backendConnection.getListEnsembles()
                     .then(function(result) {
                         console.log(result);
-                        selectVariablesPanel.setEnsembleList(result);
+                        selectedEnsembles.push(result[0]);
+                        selectEnsemblePanel.setEnsembleList(result);
+                        //selectVariablesPanel.setEnsembleList(result);
                         backendConnection.getEnsembleVariables(result[0]["_id"])
                             .then(function(result2) {
                                 console.log(result2);
                                 selectVariablesPanel.setVariableList(result2);
                                 spatialVisPanel = new SpatialVisualizationPanel([]);
-                                spatialWindow = new Window('panel1-1-3', 'Spatial Domain', rootWindow, spatialVisPanel);
+                                spatialWindow = new Window('panel1-1-3', 'Spatial Domain', variablesWindow, spatialVisPanel);
                             });
                     })
                     .catch(function() {

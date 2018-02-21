@@ -34,10 +34,12 @@ class TemporalVisPanel extends AbstractPanelBuilder {
         this.varList.forEach(function (variable, idx) {
             varNameList[idx] = variable.variable + "-" + variable.specie;
         });
-        var ensembleId = selectVariablesPanel.getEnsembleList()[0]._id;
+        //var ensembleId = selectVariablesPanel.getEnsembleList()[0]._id;
+        var ensembleId = selectedEnsembles[0]._id;
         var simulationList = [];
         if(selectedSimulations.length === 0) {
-            simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
+            //simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
+            simulationList = selectedEnsembles[0].simulations;
         }
         else {
             simulationList = selectedSimulations;
@@ -108,7 +110,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
         this.varList.forEach(function (variable) {
             varStringList.push(variable.variable + "-" + variable.specie);
         });
-        var simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
+        var simulationList = selectedEnsembles[0].simulations;
         //Set initial data
         var chartMap = new Map();
         varStringList.forEach(function (variable) {
