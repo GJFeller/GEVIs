@@ -6,7 +6,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
         this.varList = [];
         this.window = window;
         this.legendElementWidth = 95;
-        this.isLegendColumn = true;
+        this.isLegendColumn = false;
     }
 
     appendToPanel(panel, id) {
@@ -173,7 +173,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                 var minVar = 9000000;
                 var maxVar = -900000;
                 var varData = $this.data.get(variable);
-                console.log(selectVariablesPanel.getEnsembleList()[0].simulations);
+                //console.log(selectVariablesPanel.getEnsembleList()[0].simulations);
                 //var simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
                 var simulationList = this.simulationList;
                 simulationList.forEach(function(simulation) {

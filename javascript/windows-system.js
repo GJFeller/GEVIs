@@ -88,12 +88,13 @@ class Window {
 
         if(parent !== null) {
             var div = document.getElementById(parent.id);
+            var rect = div.getBoundingClientRect();
             var parentWidth = div.clientWidth;
             //var parentHeight = div.clientHeight;
             //console.log(parentWidth);
             //console.log(parentHeight);
 
-            newElem.css({'left': parentWidth+100});
+            newElem.css({'left': rect.left + parentWidth+100});
         }
         /* Sets up the panel settings as drag, resize, etc */
         this.setUpPanel(currentId);
