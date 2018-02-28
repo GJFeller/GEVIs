@@ -105,7 +105,9 @@
         
         <!--<div class ="toolTip" style="display: none;"></div>-->
         <script>
+            var variablePanelIndexor = 1;
             var selectedEnsembles = [];
+            var selectedEnsemblesOld = [];
             var selectedSimulations = [];
             var selectEnsemblePanel = new SelectEnsemblePanel([], 'panel1');
             var selectVariablesPanel = new SelectVariablesPanel([], 'panel1-1');
@@ -114,6 +116,7 @@
             var spatialVisPanel = null;
             // Create the event.
             var windowClosed = new Event('window-closed');
+            var ensembleSelectionChanged = new Event('changed-ensemble-selection');
             var varChangeEvent = new Event('changed-var-selection');
 
             var scatterWindow = null;

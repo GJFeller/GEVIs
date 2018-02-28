@@ -33,12 +33,12 @@ class SelectEnsemblePanel extends AbstractPanelBuilder {
                 children.push(childDict);
             });
             dict.children = children;
-            if(idx == 0) {
+            /*if(idx == 0) {
                 dict.selected = true;
             }
             else {
                 dict.selected = false;
-            }
+            }*/
             
             this.ensembleTree.push(dict);
         }
@@ -74,10 +74,18 @@ class SelectEnsemblePanel extends AbstractPanelBuilder {
         this.ensembleFancyTree = $("#" + this.id + "-ensembletree").fancytree({
             checkbox: true,
             extensions: ["glyph"],
-            selectMode: 1,
+            selectMode: 2,
             icon: false,
             glyph: glyph_opts,
-            source: this.ensembleTree
+            source: this.ensembleTree,
+            select: function(event, data) {
+                var selNodes = data.tree.getSelectedNodes();
+                console.log(selNodes);
+                selectedEnsembles = $.map(selNodes, function(node){
+                    return node.title;
+                 });
+                console.log(selectedEnsembles);    
+            }
         });
         this.render();
     }
