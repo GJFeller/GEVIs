@@ -102,8 +102,10 @@ class Window {
         this.setUpPanel(currentId);
 
         // Draw line
-        if(this.parent != null)
+        if(this.parent != null) {
             this.drawLine();
+            this.parent.addChild(this);
+        }
     
         var centralPanel = $( "#" + currentId + " .panel-body.center-panel");
         if(typeof panelContent === "function") {
@@ -137,6 +139,7 @@ class Window {
                 .removeAttr("disabled")
                 .on("click", function() {
                     $this.removeWindow();
+                    $this.parent.removeChild(this);
                     windowClosed.windowObj = $this;
                     document.dispatchEvent(windowClosed);
                 });
@@ -340,6 +343,9 @@ class Window {
     }
 
     removeWindow() {
+        this.children.forEach(function (child) {
+            child.removeWindow();
+        });
         this.removeLines();
         $("#" + this.id).remove();
         $("#icon-"+ this.id).remove();

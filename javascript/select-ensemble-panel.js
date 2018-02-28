@@ -81,10 +81,10 @@ class SelectEnsemblePanel extends AbstractPanelBuilder {
             select: function(event, data) {
                 var selNodes = data.tree.getSelectedNodes();
                 console.log(selNodes);
-                selectedEnsembles = $.map(selNodes, function(node){
+                selectedEnsemblesKeys = $.map(selNodes, function(node){
                     return node.title;
                  });
-                console.log(selectedEnsembles);    
+                document.dispatchEvent(ensembleSelectionChanged);
             }
         });
         this.render();

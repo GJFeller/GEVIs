@@ -105,9 +105,15 @@
         
         <!--<div class ="toolTip" style="display: none;"></div>-->
         <script>
-            var variablePanelIndexor = 1;
+            Array.prototype.diff = function(a) {
+                return this.filter(function(i) {return a.indexOf(i) < 0;});
+            };
+
+
+            var variablePanelIndexor = 0;
+            var allEnsembleList = [];
+            var selectedEnsemblesKeys = [];
             var selectedEnsembles = [];
-            var selectedEnsemblesOld = [];
             var selectedSimulations = [];
             var selectEnsemblePanel = new SelectEnsemblePanel([], 'panel1');
             var selectVariablesPanel = new SelectVariablesPanel([], 'panel1-1');
@@ -125,6 +131,7 @@
 
             // Define that the event name is 'build'.
             windowClosed.initEvent('window-closed', true, true);
+            ensembleSelectionChanged.initEvent('changed-ensemble-selection', true, true);
             varChangeEvent.initEvent('changed-var-selection', true, true);
 
             document.addEventListener('window-closed', function (e) {
@@ -139,6 +146,26 @@
                 if(e.windowObj == spatialWindow) {
                     spatialWindow = null;
                     selectVariablesPanel.unmarkColumnCheckboxes("spatial");
+                }
+            });
+
+            document.addEventListener('changed-ensemble-selection', function (e) {
+                console.log('ensembleSelectionChanged');
+                var currentKeys = selectedEnsembles.map(a => a.ensembleId);
+                if(selectedEnsemblesKeys.length > selectedEnsembles.length) {
+                    variablePanelIndexor++;
+                    var newKey = currentKeys.diff(selectedEnsemblesKeys);
+                    console.log('New key:')
+                    console.log(newKey);
+                    var allEnsemblesKeys = allEnsembleList.map(a => a.ensembleId);
+                    var ensembleInfo = allEnsembleList[allEnsemblesKeys.indexOf(newKey[0])];
+                    
+
+                }
+                else {
+                    var oldKey = currentKeys.diff(selectedEnsemblesKeys);
+                    console.log('Old key:')
+                    console.log(oldKey);
                 }
             });
 
@@ -229,6 +256,7 @@
                 backendConnection.getListEnsembles()
                     .then(function(result) {
                         console.log(result);
+                        allEnsembleList = result;
                         selectedEnsembles.push(result[0]);
                         selectEnsemblePanel.setEnsembleList(result);
                         //selectVariablesPanel.setEnsembleList(result);
