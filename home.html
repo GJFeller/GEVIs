@@ -65,6 +65,8 @@
 
             <script src="javascript/select-variables-panel.js"></script>
 
+            <script src="javascript/select-ensemble-panel.js"></script>
+
             <script src="javascript/temporal-vis-panel.js"></script>
 
             <script src="javascript/spatial-vis-panel.js"></script>
@@ -72,6 +74,10 @@
             <!-- Windows System CSS -->
             <link rel="stylesheet" href="stylesheets/windows-system.css">
             <link rel="stylesheet" href="stylesheets/font-awesome.css">
+
+
+            <!-- General CSS -->
+            <link rel="stylesheet" href="stylesheets/gcevt.css">
 
             <!-- D3 Plots CSS -->
             <link rel="stylesheet" href="stylesheets/d3-plots.css">
@@ -99,42 +105,132 @@
         
         <!--<div class ="toolTip" style="display: none;"></div>-->
         <script>
+            Array.prototype.diff = function(a) {
+                return this.filter(function(i) {return a.indexOf(i) < 0;});
+            };
+
+            
+
+            var windowSetList = [];
+            var variablePanelIndexor = 1;
+            /*var windowsObj = {
+                varPanel: new SelectVariablesPanel([], 'panel1-'+variablePanelIndexor),
+                multivarPanel: new ScatterplotMatrix([]),
+                temporalPanel: new TemporalVisPanel(new Map()),
+                spatialPanel: new SpatialVisualizationPanel([]),
+                variablesWindow: null,
+                multivarWindow: null,
+                temporalWindow: null,
+                spatialWindow: null,
+                panelIdx: 1,
+                ensembleInfo: null
+            }*/
+            //console.log(windowsObj);
+            //windowSetList.push(windowsObj);
+
+            
+            var allEnsembleList = [];
+            var selectedEnsemblesKeys = [];
+            var selectedEnsembles = [];
             var selectedSimulations = [];
-            var selectVariablesPanel = new SelectVariablesPanel([], 'panel1-1');
-            var scatterPlotMatrix = new ScatterplotMatrix([]);
-            var temporalVisPanel = new TemporalVisPanel(new Map());
-            var spatialVisPanel = null;
+            var selectEnsemblePanel = new SelectEnsemblePanel([], 'panel1');
+            //var selectVariablesPanel = new SelectVariablesPanel([], 'panel1-1');
+            //var scatterPlotMatrix = new ScatterplotMatrix([]);
+            //var temporalVisPanel = new TemporalVisPanel(new Map());
+            //var spatialVisPanel = null;
             // Create the event.
             var windowClosed = new Event('window-closed');
+            var ensembleSelectionChanged = new Event('changed-ensemble-selection');
             var varChangeEvent = new Event('changed-var-selection');
 
-            var scatterWindow = null;
-            var temporalWindow = null;
-            var spatialWindow = null;
+            //var scatterWindow = null;
+            //var temporalWindow = null;
+            //var spatialWindow = null;
 
             // Define that the event name is 'build'.
             windowClosed.initEvent('window-closed', true, true);
+            ensembleSelectionChanged.initEvent('changed-ensemble-selection', true, true);
             varChangeEvent.initEvent('changed-var-selection', true, true);
 
             document.addEventListener('window-closed', function (e) {
-                if(e.windowObj == scatterWindow) {
-                    scatterWindow = null;
-                    selectVariablesPanel.unmarkColumnCheckboxes("multivariate");
+                var windowSetIdx = windowSetList.findIndex(function(element) {
+                        return element.multivarWindow == e.windowObj || element.temporalWindow == e.windowObj || element.spatialWindow == e.windowObj;
+                });
+                var windowsObj = windowSetList[windowSetIdx];
+                if(e.windowObj == windowsObj.multivarWindow) {
+                    windowsObj.scatterWindow = null;
+                    windowsObj.varPanel.unmarkColumnCheckboxes("multivariate");
                 }
-                if(e.windowObj == temporalWindow) {
-                    temporalWindow = null;
-                    selectVariablesPanel.unmarkColumnCheckboxes("temporal");
+                if(e.windowObj == windowsObj.temporalWindow) {
+                    windowsObj.temporalWindow = null;
+                    windowsObj.varPanel.unmarkColumnCheckboxes("temporal");
                 }
-                if(e.windowObj == spatialWindow) {
-                    spatialWindow = null;
-                    selectVariablesPanel.unmarkColumnCheckboxes("spatial");
+                if(e.windowObj == windowsObj.spatialWindow) {
+                    windowsObj.spatialWindow = null;
+                    windowsObj.varPanel.unmarkColumnCheckboxes("spatial");
+                }
+            });
+
+            document.addEventListener('changed-ensemble-selection', function (e) {
+                console.log('ensembleSelectionChanged');
+                var currentKeys = selectedEnsembles.map(a => a.ensembleId);
+                if(selectedEnsemblesKeys.length > selectedEnsembles.length) {
+                    
+                    var newKey = selectedEnsemblesKeys.diff(currentKeys);
+                    console.log('New key:')
+                    console.log(newKey);
+                    var allEnsemblesKeys = allEnsembleList.map(a => a.ensembleId);
+                    var ensembleInfo = allEnsembleList[allEnsemblesKeys.indexOf(newKey[0])];
+                    selectedEnsembles.push(ensembleInfo);
+
+                    var newWindowsObj = {
+                        panelIdx: ++variablePanelIndexor,
+                        varPanel: new SelectVariablesPanel([], 'panel1-'+variablePanelIndexor),
+                        multivarPanel: new ScatterplotMatrix([]),
+                        temporalPanel: new TemporalVisPanel(new Map()),
+                        spatialPanel: new SpatialVisualizationPanel([]),
+                        variablesWindow: null,
+                        multivarWindow: null,
+                        temporalWindow: null,
+                        spatialWindow: null,
+                        ensembleInfo: ensembleInfo
+                    }
+                    backendConnection.getEnsembleVariables(ensembleInfo["_id"])
+                            .then(function(result) {
+                                newWindowsObj.variablesWindow = new Window(newWindowsObj.varPanel.id, 'Variable Selection', rootWindow, newWindowsObj.varPanel);
+                                newWindowsObj.varPanel.setVariableList(result);
+                                console.log(ensembleInfo);
+                                newWindowsObj.spatialPanel.setEnsemble(ensembleInfo);
+                                newWindowsObj.spatialWindow = new Window('panel1-'+newWindowsObj.panelIdx+'-3', 'Spatial Domain', newWindowsObj.variablesWindow, newWindowsObj.spatialPanel);
+                                windowSetList.push(newWindowsObj);
+                            });
+                    
+
+                    
+                }
+                else {
+                    var oldKey = currentKeys.diff(selectedEnsemblesKeys);
+                    console.log('Old key:')
+                    console.log(oldKey);
+                    var toRemoveEnsembleIdx = selectedEnsembles.findIndex(function(element) {
+                        return element.ensembleId == oldKey;
+                    });
+
+                    selectedEnsembles.splice(toRemoveEnsembleIdx, 1);
+
                 }
             });
 
             // Listen for the event.
             document.addEventListener('changed-var-selection', function (e) {
                     console.log("evento disparado");
-                    var varTree = selectVariablesPanel.getVariableTree();
+                    console.log(e.varPanel);
+                    console.log(windowSetList);
+                    var windowsObj = windowSetList.find(function(element) {
+                        return element.varPanel === e.varPanel;
+                    });
+                    console.log(windowsObj);
+                    var varTree = windowsObj.varPanel.getVariableTree();
                     var selectedTemporalVar = [];
                     var selectedMultivariateVar = [];
                     var selectedSpatialVar = [];
@@ -179,22 +275,25 @@
                     console.log("Selected spatial variables");
                     console.log(selectedSpatialVar);
                     if(selectedMultivariateVar.length > 0) {
-                        if(scatterWindow === null) {
-                            scatterWindow = new Window('panel1-1-1', 'Multivariate Visualization', rootWindow, scatterPlotMatrix);
+                        if(windowsObj.multivarWindow === null) {
+                            windowsObj.multivarWindow = new Window('panel1-'+windowsObj.panelIdx+'-1', 'Multivariate Visualization', windowsObj.variablesWindow, windowsObj.multivarPanel);
                         }
-                        scatterPlotMatrix.setVariableList(selectedMultivariateVar);
+                        windowsObj.multivarPanel.setVariableList(selectedMultivariateVar);
                     }
                     if(selectedTemporalVar.length > 0) {
-                        if(temporalWindow === null) {
-                            temporalWindow = new Window('panel1-1-2', 'Temporal Visualization', rootWindow, temporalVisPanel);
+                        if(windowsObj.temporalWindow === null) {
+                            windowsObj.temporalWindow = new Window('panel1-'+windowsObj.panelIdx+'-2', 'Temporal Visualization', windowsObj.variablesWindow, windowsObj.temporalPanel);
                         }
-                        temporalVisPanel.setVariableList(selectedTemporalVar);
+                        windowsObj.temporalPanel.setVariableList(selectedTemporalVar);
                     }
                     if(selectedSpatialVar.length > 0) {
-                        if(spatialWindow === null) {
-                            spatialWindow = new Window('panel1-1-3', 'Spatial Domain', rootWindow, spatialVisPanel);
+                        if(windowsObj.spatialWindow === null) {
+                            windowsObj.spatialWindow = new Window('panel1-'+windowsObj.panelIdx+'-3', 'Spatial Domain', windowsObj.variablesWindow, windowsObj.spatialPanel);
                         }
-                        spatialVisPanel.setVariableList(selectedSpatialVar);
+                        windowsObj.spatialPanel.setVariableList(selectedSpatialVar);
+                    }
+                    else {
+                        windowsObj.spatialPanel.setVariableList([]);
                     }
                     //console.log(scatterPlotMatrix);
             }, false);
@@ -205,23 +304,29 @@
             var windowSystem = $("#windows-system");
             /* Creating new window*/
             var rootWindow;
+            var variablesWindow;
             /* Initialization of System */
             $(document).ready(function(){
                 
-                rootWindow = new Window('panel1-1', 'Variable Selection', null, selectVariablesPanel);
+                rootWindow = new Window(selectEnsemblePanel.id, 'Ensemble List', null, selectEnsemblePanel);
                 
                 //scatterWindow = new Window('panel1-1-1', 'Scatter Plot Matrix', rootWindow, scatterPlotMatrix);
                 backendConnection.getListEnsembles()
                     .then(function(result) {
                         console.log(result);
-                        selectVariablesPanel.setEnsembleList(result);
-                        backendConnection.getEnsembleVariables(result[0]["_id"])
+                        allEnsembleList = result;
+                        //selectedEnsembles.push(result[0]);
+                        selectEnsemblePanel.setEnsembleList(result);
+                        //selectVariablesPanel.setEnsembleList(result);
+                        /*backendConnection.getEnsembleVariables(result[0]["_id"])
                             .then(function(result2) {
+                                windowsObj.variablesWindow = new Window(windowsObj.varPanel.id, 'Variable Selection', rootWindow, windowsObj.varPanel);
                                 console.log(result2);
-                                selectVariablesPanel.setVariableList(result2);
-                                spatialVisPanel = new SpatialVisualizationPanel([]);
-                                spatialWindow = new Window('panel1-1-3', 'Spatial Domain', rootWindow, spatialVisPanel);
-                            });
+                                windowsObj.varPanel.setVariableList(result2);
+                                windowsObj.spatialPanel.setEnsemble(result[0]);
+                                //spatialVisPanel = new SpatialVisualizationPanel([]);
+                                windowsObj.spatialWindow = new Window('panel1-'+windowsObj.panelIdx+'-3', 'Spatial Domain', windowsObj.variablesWindow, windowsObj.spatialPanel);
+                            });*/
                     })
                     .catch(function() {
                         console.log("Erro ao acessar o backend");

@@ -21,6 +21,8 @@ class Window {
         this.HEIGHT_ICON = 28;
         this.WIDTH_ICON = 28;
 
+        this.children = [];
+
         this.createNewChild(id, title, parent, panelContent);
 
         this.panelContent.setWindow(this);
@@ -88,19 +90,22 @@ class Window {
 
         if(parent !== null) {
             var div = document.getElementById(parent.id);
+            var rect = div.getBoundingClientRect();
             var parentWidth = div.clientWidth;
             //var parentHeight = div.clientHeight;
             //console.log(parentWidth);
             //console.log(parentHeight);
 
-            newElem.css({'left': parentWidth+100});
+            newElem.css({'left': rect.left + parentWidth+100});
         }
         /* Sets up the panel settings as drag, resize, etc */
         this.setUpPanel(currentId);
 
         // Draw line
-        if(this.parent != null)
+        if(this.parent != null) {
             this.drawLine();
+            this.parent.addChild(this);
+        }
     
         var centralPanel = $( "#" + currentId + " .panel-body.center-panel");
         if(typeof panelContent === "function") {
@@ -134,6 +139,7 @@ class Window {
                 .removeAttr("disabled")
                 .on("click", function() {
                     $this.removeWindow();
+                    $this.parent.removeChild(this);
                     windowClosed.windowObj = $this;
                     document.dispatchEvent(windowClosed);
                 });
@@ -337,6 +343,9 @@ class Window {
     }
 
     removeWindow() {
+        this.children.forEach(function (child) {
+            child.removeWindow();
+        });
         this.removeLines();
         $("#" + this.id).remove();
         $("#icon-"+ this.id).remove();
@@ -356,6 +365,17 @@ class Window {
                 width: width,
                 height: height
             });
+    }
+
+    addChild(window) {
+        this.children.push(window);
+    }
+
+    removeChild(window) {
+        var index = this.children.indexOf(window);
+        if(index > -1) {
+            this.children.splice(index, 1);
+        }
     }
 
 }
