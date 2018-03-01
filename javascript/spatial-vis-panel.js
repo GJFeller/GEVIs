@@ -190,7 +190,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         console.log($this.panel);
         //container.empty();
         this.panel.find("canvas").remove();
-        $("body").find("canvas").remove();
+        $("body").find("canvas#legend").remove();
         this.panel.find("div").remove();
         
         //var objects = [];
