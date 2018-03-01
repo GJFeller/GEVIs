@@ -176,6 +176,7 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                                 }
                             }
                             $this.variableTree = $tree.rootNode.children;
+                            varChangeEvent.varPanel = $this;
                             document.dispatchEvent(varChangeEvent);
                         })
                         .appendTo($tdList.eq(1));
@@ -211,6 +212,7 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                                 }
                             }
                             $this.variableTree = $tree.rootNode.children;
+                            varChangeEvent.varPanel = $this;
                             document.dispatchEvent(varChangeEvent);
                         })
                         .appendTo($tdList.eq(2));
@@ -246,6 +248,7 @@ class SelectVariablesPanel extends AbstractPanelBuilder {
                                 }
                             }
                             $this.variableTree = $tree.rootNode.children;
+                            varChangeEvent.varPanel = $this;
                             document.dispatchEvent(varChangeEvent);
                         })
                         .appendTo($tdList.eq(3));

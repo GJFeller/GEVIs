@@ -3,6 +3,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         super();
         this.id = id;
         this.data = data;
+        this.ensembleInfo = null;
         this.varList = [];
         this.window = window;
         this.renderInitialized = false;
@@ -30,7 +31,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.selectedCells = [];
         this.marginSize = 17;
 
-        this.getRemoteData();
+        //this.getRemoteData();
     }
 
     appendToPanel(panel, id) {
@@ -38,6 +39,11 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         panel.css({'overflow': 'auto'});
         this.id = id;
         this.render();
+    }
+
+    setEnsemble(ensembleInfo) {
+        this.ensembleInfo = ensembleInfo;
+        this.getRemoteData();
     }
 
     setVariableList(varList) {
@@ -61,7 +67,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
             varNameList[idx] = variable.variable + "-" + variable.specie;
         });
         /*var ensembleId = selectEnsemblePanel.getEnsembleList()[0]._id;*/
-        var ensembleId = selectedEnsembles[0]._id;
+        var ensembleId = this.ensembleInfo._id;
         var simulationList = [];
         if(selectedSimulations.length === 0) {
             //simulationList = selectEnsemblePanel.getEnsembleList()[0].simulations;
