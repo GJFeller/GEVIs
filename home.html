@@ -157,17 +157,19 @@
                         return element.multivarWindow == e.windowObj || element.temporalWindow == e.windowObj || element.spatialWindow == e.windowObj;
                 });
                 var windowsObj = windowSetList[windowSetIdx];
-                if(e.windowObj == windowsObj.multivarWindow) {
-                    windowsObj.scatterWindow = null;
-                    windowsObj.varPanel.unmarkColumnCheckboxes("multivariate");
-                }
-                if(e.windowObj == windowsObj.temporalWindow) {
-                    windowsObj.temporalWindow = null;
-                    windowsObj.varPanel.unmarkColumnCheckboxes("temporal");
-                }
-                if(e.windowObj == windowsObj.spatialWindow) {
-                    windowsObj.spatialWindow = null;
-                    windowsObj.varPanel.unmarkColumnCheckboxes("spatial");
+                if(windowsObj !== undefined) {
+                    if(e.windowObj == windowsObj.multivarWindow) {
+                        windowsObj.scatterWindow = null;
+                        windowsObj.varPanel.unmarkColumnCheckboxes("multivariate");
+                    }
+                    if(e.windowObj == windowsObj.temporalWindow) {
+                        windowsObj.temporalWindow = null;
+                        windowsObj.varPanel.unmarkColumnCheckboxes("temporal");
+                    }
+                    if(e.windowObj == windowsObj.spatialWindow) {
+                        windowsObj.spatialWindow = null;
+                        windowsObj.varPanel.unmarkColumnCheckboxes("spatial");
+                    }
                 }
             });
 
@@ -197,11 +199,11 @@
                     }
                     backendConnection.getEnsembleVariables(ensembleInfo["_id"])
                             .then(function(result) {
-                                newWindowsObj.variablesWindow = new Window(newWindowsObj.varPanel.id, 'Variable Selection', rootWindow, newWindowsObj.varPanel);
+                                newWindowsObj.variablesWindow = new Window(newWindowsObj.varPanel.id, 'Variable Selection (' + newWindowsObj.ensembleInfo.ensembleId +')', rootWindow, newWindowsObj.varPanel);
                                 newWindowsObj.varPanel.setVariableList(result);
                                 console.log(ensembleInfo);
                                 newWindowsObj.spatialPanel.setEnsemble(ensembleInfo);
-                                newWindowsObj.spatialWindow = new Window('panel1-'+newWindowsObj.panelIdx+'-3', 'Spatial Domain', newWindowsObj.variablesWindow, newWindowsObj.spatialPanel);
+                                newWindowsObj.spatialWindow = new Window('panel1-'+newWindowsObj.panelIdx+'-3', 'Spatial Domain (' + newWindowsObj.ensembleInfo.ensembleId +')', newWindowsObj.variablesWindow, newWindowsObj.spatialPanel);
                                 windowSetList.push(newWindowsObj);
                             });
                     
@@ -276,19 +278,19 @@
                     console.log(selectedSpatialVar);
                     if(selectedMultivariateVar.length > 0) {
                         if(windowsObj.multivarWindow === null) {
-                            windowsObj.multivarWindow = new Window('panel1-'+windowsObj.panelIdx+'-1', 'Multivariate Visualization', windowsObj.variablesWindow, windowsObj.multivarPanel);
+                            windowsObj.multivarWindow = new Window('panel1-'+windowsObj.panelIdx+'-1', 'Multivariate Visualization (' + windowsObj.ensembleInfo.ensembleId +')', windowsObj.variablesWindow, windowsObj.multivarPanel);
                         }
                         windowsObj.multivarPanel.setVariableList(selectedMultivariateVar);
                     }
                     if(selectedTemporalVar.length > 0) {
                         if(windowsObj.temporalWindow === null) {
-                            windowsObj.temporalWindow = new Window('panel1-'+windowsObj.panelIdx+'-2', 'Temporal Visualization', windowsObj.variablesWindow, windowsObj.temporalPanel);
+                            windowsObj.temporalWindow = new Window('panel1-'+windowsObj.panelIdx+'-2', 'Temporal Visualization (' + windowsObj.ensembleInfo.ensembleId +')', windowsObj.variablesWindow, windowsObj.temporalPanel);
                         }
                         windowsObj.temporalPanel.setVariableList(selectedTemporalVar);
                     }
                     if(selectedSpatialVar.length > 0) {
                         if(windowsObj.spatialWindow === null) {
-                            windowsObj.spatialWindow = new Window('panel1-'+windowsObj.panelIdx+'-3', 'Spatial Domain', windowsObj.variablesWindow, windowsObj.spatialPanel);
+                            windowsObj.spatialWindow = new Window('panel1-'+windowsObj.panelIdx+'-3', 'Spatial Domain (' + windowsObj.ensembleInfo.ensembleId +')', windowsObj.variablesWindow, windowsObj.spatialPanel);
                         }
                         windowsObj.spatialPanel.setVariableList(selectedSpatialVar);
                     }
