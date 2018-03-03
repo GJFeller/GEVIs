@@ -172,10 +172,6 @@ class Window {
                     Window.centerLine($this.id);
                     $("[id^=icon-]").css({'z-index':  999999});
                 },
-                stop: function() {
-                    $( "#" + newID).css({'z-index':  50});
-                    console.log(this);
-                },
                 cancel: '.dropdown-menu'
             })
             .find(".panel-body")
