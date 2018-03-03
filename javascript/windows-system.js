@@ -170,6 +170,11 @@ class Window {
                 containment: workspace,
                 drag: function(){
                     Window.centerLine($this.id);
+                    $("[id^=icon-]").css({'z-index':  999999});
+                },
+                stop: function() {
+                    $( "#" + newID).css({'z-index':  50});
+                    console.log(this);
                 },
                 cancel: '.dropdown-menu'
             })
@@ -328,11 +333,13 @@ class Window {
                 },
                 stop:function(){
                     Window.centerLine($this.id, true);
+                    $("#icon-"+$this.id).css({'z-index':  999999});
                 }
             })
             .css({
-                "left" :  panelCenter["x"],
-                "top"  :  panelCenter["y"]
+                "left"   :  panelCenter["x"],
+                "top"    :  panelCenter["y"],
+                'z-index':  999999
             })
             .on("dblclick", function() {
                 $this.maximizeWindow($(this));
