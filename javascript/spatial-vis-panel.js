@@ -412,7 +412,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                     fontFamily: 'Arial, Helvetica, sans-serif'
                                 }
                             });
-                            sprite.position.set(0, 0, 0);
+                            sprite.position.set(0, 1, 0);
                             titleScene.add(sprite);
                             
                             console.log($this.data);
@@ -722,7 +722,9 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         renderer.render($this.scenes[i], $this.scenes[i].userData.camera);
 
                         renderer.clearDepth();
-                        var axesRect = {left: 0, right: 100, bottom: container.height()-$this.marginSize, top: container.height()-100};
+                        var percentWidth = container.width()*0.25;
+                        var percentHeight = container.height()*0.25;
+                        var axesRect = {left: 0, right: percentWidth, bottom: container.height()-$this.marginSize, top: container.height()-percentHeight};
                         // set the viewport
 					    var width  = axesRect.right - axesRect.left;
 					    var height = axesRect.bottom - axesRect.top;
@@ -732,7 +734,9 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         renderer.render($this.axisScenes[i], $this.axisScenes[i].userData.camera);
 
                         renderer.clearDepth();
-                        var legendRect = {left: container.width()-150, right: container.width()-$this.marginSize, top: container.height()-150, bottom: container.height()-$this.marginSize};
+                        var percentWidth = container.width()*0.50;
+                        var percentHeight = container.height()*0.50;
+                        var legendRect = {left: container.width()-percentWidth, right: container.width()-$this.marginSize, top: container.height()-percentHeight, bottom: container.height()-$this.marginSize};
                         var width  = legendRect.right - legendRect.left;
 					    var height = legendRect.bottom - legendRect.top;
 					    var left   = legendRect.left;
@@ -741,8 +745,10 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         renderer.render( $this.legendScenes[i], $this.legendScenes[i].userData.camera);
 
                         renderer.clearDepth();
+                        var percentWidth = container.width()*0.1;
+                        var percentHeight = container.height()/2;
                         //console.log($this.titleScenes);
-                        var titleRect = {left: 0, right: container.width()-$this.marginSize, top: 0, bottom: (container.height()-$this.marginSize)/2};
+                        var titleRect = {left: percentWidth, right: container.width()-$this.marginSize-percentWidth, top: 0, bottom: percentHeight};
                         var width  = titleRect.right - titleRect.left;
 					    var height = titleRect.bottom - titleRect.top;
 					    var left   = titleRect.left;
