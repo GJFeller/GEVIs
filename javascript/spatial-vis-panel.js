@@ -69,13 +69,15 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         /*var ensembleId = selectEnsemblePanel.getEnsembleList()[0]._id;*/
         var ensembleId = this.ensembleInfo._id;
         var simulationList = [];
-        if(selectedSimulations.length === 0) {
+        // FIXME: Implement the query system to solve this problem with selectedSimulations
+        simulationList = this.ensembleInfo.simulations;
+        /*if(selectedSimulations.length === 0) {
             //simulationList = selectEnsemblePanel.getEnsembleList()[0].simulations;
             simulationList = selectedEnsembles[0].simulations;
         }
         else {
             simulationList = selectedSimulations;
-        }
+        }*/
         
         var promises = [];
         var dataList = [];

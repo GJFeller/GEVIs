@@ -25,6 +25,11 @@ class TemporalVisPanel extends AbstractPanelBuilder {
         this.render();
     }
 
+    setEnsemble(ensembleInfo) {
+        this.ensembleInfo = ensembleInfo;
+        //this.getRemoteData();
+    }
+
     getRemoteData() {
         var $this = this;
         if(this.data instanceof Array)
@@ -37,13 +42,15 @@ class TemporalVisPanel extends AbstractPanelBuilder {
         //var ensembleId = selectVariablesPanel.getEnsembleList()[0]._id;
         var ensembleId = selectedEnsembles[0]._id;
         var simulationList = [];
-        if(selectedSimulations.length === 0) {
+        // FIXME: Implement the query system to solve this problem with selectedSimulations
+        simulationList = this.ensembleInfo.simulations;
+        /*if(selectedSimulations.length === 0) {
             //simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
             simulationList = selectedEnsembles[0].simulations;
         }
         else {
             simulationList = selectedSimulations;
-        }
+        }*/
         //var simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
         /*var simulationList = ["1D-T25-pH4", "1D-T25-pH5", "1D-T25-pH6", "1D-T25-pH7", "1D-T25-pH8", "1D-T25-pH9",
                               "1D-T80-pH4", "1D-T80-pH5", "1D-T80-pH6", "1D-T80-pH7", "1D-T80-pH8", "1D-T80-pH9",

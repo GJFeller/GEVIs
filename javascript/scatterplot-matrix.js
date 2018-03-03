@@ -14,6 +14,11 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
         this.render();
     }
 
+    setEnsemble(ensembleInfo) {
+        this.ensembleInfo = ensembleInfo;
+        //this.getRemoteData();
+    }
+
     getRemoteData() {
         var $this = this;
         if(this.data instanceof Array)
@@ -25,13 +30,15 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
         });
         var ensembleId = selectedEnsembles[0]._id;
         var simulationList = [];
-        if(selectedSimulations.length === 0) {
+        // FIXME: Implement the query system to solve this problem with selectedSimulations
+        simulationList = this.ensembleInfo.simulations;
+        /*if(selectedSimulations.length === 0) {
             //simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
             simulationList = selectedEnsembles[0].simulations;
         }
         else {
             simulationList = selectedSimulations;
-        }
+        }*/
         var promises = [];
         for(var i = 0; i < simulationList.length; i++) {
             var variableStringList = this.varList[0].id;

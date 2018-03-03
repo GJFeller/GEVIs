@@ -55,6 +55,8 @@
             <script src="javascript/external/THREE.TextTexture.js"></script>
             <script src="javascript/external/THREE.TextSprite.js"></script>
 
+            <script src="javascript/events-definition.js"></script>
+
             <script src="javascript/windows-system.js"></script>
 
             <script src="javascript/abstract-panel-builder.js"></script>
@@ -132,25 +134,14 @@
             var allEnsembleList = [];
             var selectedEnsemblesKeys = [];
             var selectedEnsembles = [];
-            var selectedSimulations = [];
+            //var selectedSimulations = [];
             var selectEnsemblePanel = new SelectEnsemblePanel([], 'panel1');
             //var selectVariablesPanel = new SelectVariablesPanel([], 'panel1-1');
             //var scatterPlotMatrix = new ScatterplotMatrix([]);
             //var temporalVisPanel = new TemporalVisPanel(new Map());
             //var spatialVisPanel = null;
             // Create the event.
-            var windowClosed = new Event('window-closed');
-            var ensembleSelectionChanged = new Event('changed-ensemble-selection');
-            var varChangeEvent = new Event('changed-var-selection');
-
-            //var scatterWindow = null;
-            //var temporalWindow = null;
-            //var spatialWindow = null;
-
-            // Define that the event name is 'build'.
-            windowClosed.initEvent('window-closed', true, true);
-            ensembleSelectionChanged.initEvent('changed-ensemble-selection', true, true);
-            varChangeEvent.initEvent('changed-var-selection', true, true);
+            
 
             document.addEventListener('window-closed', function (e) {
                 var windowSetIdx = windowSetList.findIndex(function(element) {
@@ -195,7 +186,12 @@
                         multivarWindow: null,
                         temporalWindow: null,
                         spatialWindow: null,
-                        ensembleInfo: ensembleInfo
+                        ensembleInfo: ensembleInfo,
+                        queries: {
+                            selectedCells: [],
+                            selectedSimulations: [],
+                            selectedTimeExtent: []
+                        }
                     }
                     backendConnection.getEnsembleVariables(ensembleInfo["_id"])
                             .then(function(result) {
@@ -203,6 +199,8 @@
                                 newWindowsObj.varPanel.setVariableList(result);
                                 console.log(ensembleInfo);
                                 newWindowsObj.spatialPanel.setEnsemble(ensembleInfo);
+                                newWindowsObj.multivarPanel.setEnsemble(ensembleInfo);
+                                newWindowsObj.temporalPanel.setEnsemble(ensembleInfo);
                                 newWindowsObj.spatialWindow = new Window('panel1-'+newWindowsObj.panelIdx+'-3', 'Spatial Domain (' + newWindowsObj.ensembleInfo.ensembleId +')', newWindowsObj.variablesWindow, newWindowsObj.spatialPanel);
                                 windowSetList.push(newWindowsObj);
                             });
