@@ -78,14 +78,14 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
 
     render() {
         var $this = this;
-        var width = this.panel.width();
-        var height = this.panel.height();
-        var margin = {top: 30, right: 30, bottom: 30, left: 50};
-        var padding = 20;
+        var margin = {top: 20, right: 30, bottom: 30, left: 50};
+        var width = this.panel.width() - margin.left - margin.right;
+        var height = this.panel.height() - margin.top - margin.bottom;
+        var padding = 10;
 
-        var svg = d3.select("#"+this.id+"-scatter");
+        var div = d3.select("#"+this.id+"-scatter");
 
-        svg.selectAll('*').remove();
+        div.selectAll('*').remove();
         //console.log(this.data);
         if(this.data.length > 0) {
             var domainByVariable = {},
@@ -101,21 +101,23 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
 
             console.log(domainByVariable);
 
-            var size = 0;
-            if(height < width) {
+            //var size = 0;
+            var sizeHeight = (height / numberVariables)- padding;
+            var sizeWidth = (width / numberVariables) - padding;
+            /*if(height < width) {
                 size = height / numberVariables;
             }
             else {
                 size = width / numberVariables;
-            }
+            }*/
 
             var formatSiPrefix = d3.format("3e");
 
             var x = d3.scale.linear()
-                .range([padding / 2, size - padding / 2]);
+                .range([padding / 2, sizeWidth - padding / 2]);
             
             var y = d3.scale.linear()
-                .range([size - padding / 2, padding / 2]);
+                .range([sizeHeight - padding / 2, padding / 2]);
             
             var xAxis = d3.svg.axis()
                 .scale(x)
@@ -138,14 +140,15 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
             
             
 
-            svg.attr("width", size * numberVariables + padding + margin.left + margin.right)
-                .attr("height", size * numberVariables + padding + margin.top + margin.bottom)
+            var svg = div.append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
             .append("g")
-                .attr("transform", "translate(" + padding + "," + padding / 2 + ")");
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
             
             // Set the ticks to stretch across all plots
-            xAxis.tickSize(size * numberVariables);
-            yAxis.tickSize(-size * numberVariables); // negative so ticks go right
+            xAxis.tickSize(sizeWidth * numberVariables);
+            yAxis.tickSize(-sizeHeight * numberVariables); // negative so ticks go right
 
             console.log(variables);
 
@@ -153,14 +156,23 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                 .data(variables)
             .enter().append("g")
                 .attr("class", "x axisSPLOTM")
-                .attr("transform", function(d, i) { return "translate(" + ((i) * size + margin.left) + ",0)";})
-                .each(function(d) { x.domain(domainByVariable[d]); d3.select(this).call(xAxis); });
+                .attr("transform", function(d, i) { return "translate(" + (i * sizeWidth) + ",0)";})
+                .each(function(d) { x.domain(domainByVariable[d]); d3.select(this).call(xAxis); })
+            .selectAll("text")
+                .attr("y", 0)
+                .attr("x", 9)
+                //.attr("dx", "-.8em")
+                //.attr("dy", ".15em")
+                //.attr("transform", "")
+                .attr("transform", "translate(0," + height + ") rotate(-90)")
+                .style("text-anchor", "end");
+
 
             svg.selectAll(".y.axisSPLOTM")
                 .data(variables)
             .enter().append("g")
                 .attr("class", "y axisSPLOTM")
-                .attr("transform", function(d, i) { return "translate(" + margin.left + "," + i * size + ")";})
+                .attr("transform", function(d, i) { return "translate(" + 0 + "," + i * sizeHeight + ")";})
                 .each(function(d) { y.domain(domainByVariable[d]); d3.select(this).call(yAxis); });
 
             var cell = svg.selectAll(".cellSPLOTM")
@@ -171,11 +183,11 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                 .each(plot);*/
 
             cell.filter(function(d) { return d.i !== d.j; })
-                .attr("transform", function(d) { return "translate(" + ((d.i) * size + margin.left) + "," + d.j * size + ")"; })
+                .attr("transform", function(d) { return "translate(" + (d.i * sizeWidth) + "," + d.j * sizeHeight + ")"; })
                 .each(plot);
 
             cell.filter(function(d) { return d.i === d.j; })
-                .attr("transform", function(d) { return "translate(" + ((d.i) * size + margin.left) + "," + d.j * size + ")"; })
+                .attr("transform", function(d) { return "translate(" + (d.i * sizeWidth) + "," + d.j * sizeHeight + ")"; })
                 .each(plotHistogram);
                 //.each(plotHistogram);
             // Titles for the diagonal.
@@ -242,8 +254,8 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                     .attr("class", "frameSPLOTM")
                     .attr("x", padding / 2)
                     .attr("y", padding / 2)
-                    .attr("width", size - padding)
-                    .attr("height", size - padding);
+                    .attr("width", sizeWidth - padding)
+                    .attr("height", sizeHeight - padding);
                     //.style("fill", function(d) { return d3.rgb(255,255,255); });
                 
                 cell.selectAll("circle")
@@ -267,8 +279,8 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                     .attr("class", "frameSPLOTM")
                     .attr("x", padding / 2)
                     .attr("y", padding / 2)
-                    .attr("width", size - padding)
-                    .attr("height", size - padding)
+                    .attr("width", sizeWidth - padding)
+                    .attr("height", sizeHeight - padding)
                     .attr("fill", "white")
                     .attr("stroke","#aaa");
             
@@ -284,7 +296,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
             
                 var histScale = d3.scale.linear()
                 .domain([0, d3.max(hist, function(d) { return d.y; })])
-                .range([size - padding / 2, padding / 2]);
+                .range([sizeHeight - padding / 2, padding / 2]);
             
                 var bar = cell.selectAll(".bar")
                   .data(hist)
@@ -299,7 +311,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                 .attr("x", 1)
                 .attr("width", 5) //x(hist[0].dx) )
                 .attr("height", function(d) {
-                  return size - padding / 2 - histScale(d.y);
+                  return sizeHeight - padding / 2 - histScale(d.y);
                 });
             }
 
