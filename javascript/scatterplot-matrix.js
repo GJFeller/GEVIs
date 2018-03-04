@@ -148,10 +148,12 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
             
             // Set the ticks to stretch across all plots
-            xAxis.tickSize(sizeWidth * numberVariables);
-            yAxis.tickSize(-sizeHeight * numberVariables); // negative so ticks go right
+            xAxis.tickSize(sizeHeight * numberVariables);
+            yAxis.tickSize(-sizeWidth * numberVariables); // negative so ticks go right
 
             console.log(variables);
+            var xAxisLabelTranslation = sizeHeight * numberVariables + margin.top;
+            console.log(xAxisLabelTranslation);
 
             svg.selectAll(".x.axisSPLOTM")
                 .data(variables)
@@ -163,9 +165,9 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                 .attr("y", 0)
                 .attr("x", 9)
                 //.attr("dx", "-.8em")
-                //.attr("dy", ".15em")
+                //.attr("dy", ".50em")
                 //.attr("transform", "")
-                .attr("transform", "translate(0," + height + ") rotate(-90)")
+                .attr("transform", "translate(0," + xAxisLabelTranslation + ") rotate(-90)")
                 .style("text-anchor", "end");
 
 
@@ -198,49 +200,6 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                 .attr("dy", ".71em")
                 .text(function(d) { return d.x; });
 
-            // Create each x-axis
-            /*svg.selectAll(".x.axis")
-                .data(variables)
-            .enter().append("g")
-                .attr("class", "x axis")
-                .attr("transform", function(d, i) { return "translate(" + (numberVariables - i - 1) * size + ",0)"; })
-                .each(function(d) { 
-                    x.domain(domainByVariable[d]);
-                    d3.select(this).call(xAxis);
-                });
-
-            // Create each y-axis
-            svg.selectAll(".y.axis")
-                .data(variables)
-            .enter().append("g")
-                .attr("class", "y axis")
-                .attr("transform", function(d, i) { 
-                    return "translate(0," + i * size + ")";
-                })
-                .each(function(d) {
-                    y.domain(domainByVariable[d]);
-                    d3.select(this).call(yAxis);
-                });
-            
-            var cell = svg.selectAll(".cell")
-                .data(cross(variables, variables))
-                .enter().append("g")
-                .attr("class", "cell") ;
-          
-            cell.filter(function(d) { return d.i !== d.j; })
-                .attr("transform", function(d) { return "translate(" + (numberVariables - d.i - 1) * size + "," + d.j * size + ")"; })
-                .each(plot);
-          
-            cell.filter(function(d) { return d.i === d.j; })
-                .attr("transform", function(d) { return "translate(" + (numberVariables - d.i - 1) * size + "," + d.j * size + ")"; })
-                .each(plotHistogram);
-          
-            // Titles for the diagonal.
-            cell.filter(function(d) { return d.i === d.j; }).append("text")
-                .attr("x", padding)
-                .attr("y", padding)
-                .attr("dy", ".71em")
-            .text(function(d) { return d.x; });*/
 
             // Run the brush
             cell.call($this.brush);
