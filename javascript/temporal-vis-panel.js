@@ -50,7 +50,14 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             var ensembleId = selectedEnsembles[0]._id;
             var simulationList = [];
             // FIXME: Implement the query system to solve this problem with selectedSimulations
-            simulationList = this.ensembleInfo.simulations;
+            if(this.query === null || this.query.selectedSimulations === undefined 
+                || this.query.selectedSimulations.length === 0) {
+                simulationList = this.ensembleInfo.simulations;
+            }
+            else {
+                simulationList = this.query.selectedSimulations;
+            }
+            console.log(simulationList);
             /*if(selectedSimulations.length === 0) {
                 //simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
                 simulationList = selectedEnsembles[0].simulations;
@@ -105,7 +112,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                 })
                 .catch(function (err) {
                     console.log("Erro ao pegar dados temporais do servidor");
-                    console.log(err.message);
+                    console.error(err.message);
                 });
         }
         

@@ -5,6 +5,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
         this.data = data;
         this.varList = [];
         this.window = window;
+        this.brush = d3.svg.brush()
     }
 
     appendToPanel(panel, id) {
@@ -131,7 +132,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                 .ticks(6)
                 .tickFormat(formatSiPrefix);
 
-            var brush = d3.svg.brush()
+            this.brush
                 .x(x)
                 .y(y)
                 .on("brushstart", brushstart)
@@ -242,10 +243,11 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
             .text(function(d) { return d.x; });*/
 
             // Run the brush
-            cell.call(brush);
+            cell.call($this.brush);
 
             function plot(p) {
                 var cell = d3.select(this);
+                //console.log($this.data);
                 
                 x.domain(domainByVariable[p.x]);
                 y.domain(domainByVariable[p.y]);
@@ -266,6 +268,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                     .attr("r", 4)
                     .attr("x-value", function(d) {return d[p.x]; })
                     .attr("y-value", function(d) {return d[p.y]; })
+                    .attr("simulationId", function(d) {return d.simulationId; })
                     .style("fill", function(d) { return d3.rgb(0,0,255); });
             }
 
@@ -320,7 +323,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
             // Clear the previously-active brush, if any.
             function brushstart(p) {
                 if (brushCell !== this) {
-                    d3.select(brushCell).call(brush.clear());
+                    d3.select(brushCell).call($this.brush.clear());
                     x.domain(domainByVariable[p.x]);
                     y.domain(domainByVariable[p.y]);
                     brushCell = this;
@@ -329,17 +332,32 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
             
             // Highlight the selected circles.
             function brushmove(p) {
-                var e = brush.extent();
-                /*svg.selectAll("circle").classed("hiddenSPLOTM", function(d) {
+                var e = $this.brush.extent();
+                svg.selectAll("circle").classed("hiddenSPLOTM", function(d) {
                     d.hidden = e[0][0] > d[p.x] || d[p.x] > e[1][0]
                     || e[0][1] > d[p.y] || d[p.y] > e[1][1];
                     return d.hidden;
-                });*/
+                });
             }
             
             // If the brush is empty, select all circles.
             function brushend() {
-                if (brush.empty()) svg.selectAll(".hiddenSPLOTM").classed("hiddenSPLOTM", false);
+                var selectedSimulations = [];
+                if ($this.brush.empty()) {
+                    svg.selectAll(".hiddenSPLOTM").classed("hiddenSPLOTM", false);
+                }
+                else {
+                    svg.selectAll("circle").each(function(d) {
+                        if(!d.hidden) {
+                            if(selectedSimulations.indexOf(d.simulationId) < 0) {
+                                selectedSimulations.push(d.simulationId);
+                            }
+                        }
+                    });
+                }
+                changedSimulationSelectionEvent.selectedSimulations = selectedSimulations;
+                changedSimulationSelectionEvent.ensemble = $this.ensembleInfo;
+                document.dispatchEvent(changedSimulationSelectionEvent);
             }
 
             function cross(a, b) {

@@ -312,6 +312,17 @@
                 windowsObj.updatePanels();
             });
 
+            document.addEventListener('changed-simulation-selection', function (e) {
+                console.log("Evento de seleção de simulação");
+                var selectedSimulations = e.selectedSimulations;
+                var currentEnsemble = e.ensemble;
+                var windowsObj = windowSetList.find(function(element) {
+                    return element.ensembleInfo === e.ensemble;
+                });
+                windowsObj.queries.selectedSimulations = selectedSimulations;
+                windowsObj.updatePanels();
+            });
+
             var backendConnection = new BackendRequests();
             var count = 0;
             /* Getting the document body */
