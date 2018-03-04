@@ -5,5 +5,7 @@ windowClosed.initEvent('window-closed', true, true);
 // Events of the specific application
 var ensembleSelectionChanged = new Event('changed-ensemble-selection');
 var varChangeEvent = new Event('changed-var-selection');
+var changedCellSelectionEvent = new Event('changed-cell-selection');
 ensembleSelectionChanged.initEvent('changed-ensemble-selection', true, true);
 varChangeEvent.initEvent('changed-var-selection', true, true);
+changedCellSelectionEvent.initEvent('changed-cell-selection', true, true);

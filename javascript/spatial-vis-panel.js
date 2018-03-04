@@ -66,7 +66,6 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.varList.forEach(function (variable, idx) {
             varNameList[idx] = variable.variable + "-" + variable.specie;
         });
-        /*var ensembleId = selectEnsemblePanel.getEnsembleList()[0]._id;*/
         var ensembleId = this.ensembleInfo._id;
         var simulationList = [];
         // FIXME: Implement the query system to solve this problem with selectedSimulations
@@ -113,11 +112,6 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
     }
 
     reformatDataList(dataList) {
-        //var listVarDataSumary = [];
-        //var varAccumulatedData = [];
-        /*this.varList.forEach(function (variable) {
-            varAccumulatedData.push(variable);
-        });*/
         var $this = this;
         var accumulatedCellData = [];
         dataList.forEach(function (simData, i) {
@@ -167,24 +161,6 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         return accumulatedCellData;
     }
 
-    /*getRemoteData() {
-        var $this = this;
-        if(this.data instanceof Array)
-            this.data.splice(0,this.data.length);
-
-        var ensembleId = selectVariablesPanel.getEnsembleList()[0]._id;
-        var promises = [];
-        promises.push(backendConnection.getCellQuantity(ensembleId));
-        Promise.all(promises)
-            .then(function(values) {
-                $this.cellQuantity = values[0];
-                console.log($this.cellQuantity);
-                $this.render();
-            })
-            .catch(function () {
-            });
-
-    }*/
 
     render() {
 
@@ -195,8 +171,6 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         $("body").find("canvas#legend").remove();
         this.panel.find("div").remove();
         
-        //var objects = [];
-        //var wireframes = [];
         var selectedObjects = [];
         var selectedWireframes = [];
         var selectedIndexes = [];
@@ -219,15 +193,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         if(sceneQty <= 1) {
             sceneQty = 1;
         }
-        /*var baseMap = new THREE.TextureLoader().load( '../texture/text.jpg' );
-        baseMap.wrapS = baseMap.wrapT = THREE.RepeatWrapping;
-        baseMap.anisotropy = 16;
-        var baseMaterial = new THREE.MeshPhongMaterial( { map: baseMap, side: THREE.DoubleSide } );
 
-        var highlightedMap = new THREE.TextureLoader().load( '../texture/textSelected.jpg' );
-        highlightedMap.wrapS = highlightedMap.wrapT = THREE.RepeatWrapping;
-        highlightedMap.anisotropy = 16;
-        var highlightedMaterial = new THREE.MeshPhongMaterial( { map: highlightedMap, side: THREE.DoubleSide } );*/
         var baseMaterial = new THREE.MeshPhongMaterial( { color: 0x915D0A, side: THREE.DoubleSide } );
         var highlightedMaterial = new THREE.LineBasicMaterial( { color: 0xCCCCCC, linewidth: 3 } );
         var wireframeMaterial = new THREE.LineBasicMaterial( { color: 0x000000, linewidth: 2 } );
@@ -248,13 +214,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                 function init() {
 
                     for(var sceneIdx = 0; sceneIdx < sceneQty; sceneIdx++) {
-
-                        /*var canvas = container.append("<canvas id=\"scene-"+ sceneIdx + "\" width=" + container.width() + " height=" + container.height() + "></canvas>")
-                                            .children("canvas:last-child");*/
-
                         
-                        
-
                         var cubeVertices = [
                             // front
                             new THREE.Vector3(-1.0, -1.0,  1.0),
@@ -452,7 +412,6 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             //var varDataInCell = $this.data[i].variableData.filter(aVar => aVar.variableId == currentVar.id);
 
                             //console.log(objects[i]);
-                            //var aObject = Object.assign(objects[i]);
                             var aObject = objects[i].clone();
                             if($this.varList.length > 0) {
                                 var varDataInCell = $this.data[i].variableData.filter(aVar => aVar.variableId == currentVar.id);
@@ -558,21 +517,6 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     }
 
                     console.log($this.scenes);
-                    
-                    /*$this.renderer = new THREE.WebGLRenderer( { antialias: true } );
-                    $this.renderer.setPixelRatio( window.devicePixelRatio );
-                    $this.renderer.autoClear = false;
-
-                    for(var i = 0; i < sceneQty; i++) {
-                        console.log("Pao");
-                        container.append( $this.renderer.domElement );
-                    }*/
-                    
-                    /*$this.renderer.domElement.addEventListener('mousemove', onMouseMove, false);
-                    $this.renderer.domElement.addEventListener('mousedown', onMouseDown, false);
-
-                    $this.controls = new THREE.OrbitControls( $this.camera, $this.renderer.domElement );
-                    $this.controlsAxes = new THREE.OrbitControls( $this.axisCamera, $this.renderer.domElement );*/
 
                     $this.renderInitialized = true;
 
@@ -678,27 +622,10 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             $this.selectedCells.splice(sIdx, 1);
                         }
                         console.log($this.selectedCells);
-                        /*var obj = intersects[ 0 ].object;
-                        console.log(obj);
-                        var idx = selectedObjects.indexOf(obj);
-                        var wIdx = objects.indexOf(obj);
-                        var oIdx = $this.cellQuantity - 1 - objects.indexOf(obj);
-                        console.log(wIdx);
-                        console.log(wireframes);
-                        if(idx < 0) {
-                            //obj.material = highlightedMaterial;
-                            wireframes[wIdx].material = highlightedMaterial;
-                            selectedObjects.push(obj);
-                            
-                            $this.selectedCells.push(oIdx);
-                        } 
-                        else {
-                            wireframes[wIdx].material = wireframeMaterial;
-                            selectedObjects.splice(idx, 1);
-                            var sIdx = $this.selectedCells.indexOf(oIdx);
-                            $this.selectedCells.splice(sIdx, 1);
-                        }
-                        console.log($this.selectedCells);*/
+                        changedCellSelectionEvent.selectedCells = $this.selectedCells;
+                        changedCellSelectionEvent.ensemble = $this.ensembleInfo;
+                        document.dispatchEvent(changedCellSelectionEvent);
+
                     }
                     
                 }

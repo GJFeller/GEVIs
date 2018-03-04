@@ -114,7 +114,7 @@
             
 
             var windowSetList = [];
-            var variablePanelIndexor = 1;
+            var variablePanelIndexor = 0;
             /*var windowsObj = {
                 varPanel: new SelectVariablesPanel([], 'panel1-'+variablePanelIndexor),
                 multivarPanel: new ScatterplotMatrix([]),
@@ -191,6 +191,10 @@
                             selectedCells: [],
                             selectedSimulations: [],
                             selectedTimeExtent: []
+                        },
+                        updatePanels: function() {
+                            console.log(this);
+                            this.temporalPanel.setQuery(this.queries);
                         }
                     }
                     backendConnection.getEnsembleVariables(ensembleInfo["_id"])
@@ -297,6 +301,16 @@
                     }
                     //console.log(scatterPlotMatrix);
             }, false);
+
+            document.addEventListener('changed-cell-selection', function (e) {
+                var selectedCells = e.selectedCells;
+                var currentEnsemble = e.ensemble;
+                var windowsObj = windowSetList.find(function(element) {
+                    return element.ensembleInfo === e.ensemble;
+                });
+                windowsObj.queries.selectedCells = selectedCells;
+                windowsObj.updatePanels();
+            });
 
             var backendConnection = new BackendRequests();
             var count = 0;

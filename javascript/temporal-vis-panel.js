@@ -7,6 +7,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
         this.window = window;
         this.legendElementWidth = 95;
         this.isLegendColumn = false;
+        this.query = null;
     }
 
     appendToPanel(panel, id) {
@@ -30,80 +31,83 @@ class TemporalVisPanel extends AbstractPanelBuilder {
         //this.getRemoteData();
     }
 
+    setQuery(query) {
+        this.query = query;
+        this.getRemoteData();
+    }
+
     getRemoteData() {
-        var $this = this;
-        if(this.data instanceof Array)
-            this.data.splice(0,this.data.length);
-        
-        var varNameList = [];
-        this.varList.forEach(function (variable, idx) {
-            varNameList[idx] = variable.variable + "-" + variable.specie;
-        });
-        //var ensembleId = selectVariablesPanel.getEnsembleList()[0]._id;
-        var ensembleId = selectedEnsembles[0]._id;
-        var simulationList = [];
-        // FIXME: Implement the query system to solve this problem with selectedSimulations
-        simulationList = this.ensembleInfo.simulations;
-        /*if(selectedSimulations.length === 0) {
-            //simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
-            simulationList = selectedEnsembles[0].simulations;
-        }
-        else {
-            simulationList = selectedSimulations;
-        }*/
-        //var simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
-        /*var simulationList = ["1D-T25-pH4", "1D-T25-pH5", "1D-T25-pH6", "1D-T25-pH7", "1D-T25-pH8", "1D-T25-pH9",
-                              "1D-T80-pH4", "1D-T80-pH5", "1D-T80-pH6", "1D-T80-pH7", "1D-T80-pH8", "1D-T80-pH9",
-                              "1D-T160-pH4", "1D-T160-pH5", "1D-T160-pH6", "1D-T160-pH7", "1D-T160-pH8", "1D-T160-pH9"]*/
-        this.simulationList = simulationList;
-        var promises = [];
-        for(var i = 0; i < simulationList.length; i++) {
-            var variableStringList = this.varList[0].id;
-            for(var j = 1; j < this.varList.length; j++) {
-                variableStringList = variableStringList + "," + this.varList[j].id;
-            }
-            promises.push(backendConnection.getTemporalData(0, 0, 0, simulationList[i], variableStringList, ensembleId));
-        }
-        Promise.all(promises)
-            .then(function(values) {
-                var dataList = [];
-                values.forEach(function (elem) {
-                    if(elem.length > 0)
-                    {
-                        
-                        elem.forEach(function (aRow) {
-                            var data = {};
-                            data.simulationId = aRow.simulationId;
-                            data.time = aRow.time;
-                            $this.varList.forEach(function (variable, idx) {
-                                for(var i = 0; i < aRow.variables.length; i++) {
-                                    if(variable.id == aRow.variables[i].variableId) {
-                                        data[varNameList[idx]] = aRow.variables[i].value;
-                                    }
-                                }
-                            });
-                            
-                            dataList.push(data);
-                        });
-                        //var data = {};
-                        /*data.simulationId = elem[0].simulationId;
-                        data.time = elem[0].time;
-                        $this.varList.forEach(function (variable, idx) {
-                            for(var i = 0; i < elem[0].variables.length; i++) {
-                                if(variable.id == elem[0].variables[i].variableId) {
-                                    data[varNameList[idx]] = elem[0].variables[i].value;
-                                }
-                            }
-                        });
-                        dataList.push(data);
-                        */
-                    }
-                });
-                $this.data = $this.reformatDataList(dataList);
-                $this.render();
-            })
-            .catch(function () {
+        if(this.varList.length > 0) {
+            var $this = this;
+            if(this.data instanceof Array)
+                this.data.splice(0,this.data.length);
+            
+            var varNameList = [];
+            this.varList.forEach(function (variable, idx) {
+                varNameList[idx] = variable.variable + "-" + variable.specie;
             });
+            //var ensembleId = selectVariablesPanel.getEnsembleList()[0]._id;
+            var ensembleId = selectedEnsembles[0]._id;
+            var simulationList = [];
+            // FIXME: Implement the query system to solve this problem with selectedSimulations
+            simulationList = this.ensembleInfo.simulations;
+            /*if(selectedSimulations.length === 0) {
+                //simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
+                simulationList = selectedEnsembles[0].simulations;
+            }
+            else {
+                simulationList = selectedSimulations;
+            }*/
+            //var simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
+            /*var simulationList = ["1D-T25-pH4", "1D-T25-pH5", "1D-T25-pH6", "1D-T25-pH7", "1D-T25-pH8", "1D-T25-pH9",
+                                "1D-T80-pH4", "1D-T80-pH5", "1D-T80-pH6", "1D-T80-pH7", "1D-T80-pH8", "1D-T80-pH9",
+                                "1D-T160-pH4", "1D-T160-pH5", "1D-T160-pH6", "1D-T160-pH7", "1D-T160-pH8", "1D-T160-pH9"]*/
+            this.simulationList = simulationList;
+            var promises = [];
+            var variableStringList = this.varList[0].id;
+            for(var varListIdx = 1; varListIdx < this.varList.length; varListIdx++) {
+                variableStringList = variableStringList + "," + this.varList[varListIdx].id;
+            }
+            for(var i = 0; i < simulationList.length; i++) {
+                if(this.query !== null && this.query.selectedCells.length > 0) {
+                    for(var j = 0; j < this.query.selectedCells.length; j++) {
+                        promises.push(backendConnection.getTemporalData(this.query.selectedCells[j], 0, 0, simulationList[i], variableStringList, ensembleId));
+                    }
+                }
+                else {
+                    //promises.push(backendConnection.getTemporalData(0, 0, 0, simulationList[i], variableStringList, ensembleId));
+                }    
+            }
+            Promise.all(promises)
+                .then(function(values) {
+                    var dataList = [];
+                    values.forEach(function (elem) {
+                        if(elem.length > 0)
+                        {                    
+                            elem.forEach(function (aRow) {
+                                var data = {};
+                                data.simulationId = aRow.simulationId;
+                                data.time = aRow.time;
+                                $this.varList.forEach(function (variable, idx) {
+                                    for(var i = 0; i < aRow.variables.length; i++) {
+                                        if(variable.id == aRow.variables[i].variableId) {
+                                            data[varNameList[idx]] = aRow.variables[i].value;
+                                        }
+                                    }
+                                });
+                                
+                                dataList.push(data);
+                            });
+                        }
+                    });
+                    $this.data = $this.reformatDataList(dataList);
+                    $this.render();
+                })
+                .catch(function (err) {
+                    console.log("Erro ao pegar dados temporais do servidor");
+                    console.log(err.message);
+                });
+        }
         
     }
 
@@ -118,16 +122,21 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             varStringList.push(variable.variable + "-" + variable.specie);
         });
         var simulationList = selectedEnsembles[0].simulations;
+        console.log(dataList);
         //Set initial data
         var chartMap = new Map();
+        var finalData = new Map();
         varStringList.forEach(function (variable) {
             chartMap.set(variable, new Map());
+            finalData.set(variable, new Map());
             simulationList.forEach(function (simulation) {
                 var simulationData = chartMap.get(variable);
                 simulationData.set(simulation, []);
+                simulationData = finalData.get(variable);
+                simulationData.set(simulation, []);
             });
         });
-        
+        console.log(chartMap);
         // Set the whole data
         dataList.forEach(function (data) {
             var simulationId = data.simulationId;
@@ -136,16 +145,37 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                 chartMap.get(variable).get(simulationId).push({time: time, value: data[variable], variable: variable});
             });
         });
-
+        // Sort data by time
         varStringList.forEach(function (variable) {
             simulationList.forEach(function (simulation) {
                 chartMap.get(variable).get(simulation).sort(function (a, b) {
                     return (a.time > b.time) ? 1 : ((b.time > a.time) ? -1 : 0);
                 });
-
             });
         });
-        return chartMap;
+
+        // Aggregate data by time
+        varStringList.forEach(function (variable) {
+            simulationList.forEach(function (simulation) {
+                var timeSteps = [];
+                chartMap.get(variable).get(simulation).forEach(function (obj) {
+                    if(timeSteps.indexOf(obj.time) < 0) {
+                        timeSteps.push(obj.time);
+                    }
+                });
+                timeSteps.forEach(function (time) {
+                    var timeSteps = chartMap.get(variable).get(simulation).filter(function (step) {
+                        return step.time === time;
+                    });
+                    var values = timeSteps.map(a => a.value);
+                    var mean = d3.mean(values, function(d){ return d; });
+                    finalData.get(variable).get(simulation).push({time: time, value: mean, variable: timeSteps[0].variable});
+                });          
+            });
+        });
+
+        console.log(finalData);
+        return finalData;
     }
 
     render() {
