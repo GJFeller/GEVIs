@@ -190,6 +190,7 @@
                         temporalWindow: null,
                         spatialWindow: null,
                         ensembleInfo: ensembleInfo,
+                        currentMultivarPanel: null,
                         queries: {
                             selectedCells: [],
                             selectedSimulations: [],
@@ -210,6 +211,7 @@
                                 newWindowsObj.parallelCoordPanel.setEnsemble(ensembleInfo);
                                 newWindowsObj.temporalPanel.setEnsemble(ensembleInfo);
                                 newWindowsObj.spatialWindow = new Window('panel1-'+newWindowsObj.panelIdx+'-3', 'Spatial Domain (' + newWindowsObj.ensembleInfo.ensembleId +')', newWindowsObj.variablesWindow, newWindowsObj.spatialPanel);
+                                newWindowsObj.currentMultivarPanel = newWindowsObj.parallelCoordPanel;
                                 windowSetList.push(newWindowsObj);
                             });
                     
@@ -284,9 +286,11 @@
                     console.log(selectedSpatialVar);
                     if(selectedMultivariateVar.length > 0) {
                         if(windowsObj.multivarWindow === null) {
-                            windowsObj.multivarWindow = new Window('panel1-'+windowsObj.panelIdx+'-1', 'Multivariate Visualization (' + windowsObj.ensembleInfo.ensembleId +')', windowsObj.variablesWindow, windowsObj.parallelCoordPanel);
+                            windowsObj.multivarWindow = new Window('panel1-'+windowsObj.panelIdx+'-1', 'Multivariate Visualization (' + windowsObj.ensembleInfo.ensembleId +')', windowsObj.variablesWindow, windowsObj.currentMultivarPanel);
                         }
-                        windowsObj.parallelCoordPanel.setVariableList(selectedMultivariateVar);
+                        windowsObj.currentMultivarPanel.setVariableList(selectedMultivariateVar);
+                        //windowsObj.multivarPanel.setVariableList(selectedMultivariateVar);
+                        //windowsObj.parallelCoordPanel.setVariableList(selectedMultivariateVar);
                     }
                     if(selectedTemporalVar.length > 0) {
                         if(windowsObj.temporalWindow === null) {

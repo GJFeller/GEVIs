@@ -142,7 +142,8 @@ class ParallelCoordinatesPlot extends AbstractPanelBuilder {
             .selectAll("path")
                 .data($this.data)
             .enter().append("path")
-                .attr("d", path);
+                .attr("d", path)
+                .attr("simulationId", function(d) { return d.simulationId; });
 
             // Add a group element for each dimension.
             var g = svg.selectAll(".dimension")
@@ -190,7 +191,7 @@ class ParallelCoordinatesPlot extends AbstractPanelBuilder {
             g.append("g")
                 .attr("class", "brushPCP")
                 .each(function(d) {
-                    d3.select(this).call(y[d].brush = d3.svg.brush().y(y[d]).on("brushstart", brushstart).on("brush", brush));
+                    d3.select(this).call(y[d].brush = d3.svg.brush().y(y[d]).on("brushstart", brushstart).on("brush", brush).on("brushend", brushend));
                 })
                 .selectAll("rect")
                 .attr("x", -8)
@@ -224,6 +225,20 @@ class ParallelCoordinatesPlot extends AbstractPanelBuilder {
                 return extents[i][0] <= d[p] && d[p] <= extents[i][1];
               }) ? null : "none";
             });
+        }
+
+        function brushend() {
+            var selectedSimulations = [];
+            foreground.each(function (d) {
+                if(this.style.display !== "none") {
+                    if(selectedSimulations.indexOf(d.simulationId) < 0) {
+                        selectedSimulations.push(d.simulationId);
+                    }
+                }
+            });
+            changedSimulationSelectionEvent.selectedSimulations = selectedSimulations;
+            changedSimulationSelectionEvent.ensemble = $this.ensembleInfo;
+            document.dispatchEvent(changedSimulationSelectionEvent);
         }
     }
 
