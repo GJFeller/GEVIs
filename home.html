@@ -63,6 +63,8 @@
 
             <script src="javascript/scatterplot-matrix.js"></script>
 
+            <script src="javascript/parallel-coordinates-panel.js"></script>
+
             <script src="javascript/backendEnsembleRequests.js"></script>
 
             <script src="javascript/select-variables-panel.js"></script>
@@ -180,6 +182,7 @@
                         panelIdx: ++variablePanelIndexor,
                         varPanel: new SelectVariablesPanel([], 'panel1-'+variablePanelIndexor),
                         multivarPanel: new ScatterplotMatrix([]),
+                        parallelCoordPanel: new ParallelCoordinatesPlot([]),
                         temporalPanel: new TemporalVisPanel(new Map()),
                         spatialPanel: new SpatialVisualizationPanel([]),
                         variablesWindow: null,
@@ -204,6 +207,7 @@
                                 console.log(ensembleInfo);
                                 newWindowsObj.spatialPanel.setEnsemble(ensembleInfo);
                                 newWindowsObj.multivarPanel.setEnsemble(ensembleInfo);
+                                newWindowsObj.parallelCoordPanel.setEnsemble(ensembleInfo);
                                 newWindowsObj.temporalPanel.setEnsemble(ensembleInfo);
                                 newWindowsObj.spatialWindow = new Window('panel1-'+newWindowsObj.panelIdx+'-3', 'Spatial Domain (' + newWindowsObj.ensembleInfo.ensembleId +')', newWindowsObj.variablesWindow, newWindowsObj.spatialPanel);
                                 windowSetList.push(newWindowsObj);
@@ -280,9 +284,9 @@
                     console.log(selectedSpatialVar);
                     if(selectedMultivariateVar.length > 0) {
                         if(windowsObj.multivarWindow === null) {
-                            windowsObj.multivarWindow = new Window('panel1-'+windowsObj.panelIdx+'-1', 'Multivariate Visualization (' + windowsObj.ensembleInfo.ensembleId +')', windowsObj.variablesWindow, windowsObj.multivarPanel);
+                            windowsObj.multivarWindow = new Window('panel1-'+windowsObj.panelIdx+'-1', 'Multivariate Visualization (' + windowsObj.ensembleInfo.ensembleId +')', windowsObj.variablesWindow, windowsObj.parallelCoordPanel);
                         }
-                        windowsObj.multivarPanel.setVariableList(selectedMultivariateVar);
+                        windowsObj.parallelCoordPanel.setVariableList(selectedMultivariateVar);
                     }
                     if(selectedTemporalVar.length > 0) {
                         if(windowsObj.temporalWindow === null) {

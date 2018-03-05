@@ -85,6 +85,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
         var padding = 10;
 
         var div = d3.select("#"+this.id+"-scatter");
+        console.log($this.data);
 
         div.selectAll('*').remove();
         //console.log(this.data);
