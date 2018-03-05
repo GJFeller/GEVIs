@@ -58,6 +58,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
     }
 
     getRemoteData() {
+        $('#loading').css('visibility','visible');
         var $this = this;
         if(this.data instanceof Array)
             this.data.splice(0,this.data.length);
@@ -85,6 +86,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                 $this.cellQuantity = cellQty[0];
                 console.log($this.cellQuantity);
                 if($this.varList.length > 0) {
+                    $('#loading').css('visibility','visible');
                     for(var i = 0; i < simulationList.length; i++) {
                         var variableStringList = $this.varList[0].id;
                         for(var j = 1; j < $this.varList.length; j++) {
@@ -99,12 +101,14 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             $this.data = $this.reformatDataList(dataList);
                             console.log($this.data);
                             $this.render();
+                            $('#loading').css('visibility','hidden');
                         })
                         .catch(function () {
                         });
                 }
                 else {
                     $this.render();
+                    $('#loading').css('visibility','hidden');
                 }
                 
             });

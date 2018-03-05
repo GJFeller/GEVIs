@@ -20,6 +20,16 @@
     padding: 0;
 }
 
+#windows-system .panel-body{
+    height: 100%;
+    padding: 0;
+}
+
+#windows-system{
+    width:100%;
+    height: 100%;
+}
+
 .container {
     display: inline-block;
     position: absolute;
@@ -163,4 +173,31 @@ a{
    modal element will be visible */
 .panel.loading .modal {
     display: block;
+}
+
+#loading {
+    height: 200%;
+    width: 100%;
+    z-index: 1000;
+    position: absolute;
+    top: 0;
+    visibility: hidden;
+}
+#loading #greyScreen{
+    height: 100%;
+    width: 100%;
+    background-color: black;
+    position: absolute;
+    opacity: 0.2;
+}
+
+#loading .gif {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    top: 20%;
+    color: white;
+    text-align: center;
+    font-size: xx-large;
 }

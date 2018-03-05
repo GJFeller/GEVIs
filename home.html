@@ -91,10 +91,18 @@
     </head>
 
     <body id = "windows-system">
+        <div id="loading">
+            <div id="greyScreen"></div>
+            <img src="./images/ajax_loader.gif" width="100px" class="gif">
+            <span id="msg" class="gif">Loading</span>
+        </div>
         <h2>Geochemical Ensemble Visualization Tool</h2>
         <!--<button onclick="sayHello()">Say hello</button>-->
         <div class="container">    
             <svg id ="workspace" width = "100%" height = "100%" class="svg-content-responsive"></svg>
+            <ul id="contextMenuMultivariateWindow" class="dropdown-menu" role="menu" style="display: none">
+                <li><a tabindex="-1" id="change-chart">Change to parallel coordinates (PCP)</a></li>
+            </ul>
             <!--<ul id="contextMenuScatterPlot" class="dropdown-menu" role="menu" style="display:none" >
                 <li><a tabindex="-1" id="bar-chart">Create a bar chart</a></li>
                 <li><a tabindex="-1" id="force-layout">Create a force layout</a></li>
@@ -211,7 +219,7 @@
                                 newWindowsObj.parallelCoordPanel.setEnsemble(ensembleInfo);
                                 newWindowsObj.temporalPanel.setEnsemble(ensembleInfo);
                                 newWindowsObj.spatialWindow = new Window('panel1-'+newWindowsObj.panelIdx+'-3', 'Spatial Domain (' + newWindowsObj.ensembleInfo.ensembleId +')', newWindowsObj.variablesWindow, newWindowsObj.spatialPanel);
-                                newWindowsObj.currentMultivarPanel = newWindowsObj.parallelCoordPanel;
+                                newWindowsObj.currentMultivarPanel = newWindowsObj.multivarPanel;
                                 windowSetList.push(newWindowsObj);
                             });
                     
@@ -287,6 +295,7 @@
                     if(selectedMultivariateVar.length > 0) {
                         if(windowsObj.multivarWindow === null) {
                             windowsObj.multivarWindow = new Window('panel1-'+windowsObj.panelIdx+'-1', 'Multivariate Visualization (' + windowsObj.ensembleInfo.ensembleId +')', windowsObj.variablesWindow, windowsObj.currentMultivarPanel);
+                            windowsObj.multivarWindow.setWindowContextMenu("contextMenuMultivariateWindow", changeMultivariatePanel);
                         }
                         windowsObj.currentMultivarPanel.setVariableList(selectedMultivariateVar);
                         //windowsObj.multivarPanel.setVariableList(selectedMultivariateVar);
@@ -329,6 +338,24 @@
                 });
                 windowsObj.queries.selectedSimulations = selectedSimulations;
                 windowsObj.updatePanels();
+            });
+
+            document.addEventListener('changeMultivariatePanel', function (e) {
+                var currentEnsemble = e.ensemble;
+                var windowsObj = windowSetList.find(function(element) {
+                    return element.ensembleInfo === e.ensemble;
+                });
+                var selectedVar = windowsObj.currentMultivarPanel.getVariableList();
+                if(windowsObj.currentMultivarPanel === windowsObj.parallelCoordPanel) {
+                    windowsObj.multivarWindow.setWindowContent(windowsObj.multivarWindow.getId(), windowsObj.multivarPanel);
+                    windowsObj.currentMultivarPanel = windowsObj.multivarPanel;
+                    
+                }
+                else {
+                    windowsObj.multivarWindow.setWindowContent(windowsObj.multivarWindow.getId(), windowsObj.parallelCoordPanel);
+                    windowsObj.currentMultivarPanel = windowsObj.parallelCoordPanel;
+                }
+                windowsObj.currentMultivarPanel.setVariableList(selectedVar);
             });
 
             var backendConnection = new BackendRequests();

@@ -82,6 +82,24 @@ class Window {
         }
     }
 
+    getId() {
+        return this.id;
+    }
+
+    setWindowContextMenu(menuId, event) {
+        //console.log($("#" + this.id));
+        $("#" + this.id)
+            .contextmenu({
+                menuSelector: "#"+menuId,
+                menuSelected: function (invokedOn, selectedMenu) {
+                    document.windowId = this.id;
+                    document.selectedMenu = selectedMenu;
+                    document.dispatchEvent(event);
+                }
+            });
+        console.log($("#" + this.id));
+    }
+
     createNewChild(currentId, chartObj, parent, panelContent) {
         var newElem = $('<div '+ 'id="' + currentId + '" class="panel panel-default"> <div class="panel-heading clearfix"> <h4 class="panel-title pull-left" style="padding-top: 7.5px;">' + chartObj + '</h4> <button disabled class="btn btn-default btn-remove"><i class="glyphicon glyphicon-remove"></i></button> <button class="btn btn-default btn-minimize"><i class="glyphicon glyphicon-minus"></i></button> </div><div class="panel-body center-panel"></div></div>').css({"position": "absolute"});
         //var newID = "";
@@ -107,16 +125,28 @@ class Window {
             this.parent.addChild(this);
         }
     
-        var centralPanel = $( "#" + currentId + " .panel-body.center-panel");
+
+        this.setWindowContent(currentId, panelContent);
+        /*var centralPanel = $( "#" + currentId + " .panel-body.center-panel");
         if(typeof panelContent === "function") {
             panelContent(centralPanel, currentId);
         }
         else {
             panelContent.appendToPanel(centralPanel, currentId);
-        }
+        }*/
         
         //this.callback(centralPanel, currentId);
         //console.log(centralPanel);
+    }
+
+    setWindowContent(id, panelContent) {
+        var centralPanel = $( "#" + id + " .panel-body.center-panel");
+        if(typeof panelContent === "function") {
+            panelContent(centralPanel, currentId);
+        }
+        else {
+            panelContent.appendToPanel(centralPanel, id);
+        }
     }
 
     setUpPanel(newID) {

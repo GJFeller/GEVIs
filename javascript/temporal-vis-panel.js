@@ -37,6 +37,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
     }
 
     getRemoteData() {
+        $('#loading').css('visibility','visible');
         if(this.varList.length > 0) {
             var $this = this;
             if(this.data instanceof Array)
@@ -49,7 +50,6 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             //var ensembleId = selectVariablesPanel.getEnsembleList()[0]._id;
             var ensembleId = selectedEnsembles[0]._id;
             var simulationList = [];
-            // FIXME: Implement the query system to solve this problem with selectedSimulations
             if(this.query === null || this.query.selectedSimulations === undefined 
                 || this.query.selectedSimulations.length === 0) {
                 simulationList = this.ensembleInfo.simulations;
@@ -58,17 +58,6 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                 simulationList = this.query.selectedSimulations;
             }
             console.log(simulationList);
-            /*if(selectedSimulations.length === 0) {
-                //simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
-                simulationList = selectedEnsembles[0].simulations;
-            }
-            else {
-                simulationList = selectedSimulations;
-            }*/
-            //var simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
-            /*var simulationList = ["1D-T25-pH4", "1D-T25-pH5", "1D-T25-pH6", "1D-T25-pH7", "1D-T25-pH8", "1D-T25-pH9",
-                                "1D-T80-pH4", "1D-T80-pH5", "1D-T80-pH6", "1D-T80-pH7", "1D-T80-pH8", "1D-T80-pH9",
-                                "1D-T160-pH4", "1D-T160-pH5", "1D-T160-pH6", "1D-T160-pH7", "1D-T160-pH8", "1D-T160-pH9"]*/
             this.simulationList = simulationList;
             var promises = [];
             var variableStringList = this.varList[0].id;
@@ -109,6 +98,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                     });
                     $this.data = $this.reformatDataList(dataList);
                     $this.render();
+                    $('#loading').css('visibility','hidden');
                 })
                 .catch(function (err) {
                     console.log("Erro ao pegar dados temporais do servidor");

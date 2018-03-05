@@ -21,6 +21,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
     }
 
     getRemoteData() {
+        $('#loading').css('visibility','visible');
         var $this = this;
         if(this.data instanceof Array)
             this.data.splice(0,this.data.length);
@@ -69,12 +70,17 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                 });
                 $this.data = dataList;
                 $this.render();
+                $('#loading').css('visibility','hidden');
             });
     }
 
     setVariableList(varList) {
         this.varList = varList;
         this.getRemoteData();
+    }
+
+    getVariableList() {
+        return this.varList;
     }
 
     render() {
