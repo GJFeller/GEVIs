@@ -55,6 +55,9 @@
             <script src="javascript/external/THREE.TextTexture.js"></script>
             <script src="javascript/external/THREE.TextSprite.js"></script>
 
+            <!-- Underscore library -->
+            <script src="javascript/external/underscore-min.js"></script>
+
             <script src="javascript/events-definition.js"></script>
 
             <script src="javascript/windows-system.js"></script>
@@ -211,6 +214,7 @@
                             console.log(this);
                             this.temporalPanel.setQuery(this.queries);
                             this.spatialPanel.setQuery(this.queries);
+                            this.multivarPanel.setQuery(this.queries);
                         }
                     }
                     backendConnection.getEnsembleVariables(ensembleInfo["_id"])

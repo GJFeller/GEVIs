@@ -5,7 +5,8 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
         this.data = data;
         this.varList = [];
         this.window = window;
-        this.brush = d3.svg.brush()
+        this.brush = d3.svg.brush();
+        this.query = null;
     }
 
     appendToPanel(panel, id) {
@@ -18,6 +19,11 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
     setEnsemble(ensembleInfo) {
         this.ensembleInfo = ensembleInfo;
         //this.getRemoteData();
+    }
+
+    setQuery(query) {
+        this.query = query;
+        this.getRemoteData();
     }
 
     getRemoteData() {
@@ -42,36 +48,83 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
             simulationList = selectedSimulations;
         }*/
         var promises = [];
-        for(var i = 0; i < simulationList.length; i++) {
-            var variableStringList = this.varList[0].id;
-            for(var j = 1; j < this.varList.length; j++) {
-                variableStringList = variableStringList + "," + this.varList[j].id;
-            }
-            promises.push(backendConnection.getMultivariateData(0, 0, 0, 0, simulationList[i], variableStringList));
-        }
-        Promise.all(promises)
-            .then(function(values) {
-                var dataList = [];
-                values.forEach(function (elem) {
-                    if(elem.length > 0)
-                    {
-                        var data = {};
-                        data.simulationId = elem[0].simulationId;
-                        data.time = elem[0].time;
-                        $this.varList.forEach(function (variable, idx) {
-                            for(var i = 0; i < elem[0].variables.length; i++) {
-                                if(variable.id == elem[0].variables[i].variableId) {
-                                    data[varNameList[idx]] = elem[0].variables[i].value;
-                                }
-                            }
-                        });
-                        dataList.push(data);
+        if(this.varList.length > 0) {
+            for(var i = 0; i < simulationList.length; i++) {
+                var variableStringList = this.varList[0].id;
+                for(var j = 1; j < this.varList.length; j++) {
+                    variableStringList = variableStringList + "," + this.varList[j].id;
+                }
+                console.log(this.query);
+                if(this.query !== null && this.query.selectedCells.length > 0) {
+                    for(var j = 0; j < this.query.selectedCells.length; j++) {
+                        promises.push(backendConnection.getMultivariateData(this.query.selectedCells[j], 0, 0, 0, simulationList[i], variableStringList));
                     }
+                }
+                else {
+
+                }
+            }
+            Promise.all(promises)
+                .then(function(values) {
+                    var dataList = [];
+                    values.forEach(function (elem) {
+                        if(elem.length > 0)
+                        {
+                            var data = {};
+                            data.simulationId = elem[0].simulationId;
+                            data.time = elem[0].time;
+                            $this.varList.forEach(function (variable, idx) {
+                                for(var i = 0; i < elem[0].variables.length; i++) {
+                                    if(variable.id == elem[0].variables[i].variableId) {
+                                        data[varNameList[idx]] = elem[0].variables[i].value;
+                                    }
+                                }
+                            });
+                            dataList.push(data);
+                        }
+                    });
+                    $this.reformatDataList(dataList);
+                    $this.data = dataList;
+                    console.log($this.data);
+                    $this.render();
+                    $('#loading').css('visibility','hidden');
+                })
+                .catch(function (err) {
+                    console.log("Erro ao pegar os dados multivariados do servidor");
+                    console.error(err.message);
                 });
-                $this.data = dataList;
-                $this.render();
-                $('#loading').css('visibility','hidden');
+        }
+    }
+
+    reformatDataList(dataList) {
+        var simulationList = this.ensembleInfo.simulations;
+        var finalData = [];
+        if(dataList.length > 0) {
+            simulationList.forEach(function (simulation) {
+                var simArray = dataList.filter(function (a) { return a.simulationId === simulation; });
+                var simAverage = simArray.reduce((a, b, index, self) => {
+                    var keys = Object.keys(a);
+                    var c = {};
+
+                    keys.map((key) => {
+                        if(key === "simulationId" || key === "time") {
+                            c[key] = a[key];
+                        }
+                        else {
+                            c[key] = a[key] + b[key];
+                            if(index + 1 === self.length) {
+                                c[key] = c[key] / self.length;
+                            }                        
+                        }
+                    });
+                    return c;
+                });
+                //console.log(simAverage);
+                finalData.push(simAverage);
             });
+        }
+        console.log(finalData);
+        
     }
 
     setVariableList(varList) {
