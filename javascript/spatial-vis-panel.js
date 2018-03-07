@@ -104,7 +104,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         for(var j = 1; j < $this.varList.length; j++) {
                             variableStringList = variableStringList + "," + $this.varList[j].id;
                         }
-                        promises.push(backendConnection.getSpatialData(0, simulationList[i], variableStringList));
+                        //FIXME: Default is 0
+                        promises.push(backendConnection.getSpatialData(100, simulationList[i], variableStringList));
                     }
                     Promise.all(promises)
                         .then(function(values) {
