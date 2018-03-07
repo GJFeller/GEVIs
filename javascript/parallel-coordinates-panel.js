@@ -5,7 +5,8 @@ class ParallelCoordinatesPlot extends AbstractPanelBuilder {
         this.data = data;
         this.varList = [];
         this.window = window;
-        this.brush = d3.svg.brush()
+        this.brush = d3.svg.brush();
+        this.query = null;
     }
 
     appendToPanel(panel, id) {
@@ -17,6 +18,11 @@ class ParallelCoordinatesPlot extends AbstractPanelBuilder {
 
     setEnsemble(ensembleInfo) {
         this.ensembleInfo = ensembleInfo;
+    }
+
+    setQuery(query) {
+        this.query = query;
+        this.getRemoteData();
     }
 
     getRemoteData() {
@@ -46,7 +52,14 @@ class ParallelCoordinatesPlot extends AbstractPanelBuilder {
             for(var j = 1; j < this.varList.length; j++) {
                 variableStringList = variableStringList + "," + this.varList[j].id;
             }
-            promises.push(backendConnection.getMultivariateData(0, 0, 0, 0, simulationList[i], variableStringList));
+            if(this.query !== null && this.query.selectedCells.length > 0) {
+                for(var j = 0; j < this.query.selectedCells.length; j++) {
+                    promises.push(backendConnection.getMultivariateData(this.query.selectedCells[j], 0, 0, 0, simulationList[i], variableStringList));
+                }
+            }
+            else {
+                promises.push(backendConnection.getMultivariateData(0, 0, 0, 0, simulationList[i], variableStringList));
+            }
         }
         Promise.all(promises)
             .then(function(values) {
@@ -68,10 +81,41 @@ class ParallelCoordinatesPlot extends AbstractPanelBuilder {
                         dataList.push(data);
                     }
                 });
-                $this.data = dataList;
+                $this.data = $this.reformatDataList(dataList);
                 $this.render();
                 $('#loading').css('visibility','hidden');
             });
+    }
+
+    reformatDataList(dataList) {
+        var simulationList = this.ensembleInfo.simulations;
+        var finalData = [];
+        if(dataList.length > 0) {
+            simulationList.forEach(function (simulation) {
+                var simArray = dataList.filter(function (a) { return a.simulationId === simulation; });
+                var simAverage = simArray.reduce((a, b, index, self) => {
+                    var keys = Object.keys(a);
+                    var c = {};
+
+                    keys.map((key) => {
+                        if(key === "simulationId" || key === "time") {
+                            c[key] = a[key];
+                        }
+                        else {
+                            c[key] = a[key] + b[key];
+                            if(index + 1 === self.length) {
+                                c[key] = c[key] / self.length;
+                            }                        
+                        }
+                    });
+                    return c;
+                });
+                //console.log(simAverage);
+                finalData.push(simAverage);
+            });
+        }
+        console.log(finalData);
+        return finalData;
     }
 
     setVariableList(varList) {

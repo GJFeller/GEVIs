@@ -54,14 +54,14 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                 for(var j = 1; j < this.varList.length; j++) {
                     variableStringList = variableStringList + "," + this.varList[j].id;
                 }
-                console.log(this.query);
+                //console.log(this.query);
                 if(this.query !== null && this.query.selectedCells.length > 0) {
                     for(var j = 0; j < this.query.selectedCells.length; j++) {
                         promises.push(backendConnection.getMultivariateData(this.query.selectedCells[j], 0, 0, 0, simulationList[i], variableStringList));
                     }
                 }
                 else {
-
+                    promises.push(backendConnection.getMultivariateData(0, 0, 0, 0, simulationList[i], variableStringList));
                 }
             }
             Promise.all(promises)
@@ -83,8 +83,8 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                             dataList.push(data);
                         }
                     });
-                    $this.reformatDataList(dataList);
-                    $this.data = dataList;
+                    
+                    $this.data = $this.reformatDataList(dataList);
                     console.log($this.data);
                     $this.render();
                     $('#loading').css('visibility','hidden');
@@ -124,7 +124,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
             });
         }
         console.log(finalData);
-        
+        return finalData;
     }
 
     setVariableList(varList) {
