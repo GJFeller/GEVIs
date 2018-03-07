@@ -86,8 +86,9 @@ a{
     border-radius: 0 6px 6px 6px;
 }
 
-.dropdown-submenu:hover>.dropdown-menu {
+.dropdown-menu li:hover {
     display: block;
+    background-color: #2b90f5;
 }
 
 .dropdown-submenu>a:after {

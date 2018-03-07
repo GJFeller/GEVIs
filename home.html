@@ -121,7 +121,10 @@
                 return this.filter(function(i) {return a.indexOf(i) < 0;});
             };
 
-            
+            var multivarWindowConfigMenu = 
+            '<button class="btn btn-default btn-settings-multivar toggle-dropdown" data-toggle="dropdown"><i class="glyphicon glyphicon-cog"></i></button>' +
+            '<ul class="dropdown-menu panel-settings"><li id="change-option-multivar" role="option" class="ui-menu highlight">Change to parallel coordinates</li></ul>';
+
 
             var windowSetList = [];
             var variablePanelIndexor = 0;
@@ -295,7 +298,12 @@
                     if(selectedMultivariateVar.length > 0) {
                         if(windowsObj.multivarWindow === null) {
                             windowsObj.multivarWindow = new Window('panel1-'+windowsObj.panelIdx+'-1', 'Multivariate Visualization (' + windowsObj.ensembleInfo.ensembleId +')', windowsObj.variablesWindow, windowsObj.currentMultivarPanel);
-                            windowsObj.multivarWindow.setWindowContextMenu("contextMenuMultivariateWindow", changeMultivariatePanel);
+                            windowsObj.multivarWindow.setWindowConfigMenu(multivarWindowConfigMenu, changeMultivariatePanel);
+                            $("#change-option-multivar").on("click", function() { 
+                                console.log(windowsObj); 
+                                //changeMultivariatePanel.ensemble = windowsObj.ensembleInfo;
+                                changeMultivariatePanel(windowsObj.ensembleInfo);
+                            });
                         }
                         windowsObj.currentMultivarPanel.setVariableList(selectedMultivariateVar);
                         //windowsObj.multivarPanel.setVariableList(selectedMultivariateVar);
@@ -316,6 +324,10 @@
                     else {
                         windowsObj.spatialPanel.setVariableList([]);
                     }
+                    $(".panel-settings").on('click', function(e) {
+                        e.stopPropagation();
+                    });
+
                     //console.log(scatterPlotMatrix);
             }, false);
 
@@ -340,23 +352,30 @@
                 windowsObj.updatePanels();
             });
 
-            document.addEventListener('changeMultivariatePanel', function (e) {
-                var currentEnsemble = e.ensemble;
+            function changeMultivariatePanel(currentEnsemble) {
+                console.log('changeMultivariatePanel');
+                
+                //var currentEnsemble = e.ensemble;
                 var windowsObj = windowSetList.find(function(element) {
-                    return element.ensembleInfo === e.ensemble;
+                    return element.ensembleInfo === currentEnsemble;
                 });
+                console.log($("#change-option-multivar"));
                 var selectedVar = windowsObj.currentMultivarPanel.getVariableList();
                 if(windowsObj.currentMultivarPanel === windowsObj.parallelCoordPanel) {
                     windowsObj.multivarWindow.setWindowContent(windowsObj.multivarWindow.getId(), windowsObj.multivarPanel);
                     windowsObj.currentMultivarPanel = windowsObj.multivarPanel;
+                    $("#change-option-multivar").text("Change to parallel coordinates");
+                    
                     
                 }
                 else {
                     windowsObj.multivarWindow.setWindowContent(windowsObj.multivarWindow.getId(), windowsObj.parallelCoordPanel);
                     windowsObj.currentMultivarPanel = windowsObj.parallelCoordPanel;
+                    $("#change-option-multivar").text("Change to scatter plot matrix");
                 }
                 windowsObj.currentMultivarPanel.setVariableList(selectedVar);
-            });
+
+            };
 
             var backendConnection = new BackendRequests();
             var count = 0;
@@ -367,7 +386,7 @@
             var variablesWindow;
             /* Initialization of System */
             $(document).ready(function(){
-                
+                $('#loading').css('visibility','visible');
                 rootWindow = new Window(selectEnsemblePanel.id, 'Ensemble List', null, selectEnsemblePanel);
                 
                 //scatterWindow = new Window('panel1-1-1', 'Scatter Plot Matrix', rootWindow, scatterPlotMatrix);
@@ -377,6 +396,7 @@
                         allEnsembleList = result;
                         //selectedEnsembles.push(result[0]);
                         selectEnsemblePanel.setEnsembleList(result);
+                        $('#loading').css('visibility','hidden');
                         //selectVariablesPanel.setEnsembleList(result);
                         /*backendConnection.getEnsembleVariables(result[0]["_id"])
                             .then(function(result2) {
