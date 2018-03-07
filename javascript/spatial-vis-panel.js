@@ -30,6 +30,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.cellQuantity = null;
         this.selectedCells = [];
         this.marginSize = 17;
+        this.query = null;
 
         //this.getRemoteData();
     }
@@ -43,6 +44,17 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
     setEnsemble(ensembleInfo) {
         this.ensembleInfo = ensembleInfo;
+        this.getRemoteData();
+    }
+
+    setQuery(query) {
+        this.query = query;
+        this.renderInitialized = false;
+        this.renderers.splice(0,this.renderers.length);
+        this.scenes.splice(0,this.scenes.length);
+        this.axisScenes.splice(0,this.axisScenes.length);
+        this.legendScenes.splice(0,this.legendScenes.length);
+        this.titleScenes.splice(0, this.titleScenes.length);
         this.getRemoteData();
     }
 
@@ -70,14 +82,14 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         var ensembleId = this.ensembleInfo._id;
         var simulationList = [];
         // FIXME: Implement the query system to solve this problem with selectedSimulations
-        simulationList = this.ensembleInfo.simulations;
-        /*if(selectedSimulations.length === 0) {
-            //simulationList = selectEnsemblePanel.getEnsembleList()[0].simulations;
-            simulationList = selectedEnsembles[0].simulations;
+        //simulationList = this.ensembleInfo.simulations;
+        if(this.query === null || this.query.selectedSimulations === undefined 
+            || this.query.selectedSimulations.length === 0) {
+            simulationList = this.ensembleInfo.simulations;
         }
         else {
-            simulationList = selectedSimulations;
-        }*/
+            simulationList = this.query.selectedSimulations;
+        }
         
         var promises = [];
         var dataList = [];
@@ -103,7 +115,9 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             $this.render();
                             $('#loading').css('visibility','hidden');
                         })
-                        .catch(function () {
+                        .catch(function (err) {
+                            console.log("Erro ao pegar dados espaciais do servidor");
+                            console.error(err.message);
                         });
                 }
                 else {
@@ -111,6 +125,10 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     $('#loading').css('visibility','hidden');
                 }
                 
+            })
+            .catch(function (err) {
+                console.log("Erro ao pegar a quantidade de células do servidor");
+                console.error(err.message);
             });
         
     }
@@ -720,12 +738,13 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
     }
 
     resizePanel(width, height) {
-        this.camera.aspect = this.panel.width() / this.panel.height();
-        this.camera.updateProjectionMatrix();
+        //this.camera.aspect = this.panel.width() / this.panel.height();
+        //this.camera.updateProjectionMatrix();
 
-        this.axisCamera.updateProjectionMatrix();
+        //this.axisCamera.updateProjectionMatrix();
 
         //this.renderer.setSize( this.panel.width(), this.panel.height() );
+        //this.render();
     }
 
     setWindow(window) {
