@@ -58,6 +58,21 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.getRemoteData();
     }
 
+    setIfLogScale(isLogScale) {
+        this.isLogScale = isLogScale;
+        this.renderInitialized = false;
+        this.renderers.splice(0,this.renderers.length);
+        this.scenes.splice(0,this.scenes.length);
+        this.axisScenes.splice(0,this.axisScenes.length);
+        this.legendScenes.splice(0,this.legendScenes.length);
+        this.titleScenes.splice(0, this.titleScenes.length);
+        this.render();
+    }
+
+    isLogScale() {
+        return this.isLogScale;
+    }
+
     setVariableList(varList) {
         this.varList = varList;
         this.renderInitialized = false;

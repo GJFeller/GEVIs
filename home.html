@@ -106,6 +106,12 @@
             <ul id="contextMenuMultivariateWindow" class="dropdown-menu" role="menu" style="display: none">
                 <li><a tabindex="-1" id="change-chart">Change to parallel coordinates (PCP)</a></li>
             </ul>
+            <!--<ul id="contextMenuTemporalWindow" class="dropdown-menu" role="menu" style="display: none">
+                <li><a tabindex="-1" id="temporal-log-scale">Change to log scale</a></li>
+            </ul>
+            <ul id="contextMenuSpatialWindow" class="dropdown-menu" role="menu" style="display: none">
+                <li><a tabindex="-1" id="spatial-log-scale">Change to log scale</a></li>
+            </ul>-->
             <!--<ul id="contextMenuScatterPlot" class="dropdown-menu" role="menu" style="display:none" >
                 <li><a tabindex="-1" id="bar-chart">Create a bar chart</a></li>
                 <li><a tabindex="-1" id="force-layout">Create a force layout</a></li>
@@ -127,6 +133,14 @@
             var multivarWindowConfigMenu = 
             '<button class="btn btn-default btn-settings-multivar toggle-dropdown" data-toggle="dropdown"><i class="glyphicon glyphicon-cog"></i></button>' +
             '<ul class="dropdown-menu panel-settings"><li id="change-option-multivar" role="option" class="ui-menu highlight">Change to parallel coordinates</li></ul>';
+            var temporalWindowConfigMenu = 
+            '<button class="btn btn-default btn-settings-temporal toggle-dropdown" data-toggle="dropdown"><i class="glyphicon glyphicon-cog"></i></button>' +
+            '<ul class="dropdown-menu panel-settings"><li id="temporal-log-scale" role="option" class="ui-menu highlight">Change to fractioned exponent scale</li></ul>';
+            var spatialWindowConfigMenu = 
+            '<button class="btn btn-default btn-settings-spatial toggle-dropdown" data-toggle="dropdown"><i class="glyphicon glyphicon-cog"></i></button>' +
+            '<ul class="dropdown-menu panel-settings"><li id="spatial-log-scale" role="option" class="ui-menu highlight">Change to fractioned exponent scale</li></ul>';
+
+
 
 
             var windowSetList = [];
@@ -219,14 +233,27 @@
                     }
                     backendConnection.getEnsembleVariables(ensembleInfo["_id"])
                             .then(function(result) {
-                                newWindowsObj.variablesWindow = new Window(newWindowsObj.varPanel.id, 'Variable Selection (' + newWindowsObj.ensembleInfo.ensembleId +')', rootWindow, newWindowsObj.varPanel);
+                                newWindowsObj.variablesWindow = new Window(newWindowsObj.varPanel.id, 'Variable Selection', rootWindow, newWindowsObj.varPanel);
+                                newWindowsObj.variablesWindow.setWindowSubtitle('(' + newWindowsObj.ensembleInfo.ensembleId +')');
                                 newWindowsObj.varPanel.setVariableList(result);
                                 console.log(ensembleInfo);
                                 newWindowsObj.spatialPanel.setEnsemble(ensembleInfo);
                                 newWindowsObj.multivarPanel.setEnsemble(ensembleInfo);
                                 newWindowsObj.parallelCoordPanel.setEnsemble(ensembleInfo);
                                 newWindowsObj.temporalPanel.setEnsemble(ensembleInfo);
-                                newWindowsObj.spatialWindow = new Window('panel1-'+newWindowsObj.panelIdx+'-3', 'Spatial Domain (' + newWindowsObj.ensembleInfo.ensembleId +')', newWindowsObj.variablesWindow, newWindowsObj.spatialPanel);
+                                newWindowsObj.spatialWindow = new Window('panel1-'+newWindowsObj.panelIdx+'-3', 'Spatial Domain', newWindowsObj.variablesWindow, newWindowsObj.spatialPanel);
+                                newWindowsObj.spatialWindow.setWindowSubtitle('(' + newWindowsObj.ensembleInfo.ensembleId +')');
+                                newWindowsObj.spatialWindow.setWindowConfigMenu(spatialWindowConfigMenu);
+                                $("#spatial-log-scale").on("click", function() {
+                                    var isLogScale = newWindowsObj.spatialPanel.isLogScale;                       
+                                    newWindowsObj.spatialPanel.setIfLogScale(!isLogScale);
+                                    if(isLogScale) {
+                                        $("#spatial-log-scale").text("Change to fractioned exponent scale");
+                                    }
+                                    else {
+                                        $("#spatial-log-scale").text("Change to linear scale");
+                                    }
+                                });
                                 newWindowsObj.currentMultivarPanel = newWindowsObj.multivarPanel;
                                 windowSetList.push(newWindowsObj);
                             });
@@ -302,8 +329,9 @@
                     console.log(selectedSpatialVar);
                     if(selectedMultivariateVar.length > 0) {
                         if(windowsObj.multivarWindow === null) {
-                            windowsObj.multivarWindow = new Window('panel1-'+windowsObj.panelIdx+'-1', 'Multivariate Visualization (' + windowsObj.ensembleInfo.ensembleId +')', windowsObj.variablesWindow, windowsObj.currentMultivarPanel);
-                            windowsObj.multivarWindow.setWindowConfigMenu(multivarWindowConfigMenu, changeMultivariatePanel);
+                            windowsObj.multivarWindow = new Window('panel1-'+windowsObj.panelIdx+'-1', 'Multivariate Visualization', windowsObj.variablesWindow, windowsObj.currentMultivarPanel);
+                            windowsObj.multivarWindow.setWindowSubtitle('(' + windowsObj.ensembleInfo.ensembleId +')');
+                            windowsObj.multivarWindow.setWindowConfigMenu(multivarWindowConfigMenu);
                             $("#change-option-multivar").on("click", function() { 
                                 console.log(windowsObj); 
                                 //changeMultivariatePanel.ensemble = windowsObj.ensembleInfo;
@@ -316,13 +344,38 @@
                     }
                     if(selectedTemporalVar.length > 0) {
                         if(windowsObj.temporalWindow === null) {
-                            windowsObj.temporalWindow = new Window('panel1-'+windowsObj.panelIdx+'-2', 'Temporal Visualization (' + windowsObj.ensembleInfo.ensembleId +')', windowsObj.variablesWindow, windowsObj.temporalPanel);
+                            windowsObj.temporalWindow = new Window('panel1-'+windowsObj.panelIdx+'-2', 'Temporal Visualization', windowsObj.variablesWindow, windowsObj.temporalPanel);
+                            windowsObj.temporalWindow.setWindowSubtitle('(' + windowsObj.ensembleInfo.ensembleId +')');
+                            windowsObj.temporalWindow.setWindowConfigMenu(temporalWindowConfigMenu);
+                            $("#temporal-log-scale").on("click", function() {
+                                console.log("temporal log scale")
+                                var isLogScale = windowsObj.temporalPanel.isLogScale;
+                                windowsObj.temporalPanel.setIfLogScale(!isLogScale);
+                                if(isLogScale) {
+                                    $("#temporal-log-scale").text("Change to fractioned exponent scale");
+                                }
+                                else {
+                                    $("#temporal-log-scale").text("Change to linear scale");
+                                }
+                            });
                         }
                         windowsObj.temporalPanel.setVariableList(selectedTemporalVar);
                     }
                     if(selectedSpatialVar.length > 0) {
                         if(windowsObj.spatialWindow === null) {
-                            windowsObj.spatialWindow = new Window('panel1-'+windowsObj.panelIdx+'-3', 'Spatial Domain (' + windowsObj.ensembleInfo.ensembleId +')', windowsObj.variablesWindow, windowsObj.spatialPanel);
+                            windowsObj.spatialWindow = new Window('panel1-'+windowsObj.panelIdx+'-3', 'Spatial Domain', windowsObj.variablesWindow, windowsObj.spatialPanel);
+                            windowsObj.spatialWindow.setWindowSubtitle('(' + windowsObj.ensembleInfo.ensembleId +')');
+                            windowsObj.spatialWindow.setWindowConfigMenu(spatialWindowConfigMenu);
+                                $("#spatial-log-scale").on("click", function() {
+                                    var isLogScale = windowsObj.spatialPanel.isLogScale;
+                                    windowsObj.spatialPanel.setIfLogScale(!isLogScale);
+                                    if(isLogScale) {
+                                        $("#spatial-log-scale").text("Change to fractioned exponent scale");
+                                    }
+                                    else {
+                                        $("#spatial-log-scale").text("Change to linear scale");
+                                    }
+                                });
                         }
                         windowsObj.spatialPanel.setVariableList(selectedSpatialVar);
                     }

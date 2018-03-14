@@ -7,6 +7,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
         this.window = window;
         this.legendElementWidth = 95;
         this.isLegendColumn = false;
+        this.isLogScale = false;
         this.query = null;
     }
 
@@ -34,6 +35,15 @@ class TemporalVisPanel extends AbstractPanelBuilder {
     setQuery(query) {
         this.query = query;
         this.getRemoteData();
+    }
+
+    setIfLogScale(isLogScale) {
+        this.isLogScale = isLogScale;
+        this.render();
+    }
+
+    isLogScale() {
+        return this.isLogScale;
     }
 
     getRemoteData() {
@@ -243,7 +253,13 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             
             var y = new Map();
             variables.forEach(function(variable) {
-                y.set(variable, d3.scale.linear().range([height, 0]));
+                if($this.isLogScale) {
+                    y.set(variable, d3.scale.pow().exponent(1 / 10).range([height, 0]));
+                    //y.set(variable, d3.scale.log().range([height, 0]));
+                }
+                else {
+                    y.set(variable, d3.scale.linear().range([height, 0]));
+                }
             });
             /*var y = d3.scale.linear()
                 .range([height, 0]);*/
@@ -266,7 +282,12 @@ class TemporalVisPanel extends AbstractPanelBuilder {
 
             var yAxis = new Map();
             variables.forEach(function(variable) {
-                yAxis.set(variable, d3.svg.axis().scale(y.get(variable)).orient("left").tickFormat(formatSiPrefix));
+                if($this.isLogScale) {
+                    yAxis.set(variable, d3.svg.axis().scale(y.get(variable)).orient("left").ticks(7).tickFormat(formatSiPrefix));
+                }
+                else {
+                    yAxis.set(variable, d3.svg.axis().scale(y.get(variable)).orient("left").tickFormat(formatSiPrefix));
+                }
             });
 
             

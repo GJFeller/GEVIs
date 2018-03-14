@@ -82,11 +82,27 @@ class Window {
         }
     }
 
+    setWindowSubtitle(subtitle) {
+        console.log($("#" + this.id + " .panel-heading"));
+        console.log($("#" + this.id + " .panel-heading").find(".panel-subtitle"));
+        if($("#" + this.id + " .panel-heading").find(".panel-subtitle").length > 0) {
+            $("#" + this.id + " .panel-heading")
+                .find(".panel-subtitle")
+                .text(subtitle);
+        }
+        else {
+            $("#" + this.id + " .panel-heading")
+                .append("<br><span class='panel-subtitle'>"+subtitle+"</span>");
+        }
+        /*$("#" + this.id + " .panel-heading .panel-subtitle")
+            .text(subtitle);*/
+    }
+
     getId() {
         return this.id;
     }
 
-    setWindowConfigMenu(menuHTML, event) {
+    setWindowConfigMenu(menuHTML) {
         //console.log($("#" + this.id));
         $("#" + this.id + ' .panel-heading .btn-group')
             .append(menuHTML);
@@ -94,7 +110,7 @@ class Window {
     }
 
     createNewChild(currentId, chartObj, parent, panelContent) {
-        var newElem = $('<div '+ 'id="' + currentId + '" class="panel panel-default"> <div class="panel-heading clearfix"> <h4 class="panel-title pull-left" style="padding-top: 7.5px;">' + chartObj + '</h4> <div class="btn-group"><button disabled class="btn btn-default btn-remove"><i class="glyphicon glyphicon-remove"></i></button> <button class="btn btn-default btn-minimize"><i class="glyphicon glyphicon-minus"></i></button></div></div><div class="panel-body center-panel"></div></div>').css({"position": "absolute"});
+        var newElem = $('<div '+ 'id="' + currentId + '" class="panel panel-default"> <div class="panel-heading clearfix"> <h4 class="panel-title pull-left" style="padding-top: 7.5px;">' + chartObj + '</h4><div class="btn-group"><button disabled class="btn btn-default btn-remove"><i class="glyphicon glyphicon-remove"></i></button> <button class="btn btn-default btn-minimize"><i class="glyphicon glyphicon-minus"></i></button></div></div><div class="panel-body center-panel"></div></div>').css({"position": "absolute"});
         //var newID = "";
         var chart;
         $(".container").append(newElem);
