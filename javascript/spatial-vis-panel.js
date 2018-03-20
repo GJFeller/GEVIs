@@ -536,8 +536,19 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         renderer.userData = {};
                         renderer.domElement.id = sceneIdx;
 
+                        var d3Renderer = new THREE.CSS3DRenderer();
+                        d3Renderer.domElement.id = "spatial-legend-" + sceneIdx;
+                        d3Renderer.domElement.style.position = "absolute";
+                        d3Renderer.domElement.style.bottom = "5px";
+                        d3Renderer.domElement.style.right = "10px";
 
-                        container.append(renderer.domElement);
+                        var div = document.createElement("div");
+                        div.style.position = "relative";
+                        div.append(renderer.domElement);
+                        div.append(d3Renderer.domElement);
+                        container.append(div);
+
+                        //container.append(renderer.domElement);
                         //console.log(canvas[0]);
 
                         renderer.domElement.addEventListener('mousemove', onMouseMove, false);
@@ -546,6 +557,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                         var controls = new THREE.OrbitControls( camera, renderer.domElement );
                         var controlsAxes = new THREE.OrbitControls( axisCamera, renderer.domElement );
+                        controlsAxes.enableZoom = false;
                         renderer.userData.controls = controls;
                         renderer.userData.controlsAxes = controlsAxes;
 
