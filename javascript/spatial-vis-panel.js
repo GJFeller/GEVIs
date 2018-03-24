@@ -422,6 +422,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         var accumulatedVarValues = [];
                         var lut = new THREE.Lut( colorMap, numberOfColors );
                         var legend = [];
+                        var colorScale = null;
                         if($this.varList.length > 0) {
                             var currentVar = $this.varList[sceneIdx];
                             console.log(currentVar);
@@ -456,6 +457,10 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             lut.setMax( extent[1] );
                             lut.setMin( extent[0] );
                             
+                            var scale = ['#d53e4f', '#f46d43', '#fdae61', '#fee08b', '#e6f598', '#abdda4', '#66c2a5', '#3288bd'];
+                            colorScale = d3.scale.linear()
+                                .domain(linspace(extent[0], extent[1], scale.length))
+                                .range(scale);
                             
                             // Legend
                             /*legend = lut.setLegendOn({'layout': legendLayout, 'position': {'x': 0, 'y': 0, 'z' : 0}});
@@ -471,7 +476,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             function createLegend() {
 
 
-                                var percentWidth = container.width()*0.50;
+                                var percentWidth = container.width()*0.25;
                                 var percentHeight = container.height()*0.50;
                                 var legendRect = {left: container.width()-percentWidth, right: container.width()-$this.marginSize, top: container.height()-percentHeight, bottom: container.height()-$this.marginSize};
                                 var fullWidth  = legendRect.right - legendRect.left;
@@ -479,7 +484,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                 var left   = legendRect.left;
                                 var top    = legendRect.top;
 
-                                var legendMargin = {top: 20, right: 20, bottom: 20, left: 20};
+                                var legendMargin = {top: 20, right: 5, bottom: 20, left: 5};
                                 var width = fullWidth - legendMargin.left - legendMargin.right;
                                 var height = fullHeight - legendMargin.top - legendMargin.bottom;
 
@@ -492,14 +497,6 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                     .append('g')
                                     .attr('transform', 'translate(' + legendMargin.left + ',' +
                                     legendMargin.top + ')');
-
-
-                                
-
-                                var scale = ['#d53e4f', '#f46d43', '#fdae61', '#fee08b', '#e6f598', '#abdda4', '#66c2a5', '#3288bd'];
-                                var colorScale = d3.scale.linear()
-                                    .domain(linspace(extent[0], extent[1], scale.length))
-                                    .range(scale);
 
                                 // clear current legend
                                 //legendSvg.selectAll('*').remove();
@@ -532,7 +529,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                 legendSvg.append('rect')
                                     .attr('x1', 0)
                                     .attr('y1', 0)
-                                    .attr('width', width*0.1)
+                                    .attr('width', width*0.2)
                                     .attr('height', height)
                                     .style('fill', 'url(#gradient)');
 
@@ -548,157 +545,26 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                                 legendSvg.append("g")
                                     .attr("class", "legendAxis")
-                                    .attr("transform", "translate(" + width*0.1 + ", 0)")
+                                    .attr("transform", "translate(" + width*0.2 + ", 0)")
                                     .call(legendAxis);
 
-                                function linspace(start, end, n) {
-                                    var out = [];
-                                    var delta = (end - start) / (n - 1);
-                                
-                                    var i = 0;
-                                    while(i < (n - 1)) {
-                                        out.push(start + (i * delta));
-                                        i++;
-                                    }
-                                
-                                    out.push(end);
-                                    return out;
-                                }
-
-                                /*//The maximum radius the hexagons can have to still fit the screen
-                                var hexRadius = d3.min([width/(Math.sqrt(3)*MapColumns), height/(MapRows*1.5)]);
-
-                                console.log(d3.select('#spatial-legend-' + sceneIdx));
-                                var svg = d3.select('#spatial-legend-' + sceneIdx)
-                                        .append("svg")
-                                            .attr("width", width)
-                                            .attr("height", height)
-                                        .append("g");
-                                var defs = svg.append("defs");
-                                ///////////////////////////////////////////////////////////////////////////
-                                //////////////// Calculate hexagon centers and put into array /////////////
-                                ///////////////////////////////////////////////////////////////////////////	
-
-                                var SQRT3 = Math.sqrt(3),
-                                hexWidth = SQRT3 * hexRadius,
-                                hexHeight = 2 * hexRadius;
-                                var hexagonPoly = [[0,-1],[SQRT3/2,0.5],[0,1],[-SQRT3/2,0.5],[-SQRT3/2,-0.5],[0,-1],[SQRT3/2,-0.5]];
-                                var hexagonPath = "m" + hexagonPoly.map(function(p){ return [p[0]*hexRadius, p[1]*hexRadius].join(','); }).join('l') + "z";
-
-                                var points = [];
-                                for (var i = 0; i < MapRows; i++) {
-                                    for (var j = 0; j < MapColumns; j++) {
-                                        var a;
-                                        var b = (3 * i) * hexRadius / 2;
-                                        if (i % 2 === 0) {
-                                            a = SQRT3 * j * hexRadius;
-                                        } else {
-                                            a = SQRT3 * (j - 0.5) * hexRadius;
-                                        }//else
-                                        points.push({x: a, y: b});
-                                    }//for j
-                                }//for i
-
-                                ///////////////////////////////////////////////////////////////////////////
-                                //////////// Get continuous color scale for the Rainbow ///////////////////
-                                ///////////////////////////////////////////////////////////////////////////
-
-                                var coloursRainbow = ["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c","#f9d057","#f29e2e","#e76818","#d7191c"];
-                                var colourRangeRainbow = d3.range(0, 1, 1.0 / (coloursRainbow.length - 1));
-                                colourRangeRainbow.push(1);
-                                        
-                                //Create color gradient
-                                var colorScaleRainbow = d3.scale.linear()
-                                    .domain(colourRangeRainbow)
-                                    .range(coloursRainbow)
-                                    .interpolate(d3.interpolateHcl);
-
-                                //Needed to map the values of the dataset to the color scale
-                                var colorInterpolateRainbow = d3.scale.linear()
-                                    .domain(extent)
-                                    .range([0,1]);
-
-                                ///////////////////////////////////////////////////////////////////////////
-                                //////////////////// Create the Rainbow color gradient ////////////////////
-                                ///////////////////////////////////////////////////////////////////////////
-
-                                //Calculate the gradient	
-                                defs.append("linearGradient")
-                                    .attr("id", "gradient-rainbow-colors")
-                                    .attr("x1", "0%").attr("y1", "0%")
-                                    .attr("x2", "100%").attr("y2", "0%")
-                                    .selectAll("stop") 
-                                    .data(coloursRainbow)                  
-                                    .enter().append("stop") 
-                                    .attr("offset", function(d,i) { return i/(coloursRainbow.length-1); })   
-                                    .attr("stop-color", function(d) { return d; });
-
-                                ///////////////////////////////////////////////////////////////////////////
-                                ////////////////////////// Draw the legend ////////////////////////////////
-                                ///////////////////////////////////////////////////////////////////////////
-
-                                var legendWidth = width * 0.6,
-                                    legendHeight = 10;
-
-                                //Color Legend container
-                                var legendsvg = svg.append("g")
-                                    .attr("class", "legendWrapper")
-                                    .attr("transform", "translate(" + (width/2 - 10) + "," + (height/2) + ")");
-
-                                //Draw the Rectangle
-                                legendsvg.append("rect")
-                                    .attr("class", "legendRect")
-                                    .attr("x", -legendWidth/2)
-                                    .attr("y", 10)
-                                    //.attr("rx", legendHeight/2)
-                                    .attr("width", legendWidth)
-                                    .attr("height", legendHeight)
-                                    .style("fill", "none");
-
-                                //Append title
-                                legendsvg.append("text")
-                                    .attr("class", "legendTitle")
-                                    .attr("x", 0)
-                                    .attr("y", -2)
-                                    .text("Store Competition Index");
-
-                                //Set scale for x-axis
-                                var xScale = d3.scale.linear()
-                                    .range([0, legendWidth])
-                                    .domain([extent[0],extent[1]]);
-                                    //.domain([d3.min(pt.legendSOM.colorData)/100, d3.max(pt.legendSOM.colorData)/100]);
-
-                                //Define x-axis
-                                var xAxis = d3.svg.axis()
-                                    .orient("bottom")
-                                    .ticks(5)  //Set rough # of ticks
-                                    //.tickFormat(formatPercent)
-                                    .scale(xScale);
-
-                                //Set up X axis
-                                legendsvg.append("g")
-                                    .attr("class", "legendAxis")  //Assign "axis" class
-                                    .attr("transform", "translate(" + (-legendWidth/2) + "," + (10 + legendHeight) + ")")
-                                    .call(xAxis);*/
 
                             }
-                            //var element = document.createElement('div');
-                            //element.innerHTML = ''; 
-                            //element.style.background = "#0094ff";
-                            //element.style.fontSize = "2em";
-                            //element.style.color = "white";
-                            //element.style.padding = "2em";
 
-                            //CSS Object
-                            /*var objdiv = new THREE.CSS3DObject(element);
-                            objdiv.position.x = 0;
-                            objdiv.position.y = 0;
-                            objdiv.position.z = 0;
-                            legendScene.add(objdiv);*/
-
+                            function linspace(start, end, n) {
+                                var out = [];
+                                var delta = (end - start) / (n - 1);
+                            
+                                var i = 0;
+                                while(i < (n - 1)) {
+                                    out.push(start + (i * delta));
+                                    i++;
+                                }
+                            
+                                out.push(end);
+                                return out;
+                            }
                         }
-
-                        //console.log(accumulatedVarValues);                     
 
                         for(var i = 0; i < $this.cellQuantity; i++) {
                             //var varDataInCell = $this.data[i].variableData.filter(aVar => aVar.variableId == currentVar.id);
@@ -710,7 +576,9 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                 //accumulatedVarValues = [].concat(varDataInCell[0].accumulatedData);
                                 console.log(varDataInCell[0].accumulatedData);
                                 var mean = d3.mean(varDataInCell[0].accumulatedData, function(d){ return d; });
-                                var newMaterial = new THREE.MeshPhongMaterial( { color: lut.getColor(mean), side: THREE.DoubleSide } );
+                                var color = colorScale(mean);
+                                //var newMaterial = new THREE.MeshPhongMaterial( { color: lut.getColor(mean), side: THREE.DoubleSide } );
+                                var newMaterial = new THREE.MeshPhongMaterial( { color: color, side: THREE.DoubleSide } );
                                 //aObject.material.color = lut.getColor(mean);
                                 aObject.material = newMaterial;
                             }
