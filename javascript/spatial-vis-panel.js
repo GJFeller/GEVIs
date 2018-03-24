@@ -133,7 +133,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         })
                         .catch(function (err) {
                             console.log("Erro ao pegar dados espaciais do servidor");
-                            console.error(err.message);
+                            console.log(err);
                         });
                 }
                 else {
@@ -320,6 +320,31 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         var objects = [];
                         var wireframes = [];
 
+                        /*var d3Renderer = new THREE.CSS3DRenderer();
+                        d3Renderer.domElement.id = "spatial-legend-" + sceneIdx;
+                        d3Renderer.domElement.style.position = "absolute";
+                        d3Renderer.domElement.style.bottom = "5px";
+                        d3Renderer.domElement.style.right = "10px";*/
+
+                        var renderer = new THREE.WebGLRenderer( { antialias: true } );
+                        renderer.setPixelRatio( window.devicePixelRatio );
+                        renderer.autoClear = false;
+                        renderer.userData = {};
+                        renderer.domElement.id = sceneIdx;
+
+                        var div = document.createElement("div");
+                        div.style.position = "relative";
+
+                        var legendDiv = document.createElement("div");
+                        legendDiv.id = "spatial-legend-" + sceneIdx;
+                        legendDiv.style.position = "absolute";
+                        legendDiv.style.bottom = "5px";
+                        legendDiv.style.right = "10px";
+                        
+                        div.append(renderer.domElement);
+                        div.append(legendDiv);
+                        container.append(div);
+
                         
 
                         for(var i = 0; i < $this.cellQuantity; i++) {
@@ -433,7 +458,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             
                             
                             // Legend
-                            legend = lut.setLegendOn({'layout': legendLayout, 'position': {'x': 0, 'y': 0, 'z' : 0}});
+                            /*legend = lut.setLegendOn({'layout': legendLayout, 'position': {'x': 0, 'y': 0, 'z' : 0}});
                             var labels = lut.setLegendLabels({'title': '', 'um': currentVar.unit, 'ticks': 5, 'fontsize': 50});
                             legendScene.add( legend );
                             legendScene.add ( labels['title'] );
@@ -441,7 +466,236 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             for ( var i = 0; i < Object.keys( labels[ 'ticks' ] ).length; i++ ) {
                                 legendScene.add ( labels[ 'ticks' ][ i ] );
                                 legendScene.add ( labels[ 'lines' ][ i ] );
+                            }*/
+                            createLegend();
+                            function createLegend() {
+
+
+                                var percentWidth = container.width()*0.50;
+                                var percentHeight = container.height()*0.50;
+                                var legendRect = {left: container.width()-percentWidth, right: container.width()-$this.marginSize, top: container.height()-percentHeight, bottom: container.height()-$this.marginSize};
+                                var fullWidth  = legendRect.right - legendRect.left;
+                                var fullHeight = legendRect.bottom - legendRect.top;
+                                var left   = legendRect.left;
+                                var top    = legendRect.top;
+
+                                var legendMargin = {top: 20, right: 20, bottom: 20, left: 20};
+                                var width = fullWidth - legendMargin.left - legendMargin.right;
+                                var height = fullHeight - legendMargin.top - legendMargin.bottom;
+
+
+                                var legendSvg = d3.select('#spatial-legend-' + sceneIdx)
+                                    .append("svg")
+                                    .attr('width', fullWidth)
+                                    .attr('height', fullHeight)
+                                    .style('vertical-align', 'top')
+                                    .append('g')
+                                    .attr('transform', 'translate(' + legendMargin.left + ',' +
+                                    legendMargin.top + ')');
+
+
+                                
+
+                                var scale = ['#d53e4f', '#f46d43', '#fdae61', '#fee08b', '#e6f598', '#abdda4', '#66c2a5', '#3288bd'];
+                                var colorScale = d3.scale.linear()
+                                    .domain(linspace(extent[0], extent[1], scale.length))
+                                    .range(scale);
+
+                                // clear current legend
+                                //legendSvg.selectAll('*').remove();
+                                // append gradient bar
+                                var gradient = legendSvg.append('defs')
+                                    .append('linearGradient')
+                                    .attr('id', 'gradient')
+                                    .attr('x1', '0%') // bottom
+                                    .attr('y1', '100%')
+                                    .attr('x2', '0%') // to top
+                                    .attr('y2', '0%')
+                                    .attr('spreadMethod', 'pad');
+
+                                // programatically generate the gradient for the legend
+                                // this creates an array of [pct, colour] pairs as stop
+                                // values for legend
+                                var pct = linspace(0, 100, scale.length).map(function(d) {
+                                    return Math.round(d) + '%';
+                                });
+
+                                var colourPct = d3.zip(pct, scale);
+
+                                colourPct.forEach(function(d) {
+                                    gradient.append('stop')
+                                        .attr('offset', d[0])
+                                        .attr('stop-color', d[1])
+                                        .attr('stop-opacity', 1);
+                                });
+
+                                legendSvg.append('rect')
+                                    .attr('x1', 0)
+                                    .attr('y1', 0)
+                                    .attr('width', width*0.1)
+                                    .attr('height', height)
+                                    .style('fill', 'url(#gradient)');
+
+                                // create a scale and axis for the legend
+                                var legendScale = d3.scale.linear()
+                                    .domain(extent)
+                                    .range([height, 0]);
+
+                                var legendAxis = d3.svg.axis()
+                                    .scale(legendScale)
+                                    .orient("right")
+                                    .ticks(5);
+
+                                legendSvg.append("g")
+                                    .attr("class", "legendAxis")
+                                    .attr("transform", "translate(" + width*0.1 + ", 0)")
+                                    .call(legendAxis);
+
+                                function linspace(start, end, n) {
+                                    var out = [];
+                                    var delta = (end - start) / (n - 1);
+                                
+                                    var i = 0;
+                                    while(i < (n - 1)) {
+                                        out.push(start + (i * delta));
+                                        i++;
+                                    }
+                                
+                                    out.push(end);
+                                    return out;
+                                }
+
+                                /*//The maximum radius the hexagons can have to still fit the screen
+                                var hexRadius = d3.min([width/(Math.sqrt(3)*MapColumns), height/(MapRows*1.5)]);
+
+                                console.log(d3.select('#spatial-legend-' + sceneIdx));
+                                var svg = d3.select('#spatial-legend-' + sceneIdx)
+                                        .append("svg")
+                                            .attr("width", width)
+                                            .attr("height", height)
+                                        .append("g");
+                                var defs = svg.append("defs");
+                                ///////////////////////////////////////////////////////////////////////////
+                                //////////////// Calculate hexagon centers and put into array /////////////
+                                ///////////////////////////////////////////////////////////////////////////	
+
+                                var SQRT3 = Math.sqrt(3),
+                                hexWidth = SQRT3 * hexRadius,
+                                hexHeight = 2 * hexRadius;
+                                var hexagonPoly = [[0,-1],[SQRT3/2,0.5],[0,1],[-SQRT3/2,0.5],[-SQRT3/2,-0.5],[0,-1],[SQRT3/2,-0.5]];
+                                var hexagonPath = "m" + hexagonPoly.map(function(p){ return [p[0]*hexRadius, p[1]*hexRadius].join(','); }).join('l') + "z";
+
+                                var points = [];
+                                for (var i = 0; i < MapRows; i++) {
+                                    for (var j = 0; j < MapColumns; j++) {
+                                        var a;
+                                        var b = (3 * i) * hexRadius / 2;
+                                        if (i % 2 === 0) {
+                                            a = SQRT3 * j * hexRadius;
+                                        } else {
+                                            a = SQRT3 * (j - 0.5) * hexRadius;
+                                        }//else
+                                        points.push({x: a, y: b});
+                                    }//for j
+                                }//for i
+
+                                ///////////////////////////////////////////////////////////////////////////
+                                //////////// Get continuous color scale for the Rainbow ///////////////////
+                                ///////////////////////////////////////////////////////////////////////////
+
+                                var coloursRainbow = ["#2c7bb6", "#00a6ca","#00ccbc","#90eb9d","#ffff8c","#f9d057","#f29e2e","#e76818","#d7191c"];
+                                var colourRangeRainbow = d3.range(0, 1, 1.0 / (coloursRainbow.length - 1));
+                                colourRangeRainbow.push(1);
+                                        
+                                //Create color gradient
+                                var colorScaleRainbow = d3.scale.linear()
+                                    .domain(colourRangeRainbow)
+                                    .range(coloursRainbow)
+                                    .interpolate(d3.interpolateHcl);
+
+                                //Needed to map the values of the dataset to the color scale
+                                var colorInterpolateRainbow = d3.scale.linear()
+                                    .domain(extent)
+                                    .range([0,1]);
+
+                                ///////////////////////////////////////////////////////////////////////////
+                                //////////////////// Create the Rainbow color gradient ////////////////////
+                                ///////////////////////////////////////////////////////////////////////////
+
+                                //Calculate the gradient	
+                                defs.append("linearGradient")
+                                    .attr("id", "gradient-rainbow-colors")
+                                    .attr("x1", "0%").attr("y1", "0%")
+                                    .attr("x2", "100%").attr("y2", "0%")
+                                    .selectAll("stop") 
+                                    .data(coloursRainbow)                  
+                                    .enter().append("stop") 
+                                    .attr("offset", function(d,i) { return i/(coloursRainbow.length-1); })   
+                                    .attr("stop-color", function(d) { return d; });
+
+                                ///////////////////////////////////////////////////////////////////////////
+                                ////////////////////////// Draw the legend ////////////////////////////////
+                                ///////////////////////////////////////////////////////////////////////////
+
+                                var legendWidth = width * 0.6,
+                                    legendHeight = 10;
+
+                                //Color Legend container
+                                var legendsvg = svg.append("g")
+                                    .attr("class", "legendWrapper")
+                                    .attr("transform", "translate(" + (width/2 - 10) + "," + (height/2) + ")");
+
+                                //Draw the Rectangle
+                                legendsvg.append("rect")
+                                    .attr("class", "legendRect")
+                                    .attr("x", -legendWidth/2)
+                                    .attr("y", 10)
+                                    //.attr("rx", legendHeight/2)
+                                    .attr("width", legendWidth)
+                                    .attr("height", legendHeight)
+                                    .style("fill", "none");
+
+                                //Append title
+                                legendsvg.append("text")
+                                    .attr("class", "legendTitle")
+                                    .attr("x", 0)
+                                    .attr("y", -2)
+                                    .text("Store Competition Index");
+
+                                //Set scale for x-axis
+                                var xScale = d3.scale.linear()
+                                    .range([0, legendWidth])
+                                    .domain([extent[0],extent[1]]);
+                                    //.domain([d3.min(pt.legendSOM.colorData)/100, d3.max(pt.legendSOM.colorData)/100]);
+
+                                //Define x-axis
+                                var xAxis = d3.svg.axis()
+                                    .orient("bottom")
+                                    .ticks(5)  //Set rough # of ticks
+                                    //.tickFormat(formatPercent)
+                                    .scale(xScale);
+
+                                //Set up X axis
+                                legendsvg.append("g")
+                                    .attr("class", "legendAxis")  //Assign "axis" class
+                                    .attr("transform", "translate(" + (-legendWidth/2) + "," + (10 + legendHeight) + ")")
+                                    .call(xAxis);*/
+
                             }
+                            //var element = document.createElement('div');
+                            //element.innerHTML = ''; 
+                            //element.style.background = "#0094ff";
+                            //element.style.fontSize = "2em";
+                            //element.style.color = "white";
+                            //element.style.padding = "2em";
+
+                            //CSS Object
+                            /*var objdiv = new THREE.CSS3DObject(element);
+                            objdiv.position.x = 0;
+                            objdiv.position.y = 0;
+                            objdiv.position.z = 0;
+                            legendScene.add(objdiv);*/
+
                         }
 
                         //console.log(accumulatedVarValues);                     
@@ -530,23 +784,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         $this.legendScenes.push(legendScene);
                         $this.titleScenes.push(titleScene);
 
-                        var renderer = new THREE.WebGLRenderer( { antialias: true } );
-                        renderer.setPixelRatio( window.devicePixelRatio );
-                        renderer.autoClear = false;
-                        renderer.userData = {};
-                        renderer.domElement.id = sceneIdx;
-
-                        var d3Renderer = new THREE.CSS3DRenderer();
-                        d3Renderer.domElement.id = "spatial-legend-" + sceneIdx;
-                        d3Renderer.domElement.style.position = "absolute";
-                        d3Renderer.domElement.style.bottom = "5px";
-                        d3Renderer.domElement.style.right = "10px";
-
-                        var div = document.createElement("div");
-                        div.style.position = "relative";
-                        div.append(renderer.domElement);
-                        div.append(d3Renderer.domElement);
-                        container.append(div);
+                        
 
                         //container.append(renderer.domElement);
                         //console.log(canvas[0]);
@@ -560,6 +798,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         controlsAxes.enableZoom = false;
                         renderer.userData.controls = controls;
                         renderer.userData.controlsAxes = controlsAxes;
+                        //renderer.userData.legendRenderer = d3Renderer;
 
                         $this.renderers.push(renderer);
 
@@ -713,6 +952,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         renderer.render($this.axisScenes[i], $this.axisScenes[i].userData.camera);
 
                         renderer.clearDepth();
+                        /*var legendRenderer = renderer.userData.legendRenderer;
                         var percentWidth = container.width()*0.50;
                         var percentHeight = container.height()*0.50;
                         var legendRect = {left: container.width()-percentWidth, right: container.width()-$this.marginSize, top: container.height()-percentHeight, bottom: container.height()-$this.marginSize};
@@ -720,10 +960,10 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 					    var height = legendRect.bottom - legendRect.top;
 					    var left   = legendRect.left;
                         var top    = legendRect.top;
-                        renderer.setViewport( left, top, width, height );
-                        renderer.render( $this.legendScenes[i], $this.legendScenes[i].userData.camera);
+                        legendRenderer.setSize( width, height );
+                        legendRenderer.render( $this.legendScenes[i], $this.legendScenes[i].userData.camera);*/
 
-                        renderer.clearDepth();
+                        //legendRenderer.clearDepth();
                         var percentWidth = container.width()*0.1;
                         var percentHeight = container.height()/2;
                         //console.log($this.titleScenes);
