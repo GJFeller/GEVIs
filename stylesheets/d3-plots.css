@@ -94,4 +94,5 @@ circle.hiddenSPLOTM {
     stroke: #000;
     stroke-width: 1;
     fill: none;
+    shape-rendering: crispEdges;
   }

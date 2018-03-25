@@ -31,6 +31,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.selectedCells = [];
         this.marginSize = 17;
         this.query = null;
+        this.isLogScale = false;
 
         //this.getRemoteData();
     }
@@ -461,6 +462,16 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             colorScale = d3.scale.linear()
                                 .domain(linspace(extent[0], extent[1], scale.length))
                                 .range(scale);
+
+                            var ticksValues = [];
+                            var ticksQty = 5;
+                            var tickIncrement = (extent[1] - extent[0])/(ticksQty-1)
+
+                            ticksValues.push(extent[0]);
+                            for(var idx=0; idx < ticksQty-2; idx++) {
+                                ticksValues.push(ticksValues[idx]+tickIncrement);
+                            }
+                            ticksValues.push(extent[1]);
                             
                             // Legend
                             /*legend = lut.setLegendOn({'layout': legendLayout, 'position': {'x': 0, 'y': 0, 'z' : 0}});
@@ -541,7 +552,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                 var legendAxis = d3.svg.axis()
                                     .scale(legendScale)
                                     .orient("right")
-                                    .ticks(5);
+                                    .tickValues(ticksValues);
 
                                 legendSvg.append("g")
                                     .attr("class", "legendAxis")
