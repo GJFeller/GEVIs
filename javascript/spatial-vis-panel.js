@@ -459,9 +459,17 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             lut.setMin( extent[0] );
                             
                             var scale = ['#d53e4f', '#f46d43', '#fdae61', '#fee08b', '#e6f598', '#abdda4', '#66c2a5', '#3288bd'];
-                            colorScale = d3.scale.linear()
-                                .domain(linspace(extent[0], extent[1], scale.length))
-                                .range(scale);
+
+                            if(!$this.isLogScale) {
+                                colorScale = d3.scale.linear()
+                                    .domain(linspace(extent[0], extent[1], scale.length))
+                                    .range(scale);
+                            }
+                            else {
+                                colorScale = d3.scale.pow().exponent(1 / 10)
+                                    .domain(linspace(extent[0], extent[1], scale.length))
+                                    .range(scale);
+                            }
 
                             var ticksValues = [];
                             var ticksQty = 5;
@@ -545,14 +553,28 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                     .style('fill', 'url(#gradient)');
 
                                 // create a scale and axis for the legend
-                                var legendScale = d3.scale.linear()
-                                    .domain(extent)
-                                    .range([height, 0]);
+                                if(!$this.isLogScale) {
+                                    var legendScale = d3.scale.linear()
+                                        .domain(extent)
+                                        .range([height, 0]);
 
-                                var legendAxis = d3.svg.axis()
-                                    .scale(legendScale)
-                                    .orient("right")
-                                    .tickValues(ticksValues);
+                                
+                                    var legendAxis = d3.svg.axis()
+                                        .scale(legendScale)
+                                        .orient("right")
+                                        .tickValues(ticksValues);
+                                }
+                                else {
+                                    var legendScale = d3.scale.pow().exponent(1 / 10)
+                                        .domain(extent)
+                                        .range([height, 0]);
+
+                                
+                                    var legendAxis = d3.svg.axis()
+                                        .scale(legendScale)
+                                        .orient("right")
+                                        .tickValues(ticksValues);
+                                }
 
                                 legendSvg.append("g")
                                     .attr("class", "legendAxis")
