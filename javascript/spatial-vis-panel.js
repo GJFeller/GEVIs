@@ -520,6 +520,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                     .append("svg")
                                     .attr('width', fullWidth)
                                     .attr('height', fullHeight)
+                                    .attr('unselectable', 'on')
+                                    .attr('class', 'unselectable')
                                     .style('vertical-align', 'top')
                                     .append('g')
                                     .attr('transform', 'translate(' + legendMargin.left + ',' +
@@ -609,6 +611,15 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                     .attr("transform", "translate(" + width*0.2 + ", 0)")
                                     .call(legendAxis);
 
+                                if(currentVar.unit !== 'n/a') {
+                                    legendSvg.append("text")
+                                        .attr('x', (width/2))
+                                        .attr('y', 0 - (legendMargin.top / 3))
+                                        .attr("text-anchor", "middle")  
+                                        .style("font-size", "10px") 
+                                        .style("text-decoration", "underline")  
+                                        .text("Unit: " + currentVar.unit);
+                                }
 
                             }
 

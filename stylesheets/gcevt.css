@@ -24,6 +24,9 @@
 #valueText {
     display: block;
     position: absolute;
+    background-color:rgba(230, 242, 255, 0.5);
+    height: 16px;
+
 }
 
 *.unselectable {
