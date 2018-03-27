@@ -45,13 +45,13 @@
             <script src="https://cdn.jsdelivr.net/npm/jquery.fancytree@2.23/dist/jquery.fancytree-all.js"></script>
 
             <!-- Three.JS library -->
-            <script src="https://threejs.org/build/three.js"></script>
-            <script src="https://threejs.org/examples/js/Detector.js"></script>
-            <script src="https://threejs.org/examples/js/renderers/Projector.js"></script>
-            <script src="https://threejs.org/examples/js/controls/TrackballControls.js"></script>
-            <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
-            <script src="https://threejs.org/examples/js/utils/GeometryUtils.js"></script>
-            <script src="https://threejs.org/examples/js/math/Lut.js"></script>
+            <script src="javascript/external/three.min.js"></script>
+            <script src="javascript/external/Detector.js"></script>
+            <script src="javascript/external/Projector.js"></script>
+            <script src="javascript/external/TrackballControls.js"></script>
+            <script src="javascript/external/OrbitControls.js"></script>
+            <script src="javascript/external/GeometryUtils.js"></script>
+            <script src="javascript/external/Lut.js"></script>
             <script src="javascript/external/THREE.TextTexture.js"></script>
             <script src="javascript/external/THREE.TextSprite.js"></script>
             <script src="javascript/external/CSS3DRenderer.js"></script>
@@ -90,6 +90,8 @@
             <!-- D3 Plots CSS -->
             <link rel="stylesheet" href="stylesheets/d3-plots.css">
 
+            <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,700' rel='stylesheet' type='text/css'>
+
 
             <title>Geochemical Ensemble Visualization Tool</title>
     </head>
@@ -100,6 +102,7 @@
             <img src="./images/ajax_loader.gif" width="100px" class="gif">
             <span id="msg" class="gif">Loading</span>
         </div>
+        <p id="valueText" unselectable="on" class="unselectable"></p>
         <h2>Geochemical Ensemble Visualization Tool</h2>
         <!--<button onclick="sayHello()">Say hello</button>-->
         <div class="container">    
@@ -137,9 +140,9 @@
             var temporalWindowConfigMenu = 
             '<button class="btn btn-default btn-settings-temporal toggle-dropdown" data-toggle="dropdown"><i class="glyphicon glyphicon-cog"></i></button>' +
             '<ul class="dropdown-menu panel-settings"><li id="temporal-log-scale" role="option" class="ui-menu highlight">Change to fractioned exponent scale</li></ul>';
-            var spatialWindowConfigMenu = 
+            /*var spatialWindowConfigMenu = 
             '<button class="btn btn-default btn-settings-spatial toggle-dropdown" data-toggle="dropdown"><i class="glyphicon glyphicon-cog"></i></button>' +
-            '<ul class="dropdown-menu panel-settings"><li id="spatial-log-scale" role="option" class="ui-menu highlight">Change to fractioned exponent scale</li></ul>';
+            '<ul class="dropdown-menu panel-settings"><li id="spatial-log-scale" role="option" class="ui-menu highlight">Change to fractioned exponent scale</li></ul>';*/
 
 
 
@@ -244,7 +247,7 @@
                                 newWindowsObj.temporalPanel.setEnsemble(ensembleInfo);
                                 newWindowsObj.spatialWindow = new Window('panel1-'+newWindowsObj.panelIdx+'-3', 'Spatial Domain', newWindowsObj.variablesWindow, newWindowsObj.spatialPanel);
                                 newWindowsObj.spatialWindow.setWindowSubtitle('(' + newWindowsObj.ensembleInfo.ensembleId +')');
-                                newWindowsObj.spatialWindow.setWindowConfigMenu(spatialWindowConfigMenu);
+                                //newWindowsObj.spatialWindow.setWindowConfigMenu(spatialWindowConfigMenu);
                                 $("#spatial-log-scale").on("click", function() {
                                     var isLogScale = newWindowsObj.spatialPanel.isLogScale;                       
                                     newWindowsObj.spatialPanel.setIfLogScale(!isLogScale);
@@ -366,7 +369,7 @@
                         if(windowsObj.spatialWindow === null) {
                             windowsObj.spatialWindow = new Window('panel1-'+windowsObj.panelIdx+'-3', 'Spatial Domain', windowsObj.variablesWindow, windowsObj.spatialPanel);
                             windowsObj.spatialWindow.setWindowSubtitle('(' + windowsObj.ensembleInfo.ensembleId +')');
-                            windowsObj.spatialWindow.setWindowConfigMenu(spatialWindowConfigMenu);
+                            //windowsObj.spatialWindow.setWindowConfigMenu(spatialWindowConfigMenu);
                                 $("#spatial-log-scale").on("click", function() {
                                     var isLogScale = windowsObj.spatialPanel.isLogScale;
                                     windowsObj.spatialPanel.setIfLogScale(!isLogScale);

@@ -80,3 +80,19 @@ circle.hiddenSPLOTM {
     text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff;
     cursor: move;
   }
+
+  .legendTitle {
+    text-anchor: middle;
+    font-size: 2.2rem;
+    fill: #4F4F4F;
+    font-weight: 300;
+  }
+
+  .legendAxis path,
+  .legendAxis tick,
+  .legendAxis line {
+    stroke: #000;
+    stroke-width: 1;
+    fill: none;
+    shape-rendering: crispEdges;
+  }

@@ -31,6 +31,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.selectedCells = [];
         this.marginSize = 17;
         this.query = null;
+        this.isLogScale = false;
 
         //this.getRemoteData();
     }
@@ -133,7 +134,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         })
                         .catch(function (err) {
                             console.log("Erro ao pegar dados espaciais do servidor");
-                            console.error(err.message);
+                            console.log(err);
                         });
                 }
                 else {
@@ -320,6 +321,31 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         var objects = [];
                         var wireframes = [];
 
+                        /*var d3Renderer = new THREE.CSS3DRenderer();
+                        d3Renderer.domElement.id = "spatial-legend-" + sceneIdx;
+                        d3Renderer.domElement.style.position = "absolute";
+                        d3Renderer.domElement.style.bottom = "5px";
+                        d3Renderer.domElement.style.right = "10px";*/
+
+                        var renderer = new THREE.WebGLRenderer( { antialias: true } );
+                        renderer.setPixelRatio( window.devicePixelRatio );
+                        renderer.autoClear = false;
+                        renderer.userData = {};
+                        renderer.domElement.id = sceneIdx;
+
+                        var div = document.createElement("div");
+                        div.style.position = "relative";
+
+                        var legendDiv = document.createElement("div");
+                        legendDiv.id = "spatial-legend-" + sceneIdx;
+                        legendDiv.style.position = "absolute";
+                        legendDiv.style.bottom = "5px";
+                        legendDiv.style.right = "10px";
+                        
+                        div.append(renderer.domElement);
+                        div.append(legendDiv);
+                        container.append(div);
+
                         
 
                         for(var i = 0; i < $this.cellQuantity; i++) {
@@ -397,6 +423,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         var accumulatedVarValues = [];
                         var lut = new THREE.Lut( colorMap, numberOfColors );
                         var legend = [];
+                        var colorScale = null;
                         if($this.varList.length > 0) {
                             var currentVar = $this.varList[sceneIdx];
                             console.log(currentVar);
@@ -431,9 +458,39 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             lut.setMax( extent[1] );
                             lut.setMin( extent[0] );
                             
+                            var scale = ['#d53e4f', '#f46d43', '#fdae61', '#fee08b', '#e6f598', '#abdda4', '#66c2a5', '#3288bd'];
+
+                            
+
+                            /*if(!$this.isLogScale) {
+                                colorScale = d3.scale.linear()
+                                    .domain(linspace(extent[0], extent[1], scale.length))
+                                    .range(scale);
+                            }
+                            else {
+                                //Map colours across the range in equal intervals
+                                var num_colours = scale.length
+                                var diff = extent[1] - extent[0]
+                                var step = diff / (scale.length - 1)
+                                var for_inversion = d3.range(num_colours).map(function(d) {return range[0] + d*step})
+                                var log_colour_values = for_inversion.map(logScale.invert)
+                                colorScale = d3.scale.pow().exponent(1 / 10)
+                                    .domain(linspace(extent[0], extent[1], scale.length))
+                                    .range(scale);
+                            }*/
+
+                            var ticksValues = [];
+                            var ticksQty = 5;
+                            var tickIncrement = (extent[1] - extent[0])/(ticksQty-1)
+
+                            ticksValues.push(extent[0]);
+                            for(var idx=0; idx < ticksQty-2; idx++) {
+                                ticksValues.push(ticksValues[idx]+tickIncrement);
+                            }
+                            ticksValues.push(extent[1]);
                             
                             // Legend
-                            legend = lut.setLegendOn({'layout': legendLayout, 'position': {'x': 0, 'y': 0, 'z' : 0}});
+                            /*legend = lut.setLegendOn({'layout': legendLayout, 'position': {'x': 0, 'y': 0, 'z' : 0}});
                             var labels = lut.setLegendLabels({'title': '', 'um': currentVar.unit, 'ticks': 5, 'fontsize': 50});
                             legendScene.add( legend );
                             legendScene.add ( labels['title'] );
@@ -441,10 +498,134 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             for ( var i = 0; i < Object.keys( labels[ 'ticks' ] ).length; i++ ) {
                                 legendScene.add ( labels[ 'ticks' ][ i ] );
                                 legendScene.add ( labels[ 'lines' ][ i ] );
+                            }*/
+                            createLegend();
+                            function createLegend() {
+
+
+                                var percentWidth = container.width()*0.25;
+                                var percentHeight = container.height()*0.50;
+                                var legendRect = {left: container.width()-percentWidth, right: container.width()-$this.marginSize, top: container.height()-percentHeight, bottom: container.height()-$this.marginSize};
+                                var fullWidth  = legendRect.right - legendRect.left;
+                                var fullHeight = legendRect.bottom - legendRect.top;
+                                var left   = legendRect.left;
+                                var top    = legendRect.top;
+
+                                var legendMargin = {top: 20, right: 5, bottom: 20, left: 5};
+                                var width = fullWidth - legendMargin.left - legendMargin.right;
+                                var height = fullHeight - legendMargin.top - legendMargin.bottom;
+
+
+                                var legendSvg = d3.select('#spatial-legend-' + sceneIdx)
+                                    .append("svg")
+                                    .attr('width', fullWidth)
+                                    .attr('height', fullHeight)
+                                    .style('vertical-align', 'top')
+                                    .append('g')
+                                    .attr('transform', 'translate(' + legendMargin.left + ',' +
+                                    legendMargin.top + ')');
+
+                                // clear current legend
+                                //legendSvg.selectAll('*').remove();
+                                // append gradient bar
+                                var gradient = legendSvg.append('defs')
+                                    .append('linearGradient')
+                                    .attr('id', 'gradient')
+                                    .attr('x1', '0%') // bottom
+                                    .attr('y1', '100%')
+                                    .attr('x2', '0%') // to top
+                                    .attr('y2', '0%')
+                                    .attr('spreadMethod', 'pad');
+
+                                // programatically generate the gradient for the legend
+                                // this creates an array of [pct, colour] pairs as stop
+                                // values for legend
+                                var pct = linspace(0, 100, scale.length).map(function(d) {
+                                    return Math.round(d) + '%';
+                                });
+
+                                var colourPct = d3.zip(pct, scale);
+
+                                colourPct.forEach(function(d) {
+                                    gradient.append('stop')
+                                        .attr('offset', d[0])
+                                        .attr('stop-color', d[1])
+                                        .attr('stop-opacity', 1);
+                                });
+
+                                legendSvg.append('rect')
+                                    .attr('x1', 0)
+                                    .attr('y1', 0)
+                                    .attr('width', width*0.2)
+                                    .attr('height', height)
+                                    .style('fill', 'url(#gradient)');
+
+                                // create a scale and axis for the legend
+                                if(!$this.isLogScale) {
+
+                                    colorScale = d3.scale.linear()
+                                        .domain(linspace(extent[0], extent[1], scale.length))
+                                        .range(scale);
+
+                                    var legendScale = d3.scale.linear()
+                                        .domain(extent)
+                                        .range([height, 0]);
+
+                                
+                                    var legendAxis = d3.svg.axis()
+                                        .scale(legendScale)
+                                        .orient("right")
+                                        .tickValues(ticksValues);
+                                }
+                                else {
+
+                                    
+
+                                    var legendScale = d3.scale.pow().exponent(1 / 10)
+                                        .domain(extent)
+                                        .range([height, 0]);
+
+
+                                    //Map colours across the range in equal intervals
+                                    var num_colours = scale.length
+                                    var diff = extent[1] - extent[0]
+                                    var step = diff / (scale.length - 1)
+                                    var for_inversion = d3.range(num_colours).map(function(d) {return extent[0] + d*step})
+                                    var log_colour_values = for_inversion.map(legendScale.invert)
+
+                                    colorScale = d3.scale.pow().exponent(1 / 10)
+                                        .domain(log_colour_values)
+                                        .range(scale);
+
+                                
+                                    var legendAxis = d3.svg.axis()
+                                        .scale(legendScale)
+                                        .orient("right")
+                                        .tickValues(ticksValues);
+                                }
+
+                                legendSvg.append("g")
+                                    .attr("class", "legendAxis")
+                                    .attr("transform", "translate(" + width*0.2 + ", 0)")
+                                    .call(legendAxis);
+
+
+                            }
+
+                            function linspace(start, end, n) {
+                                var out = [];
+                                var delta = (end - start) / (n - 1);
+                            
+                                var i = 0;
+                                while(i < (n - 1)) {
+                                    out.push(start + (i * delta));
+                                    i++;
+                                }
+                            
+                                out.push(end);
+                                return out;
                             }
                         }
-
-                        //console.log(accumulatedVarValues);                     
 
                         for(var i = 0; i < $this.cellQuantity; i++) {
                             //var varDataInCell = $this.data[i].variableData.filter(aVar => aVar.variableId == currentVar.id);
@@ -456,7 +637,10 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                 //accumulatedVarValues = [].concat(varDataInCell[0].accumulatedData);
                                 console.log(varDataInCell[0].accumulatedData);
                                 var mean = d3.mean(varDataInCell[0].accumulatedData, function(d){ return d; });
-                                var newMaterial = new THREE.MeshPhongMaterial( { color: lut.getColor(mean), side: THREE.DoubleSide } );
+                                var color = colorScale(mean);
+                                aObject.mean = mean;
+                                //var newMaterial = new THREE.MeshPhongMaterial( { color: lut.getColor(mean), side: THREE.DoubleSide } );
+                                var newMaterial = new THREE.MeshPhongMaterial( { color: color, side: THREE.DoubleSide } );
                                 //aObject.material.color = lut.getColor(mean);
                                 aObject.material = newMaterial;
                             }
@@ -530,14 +714,9 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         $this.legendScenes.push(legendScene);
                         $this.titleScenes.push(titleScene);
 
-                        var renderer = new THREE.WebGLRenderer( { antialias: true } );
-                        renderer.setPixelRatio( window.devicePixelRatio );
-                        renderer.autoClear = false;
-                        renderer.userData = {};
-                        renderer.domElement.id = sceneIdx;
+                        
 
-
-                        container.append(renderer.domElement);
+                        //container.append(renderer.domElement);
                         //console.log(canvas[0]);
 
                         renderer.domElement.addEventListener('mousemove', onMouseMove, false);
@@ -546,8 +725,10 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                         var controls = new THREE.OrbitControls( camera, renderer.domElement );
                         var controlsAxes = new THREE.OrbitControls( axisCamera, renderer.domElement );
+                        controlsAxes.enableZoom = false;
                         renderer.userData.controls = controls;
                         renderer.userData.controlsAxes = controlsAxes;
+                        //renderer.userData.legendRenderer = d3Renderer;
 
                         $this.renderers.push(renderer);
 
@@ -592,9 +773,14 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     // create an array containing all objects in the scene with which the ray intersects
                     var intersects = ray.intersectObjects( $this.scenes[idx].userData.objects );
         
+                    /*$('#valueText').css({
+                        left: event.pageX + 10,
+                        top: event.pageY - 20,
+                    });*/
                     // if there is one (or more) intersections
                     if ( intersects.length > 0 )
                     {
+                        
                         if(INTERSECTED==null) {
                             INTERSECTED = intersects[ 0 ];
                             console.log(INTERSECTED);
@@ -602,15 +788,40 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                 $this.scenes[idx].userData.wireframe.position.set(INTERSECTED.object.position.x, INTERSECTED.object.position.y, INTERSECTED.object.position.z);
                                 $this.scenes[idx].add( $this.scenes[idx].userData.wireframe );
                             }
+                            if(INTERSECTED.object.mean !== undefined) {
+                                $('#valueText').css({
+                                    left: event.pageX + 10,
+                                    bottom: event.pageY + 30,
+                                    visibility: 'visible',
+                                    'z-index': 99999,
+                                    'font-weight': 'bold',
+                                    'pointer-events': 'none'
+                                })
+                                .text(parseFloat(INTERSECTED.object.mean).toFixed(5));
+                            }
                         }
                         else {
                             $this.scenes[idx].remove( $this.scenes[idx].userData.wireframe );
                             INTERSECTED = intersects[ 0 ];
                             $this.scenes[idx].userData.wireframe.position.set(INTERSECTED.object.position.x, INTERSECTED.object.position.y, INTERSECTED.object.position.z);
-                            $this.scenes[idx].add( $this.scenes[idx].userData.wireframe );	
+                            $this.scenes[idx].add( $this.scenes[idx].userData.wireframe );
+                            if(INTERSECTED.object.mean !== undefined) {
+                                $('#valueText').css({
+                                    left: event.pageX + 10,
+                                    top: event.pageY - 20,
+                                    visibility: 'visible',
+                                    'z-index': 99999,
+                                    'font-weight': 'bold',
+                                    'pointer-events': 'none'
+                                })
+                                .text(parseFloat(INTERSECTED.object.mean).toFixed(5));
+                            }
                         }
                     }
                     else {
+                        $('#valueText').css({
+                            visibility: 'hidden'
+                        });
                         if(INTERSECTED) {
                             $this.scenes[idx].remove($this.scenes[idx].userData.wireframe);
                         }
@@ -701,6 +912,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         renderer.render($this.axisScenes[i], $this.axisScenes[i].userData.camera);
 
                         renderer.clearDepth();
+                        /*var legendRenderer = renderer.userData.legendRenderer;
                         var percentWidth = container.width()*0.50;
                         var percentHeight = container.height()*0.50;
                         var legendRect = {left: container.width()-percentWidth, right: container.width()-$this.marginSize, top: container.height()-percentHeight, bottom: container.height()-$this.marginSize};
@@ -708,10 +920,10 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 					    var height = legendRect.bottom - legendRect.top;
 					    var left   = legendRect.left;
                         var top    = legendRect.top;
-                        renderer.setViewport( left, top, width, height );
-                        renderer.render( $this.legendScenes[i], $this.legendScenes[i].userData.camera);
+                        legendRenderer.setSize( width, height );
+                        legendRenderer.render( $this.legendScenes[i], $this.legendScenes[i].userData.camera);*/
 
-                        renderer.clearDepth();
+                        //legendRenderer.clearDepth();
                         var percentWidth = container.width()*0.1;
                         var percentHeight = container.height()/2;
                         //console.log($this.titleScenes);
