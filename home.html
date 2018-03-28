@@ -136,7 +136,8 @@
 
             var multivarWindowConfigMenu = 
             '<button class="btn btn-default btn-settings-multivar toggle-dropdown" data-toggle="dropdown"><i class="glyphicon glyphicon-cog"></i></button>' +
-            '<ul class="dropdown-menu panel-settings"><li id="change-option-multivar" role="option" class="ui-menu highlight">Change to parallel coordinates</li></ul>';
+            '<ul class="dropdown-menu panel-settings"><li id="change-option-multivar" role="option" class="ui-menu highlight">Change to parallel coordinates</li>' +
+            '<li id="multivar-log-scale" role="option" class="ui-menu highlight">Change to fractioned exponent scale</li></ul>';
             var temporalWindowConfigMenu = 
             '<button class="btn btn-default btn-settings-temporal toggle-dropdown" data-toggle="dropdown"><i class="glyphicon glyphicon-cog"></i></button>' +
             '<ul class="dropdown-menu panel-settings"><li id="temporal-log-scale" role="option" class="ui-menu highlight">Change to fractioned exponent scale</li></ul>';
@@ -341,6 +342,18 @@
                                 //changeMultivariatePanel.ensemble = windowsObj.ensembleInfo;
                                 changeMultivariatePanel(windowsObj.ensembleInfo);
                             });
+                            $("#multivar-log-scale").on("click", function() { 
+                                var isLogScale = windowsObj.multivarPanel.isLogScale;
+                                windowsObj.multivarPanel.setIfLogScale(!isLogScale);
+                                windowsObj.parallelCoordPanel.setIfLogScale(!isLogScale);
+                                if(isLogScale) {
+                                    $("#multivar-log-scale").text("Change to fractioned exponent scale");
+                                }
+                                else {
+                                    $("#multivar-log-scale").text("Change to linear scale");
+                                }
+                            });
+
                         }
                         windowsObj.currentMultivarPanel.setVariableList(selectedMultivariateVar);
                         //windowsObj.multivarPanel.setVariableList(selectedMultivariateVar);
