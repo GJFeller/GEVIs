@@ -439,6 +439,55 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                     .style("font-size", 12);
             }
 
+            svg
+                .append("rect")
+                .attr("fill", "transparent")
+                .attr("width", this.panel.width() - 10)
+                .attr("height", height + margin.top + margin.bottom)
+                .attr("class", "dumbRect")
+                .on("click", mousedown)
+                .append("g")
+                .attr("class", "huehuehue");
+
+            function mousedown() {
+                console.log("Captured mouse");
+                var m = d3.mouse(this);
+
+                console.log(this);
+                var timeLine = svg.selectAll(".huehuehue");
+                console.log(svg);
+                console.log(timeLine);
+                if(timeLine.length > 0) {
+                    console.log(d3.selectAll(".timeLine"));
+                    if(d3.selectAll(".timeLine")[0].length > 0) {
+                        svg.selectAll(".timeLine")
+                            .attr("x1", m[0])
+                            .attr("x2", m[0]);
+                    }
+                    else {
+                        svg
+                            .append("line")
+                            .attr("x1", m[0])
+                            .attr("x2", m[0])
+                            .attr("y1", 0)
+                            .attr("y2", height)
+                            .attr("class", "timeLine")
+                            .attr("stroke", "#111")
+                            .attr("stroke-width", 1);
+                    }
+                    console.log(x.invert(m[0]));
+                }
+                //if(timeLine.length > 0) {
+                    //timeLine
+                    //    .attr("x1", m[0])
+                  //      .attr("x2", m[0]);    
+                //}
+                //else {
+                    
+                //}
+
+            }
+
                 /*.attr("transform", function(d, i) { return "translate(" + margin.left + "," + margin.top + ")";});*/
 
 
