@@ -488,7 +488,12 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                             .attr("stroke-width", 1);
                     }
                     console.log(x.invert(m[0]));
-                    selectedTimeInstant.time = x.invert(m[0]);
+                    if(m[0] > x.range()[1]) {
+                        selectedTimeInstant.time = x.range()[1];
+                    }
+                    else {
+                        selectedTimeInstant.time = x.invert(m[0]);
+                    }
                     selectedTimeInstant.ensemble = $this.ensembleInfo;
                     document.dispatchEvent(selectedTimeInstant);
                 }

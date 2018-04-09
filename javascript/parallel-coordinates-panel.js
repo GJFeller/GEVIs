@@ -47,54 +47,52 @@ class ParallelCoordinatesPlot extends AbstractPanelBuilder {
         });
         var ensembleId = selectedEnsembles[0]._id;
         var simulationList = [];
-        // FIXME: Implement the query system to solve this problem with selectedSimulations
         simulationList = this.ensembleInfo.simulations;
-        /*if(selectedSimulations.length === 0) {
-            //simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
-            simulationList = selectedEnsembles[0].simulations;
-        }
-        else {
-            simulationList = selectedSimulations;
-        }*/
         var promises = [];
-        for(var i = 0; i < simulationList.length; i++) {
-            var variableStringList = this.varList[0].id;
-            for(var j = 1; j < this.varList.length; j++) {
-                variableStringList = variableStringList + "," + this.varList[j].id;
-            }
-            if(this.query !== null && this.query.selectedCells.length > 0) {
-                for(var j = 0; j < this.query.selectedCells.length; j++) {
-                    promises.push(backendConnection.getMultivariateData(this.query.selectedCells[j], 0, 0, this.query.selectedTime, simulationList[i], variableStringList));
+        if(this.varList.length > 0) {
+            for(var i = 0; i < simulationList.length; i++) {
+                var variableStringList = this.varList[0].id;
+                for(var j = 1; j < this.varList.length; j++) {
+                    variableStringList = variableStringList + "," + this.varList[j].id;
+                }
+                //console.log(this.query);
+                if(this.query !== null && this.query.selectedCells.length > 0) {
+                    for(var j = 0; j < this.query.selectedCells.length; j++) {
+                        promises.push(backendConnection.getMultivariateData(this.query.selectedCells[j], 0, 0, this.query.selectedTime, simulationList[i], variableStringList));
+                    }
+                }
+                else {
+                    promises.push(backendConnection.getMultivariateData(0, 0, 0, 0, simulationList[i], variableStringList));
                 }
             }
-            else {
-                promises.push(backendConnection.getMultivariateData(0, 0, 0, 0, simulationList[i], variableStringList));
-            }
-        }
-        Promise.all(promises)
-            .then(function(values) {
-                
-                var dataList = [];
-                values.forEach(function (elem) {
-                    if(elem.length > 0)
-                    {
-                        var data = {};
-                        data.simulationId = elem[0].simulationId;
-                        data.time = elem[0].time;
-                        $this.varList.forEach(function (variable, idx) {
-                            for(var i = 0; i < elem[0].variables.length; i++) {
-                                if(variable.id == elem[0].variables[i].variableId) {
-                                    data[varNameList[idx]] = elem[0].variables[i].value;
+            Promise.all(promises)
+                .then(function(values) {
+                    var dataList = [];
+                    console.log(values);
+                    values.forEach(function (elem) {
+                            var data = {};
+                            data.simulationId = elem.simulationId;
+                            data.time = elem.time;
+                            $this.varList.forEach(function (variable, idx) {
+                                for(var i = 0; i < elem.variables.length; i++) {
+                                    if(variable.id == elem.variables[i].variableId) {
+                                        data[varNameList[idx]] = elem.variables[i].value;
+                                    }
                                 }
-                            }
-                        });
-                        dataList.push(data);
-                    }
+                            });
+                            dataList.push(data);
+                    });
+                    console.log(dataList);
+                    $this.data = $this.reformatDataList(dataList);
+                    console.log($this.data);
+                    $this.render();
+                    $('#loading').css('visibility','hidden');
+                })
+                .catch(function (err) {
+                    console.log("Erro ao pegar os dados multivariados do servidor");
+                    console.error(err.message);
                 });
-                $this.data = $this.reformatDataList(dataList);
-                $this.render();
-                $('#loading').css('visibility','hidden');
-            });
+            }
     }
 
     reformatDataList(dataList) {

@@ -48,15 +48,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
         });
         var ensembleId = selectedEnsembles[0]._id;
         var simulationList = [];
-        // FIXME: Implement the query system to solve this problem with selectedSimulations
         simulationList = this.ensembleInfo.simulations;
-        /*if(selectedSimulations.length === 0) {
-            //simulationList = selectVariablesPanel.getEnsembleList()[0].simulations;
-            simulationList = selectedEnsembles[0].simulations;
-        }
-        else {
-            simulationList = selectedSimulations;
-        }*/
         var promises = [];
         if(this.varList.length > 0) {
             for(var i = 0; i < simulationList.length; i++) {
@@ -77,23 +69,21 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
             Promise.all(promises)
                 .then(function(values) {
                     var dataList = [];
+                    console.log(values);
                     values.forEach(function (elem) {
-                        if(elem.length > 0)
-                        {
                             var data = {};
-                            data.simulationId = elem[0].simulationId;
-                            data.time = elem[0].time;
+                            data.simulationId = elem.simulationId;
+                            data.time = elem.time;
                             $this.varList.forEach(function (variable, idx) {
-                                for(var i = 0; i < elem[0].variables.length; i++) {
-                                    if(variable.id == elem[0].variables[i].variableId) {
-                                        data[varNameList[idx]] = elem[0].variables[i].value;
+                                for(var i = 0; i < elem.variables.length; i++) {
+                                    if(variable.id == elem.variables[i].variableId) {
+                                        data[varNameList[idx]] = elem.variables[i].value;
                                     }
                                 }
                             });
                             dataList.push(data);
-                        }
                     });
-                    
+                    console.log(dataList);
                     $this.data = $this.reformatDataList(dataList);
                     console.log($this.data);
                     $this.render();
