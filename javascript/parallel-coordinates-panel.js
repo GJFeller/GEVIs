@@ -64,7 +64,7 @@ class ParallelCoordinatesPlot extends AbstractPanelBuilder {
             }
             if(this.query !== null && this.query.selectedCells.length > 0) {
                 for(var j = 0; j < this.query.selectedCells.length; j++) {
-                    promises.push(backendConnection.getMultivariateData(this.query.selectedCells[j], 0, 0, 0, simulationList[i], variableStringList));
+                    promises.push(backendConnection.getMultivariateData(this.query.selectedCells[j], 0, 0, this.query.selectedTime, simulationList[i], variableStringList));
                 }
             }
             else {

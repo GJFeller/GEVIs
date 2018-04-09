@@ -227,7 +227,7 @@
                         queries: {
                             selectedCells: [],
                             selectedSimulations: [],
-                            selectedTimeExtent: []
+                            selectedTime: 0
                         },
                         updatePanels: function() {
                             console.log(this);
@@ -424,6 +424,17 @@
                     return element.ensembleInfo === e.ensemble;
                 });
                 windowsObj.queries.selectedSimulations = selectedSimulations;
+                windowsObj.updatePanels();
+            });
+
+            document.addEventListener('selected-time-instant', function (e) {
+                console.log("Evento de seleção de tempo");
+                var timeInstant = e.time;
+                var currentEnsemble = e.ensemble;
+                var windowsObj = windowSetList.find(function(element) {
+                    return element.ensembleInfo === e.ensemble;
+                });
+                windowsObj.queries.selectedTime = timeInstant;
                 windowsObj.updatePanels();
             });
 

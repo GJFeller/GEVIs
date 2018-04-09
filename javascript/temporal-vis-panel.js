@@ -447,14 +447,26 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                 .attr("class", "dumbRect")
                 .on("click", mousedown)
                 .append("g")
-                .attr("class", "huehuehue");
+                .attr("class", "timeLineSpace");
+
+            var scaledValue = x($this.query.selectedTime);
+
+            svg
+                .append("line")
+                .attr("x1", scaledValue)
+                .attr("x2", scaledValue)
+                .attr("y1", 0)
+                .attr("y2", height)
+                .attr("class", "timeLine")
+                .attr("stroke", "#111")
+                .attr("stroke-width", 1);
 
             function mousedown() {
                 console.log("Captured mouse");
                 var m = d3.mouse(this);
 
                 console.log(this);
-                var timeLine = svg.selectAll(".huehuehue");
+                var timeLine = svg.selectAll(".timeLineSpace");
                 console.log(svg);
                 console.log(timeLine);
                 if(timeLine.length > 0) {
@@ -476,6 +488,9 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                             .attr("stroke-width", 1);
                     }
                     console.log(x.invert(m[0]));
+                    selectedTimeInstant.time = x.invert(m[0]);
+                    selectedTimeInstant.ensemble = $this.ensembleInfo;
+                    document.dispatchEvent(selectedTimeInstant);
                 }
                 //if(timeLine.length > 0) {
                     //timeLine
