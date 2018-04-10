@@ -1,8 +1,8 @@
 class BackendRequests {
     constructor() {
         //this.url = "http://ensemblemongobackend.azurewebsites.net";
-        //this.url = "https://gcevt-backend.herokuapp.com";
-        this.url = "http://localhost:4000";
+        this.url = "https://gcevt-backend.herokuapp.com";
+        //this.url = "http://localhost:4000";
     }
 
     getListEnsembles() {
