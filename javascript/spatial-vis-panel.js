@@ -249,7 +249,23 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                 
 
                 var holes = [];
-                var container = $this.panel;
+                var container = document.createElement("div");
+                container.className = "grid-container";
+                $this.panel.append(container);
+
+                // Transform in a grid layout
+                var colQty = 1;
+                while(colQty*colQty < sceneQty) {
+                    colQty++;
+                }
+
+                var gridTemplateString = "";
+                for(var i = 0; i < colQty; i++) {
+                    gridTemplateString += "auto ";
+                }
+
+                container.style.cssText = "grid-template-columns: " + gridTemplateString;
+                //var container = $this.panel;
 
                 init();
                 animate();
@@ -338,6 +354,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         renderer.domElement.id = sceneIdx;
 
                         var div = document.createElement("div");
+                        div.className = "grid-item";
                         div.style.position = "relative";
 
                         var legendDiv = document.createElement("div");
@@ -366,7 +383,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                         }
 
-                        var camera = new THREE.PerspectiveCamera( 50, (container.width()-$this.marginSize) / (container.height()-$this.marginSize), 1, 2000 );
+                        var camera = new THREE.PerspectiveCamera( 50, (container.getBoundingClientRect().width-$this.marginSize) / (container.getBoundingClientRect().height-$this.marginSize), 1, 2000 );
                         camera.position.x = 0;
                         camera.position.y = 0;
                         camera.position.z = $this.cellQuantity*3 + 2;
@@ -507,9 +524,9 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             function createLegend() {
 
 
-                                var percentWidth = container.width()*0.25;
+                                var percentWidth = container.getBoundingClientRect().width*0.25;
                                 var percentHeight = container.height()*0.50;
-                                var legendRect = {left: container.width()-percentWidth, right: container.width()-$this.marginSize, top: container.height()-percentHeight, bottom: container.height()-$this.marginSize};
+                                var legendRect = {left: container.getBoundingClientRect().width-percentWidth, right: container.getBoundingClientRect().width-$this.marginSize, top: container.getBoundingClientRect().height-percentHeight, bottom: container.getBoundingClientRect().height-$this.marginSize};
                                 var fullWidth  = legendRect.right - legendRect.left;
                                 var fullHeight = legendRect.bottom - legendRect.top;
                                 var left   = legendRect.left;
@@ -758,10 +775,10 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                 function onWindowResize() {
 
-                    $this.camera.aspect = container.width() / container.height();
+                    $this.camera.aspect = container.getBoundingClientRect().width / container.getBoundingClientRect().height;
                     $this.camera.updateProjectionMatrix();
 
-                    $this.renderer.setSize( container.width(), container.height() );
+                    $this.renderer.setSize( container.getBoundingClientRect().width, container.getBoundingClientRect().height );
 
                 }
 
@@ -773,8 +790,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     // update the mouse variable
                     var rect = event.target.getBoundingClientRect();
                     //console.log(rect);
-                    $this.mouse.x = ( (event.clientX - rect.left) / (container.width()-$this.marginSize) ) * 2 - 1;
-                    $this.mouse.y = - ( (event.clientY - rect.top) / (container.height()-$this.marginSize) ) * 2 + 1;
+                    $this.mouse.x = ( (event.clientX - rect.left) / (container.getBoundingClientRect().width-$this.marginSize) ) * 2 - 1;
+                    $this.mouse.y = - ( (event.clientY - rect.top) / (container.getBoundingClientRect().height-$this.marginSize) ) * 2 + 1;
 
                     // find intersections
 
@@ -851,8 +868,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     var idx = parseInt(event.target.id);
                     // update the mouse variable
                     var rect = event.target.getBoundingClientRect();
-                    $this.mouse.x = ( (event.clientX - rect.left) / (container.width()-$this.marginSize) ) * 2 - 1;
-                    $this.mouse.y = - ( (event.clientY - rect.top) / (container.height()-$this.marginSize) ) * 2 + 1;
+                    $this.mouse.x = ( (event.clientX - rect.left) / (container.getBoundingClientRect().width-$this.marginSize) ) * 2 - 1;
+                    $this.mouse.y = - ( (event.clientY - rect.top) / (container.getBoundingClientRect().height-$this.marginSize) ) * 2 + 1;
 
                     // find intersections
 
@@ -910,14 +927,14 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     for(var i = 0; i < $this.renderers.length; i++) {
                         var renderer = $this.renderers[i];
                         //console.log($this.scenes);
-                        renderer.setSize( container.width()-$this.marginSize, container.height()-$this.marginSize );
-                        renderer.setViewport( 0, 0, container.width()-$this.marginSize, container.height()-$this.marginSize );
+                        renderer.setSize( container.getBoundingClientRect().width-$this.marginSize, container.getBoundingClientRect().height-$this.marginSize );
+                        renderer.setViewport( 0, 0, container.getBoundingClientRect().width-$this.marginSize, container.getBoundingClientRect().height-$this.marginSize );
                         renderer.render($this.scenes[i], $this.scenes[i].userData.camera);
 
                         renderer.clearDepth();
-                        var percentWidth = container.width()*0.25;
-                        var percentHeight = container.height()*0.25;
-                        var axesRect = {left: 0, right: percentWidth, bottom: container.height()-$this.marginSize, top: container.height()-percentHeight};
+                        var percentWidth = container.getBoundingClientRect().width*0.25;
+                        var percentHeight = container.getBoundingClientRect().height*0.25;
+                        var axesRect = {left: 0, right: percentWidth, bottom: container.getBoundingClientRect().height-$this.marginSize, top: container.getBoundingClientRect().height-percentHeight};
                         // set the viewport
 					    var width  = axesRect.right - axesRect.left;
 					    var height = axesRect.bottom - axesRect.top;
@@ -939,10 +956,10 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         legendRenderer.render( $this.legendScenes[i], $this.legendScenes[i].userData.camera);*/
 
                         //legendRenderer.clearDepth();
-                        var percentWidth = container.width()*0.1;
-                        var percentHeight = container.height()/2;
+                        var percentWidth = container.getBoundingClientRect().width*0.1;
+                        var percentHeight = container.getBoundingClientRect().height/2;
                         //console.log($this.titleScenes);
-                        var titleRect = {left: percentWidth, right: container.width()-$this.marginSize-percentWidth, top: 0, bottom: percentHeight};
+                        var titleRect = {left: percentWidth, right: container.getBoundingClientRect().width-$this.marginSize-percentWidth, top: 0, bottom: percentHeight};
                         var width  = titleRect.right - titleRect.left;
 					    var height = titleRect.bottom - titleRect.top;
 					    var left   = titleRect.left;
