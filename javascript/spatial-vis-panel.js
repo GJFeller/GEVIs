@@ -525,7 +525,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
 
                                 var percentWidth = container.getBoundingClientRect().width*0.25;
-                                var percentHeight = container.height()*0.50;
+                                var percentHeight = container.getBoundingClientRect().height*0.50;
                                 var legendRect = {left: container.getBoundingClientRect().width-percentWidth, right: container.getBoundingClientRect().width-$this.marginSize, top: container.getBoundingClientRect().height-percentHeight, bottom: container.getBoundingClientRect().height-$this.marginSize};
                                 var fullWidth  = legendRect.right - legendRect.left;
                                 var fullHeight = legendRect.bottom - legendRect.top;
