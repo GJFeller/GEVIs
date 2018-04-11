@@ -189,8 +189,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
 
         var margin = {top: 20, right: 20, bottom: 30, left: 50};
         var $this = this;
-        var width = this.panel.width() - margin.left - margin.right;
-        var height = this.panel.height() - margin.top - margin.bottom;
+        
 
         var formatSiPrefix = d3.format(".3n");
         //var heightEachPlot = height - margin.top - margin.bottom;
@@ -206,6 +205,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             
 
         div.selectAll('svg').remove();
+        div.attr("class", "grid-container");
 
         if(numberVariables > 0) {
             var minX = 9000000;
@@ -247,18 +247,35 @@ class TemporalVisPanel extends AbstractPanelBuilder {
 
             xDomain = [minX, maxX];
 
+            // Transform in a grid layout
+            var colQty = 1;
+            while(colQty*colQty < numberVariables) {
+                colQty++;
+            }
+
+            var gridTemplateString = "";
+            for(var i = 0; i < colQty; i++) {
+                gridTemplateString += "auto ";
+            }
+
+            div.style("grid-template-columns", gridTemplateString);
+
+            var width = this.panel.width()/colQty /*- margin.left - margin.right*/;
+            var height = this.panel.height()/colQty /*- margin.top - margin.bottom*/;
+            var axisWidth = width - margin.left - margin.right;
+            var axisHeight = height - margin.top - margin.bottom
 
             var x = d3.scale.linear()
-                .range([0, width]);
+                .range([0, axisWidth]);
             
             var y = new Map();
             variables.forEach(function(variable) {
                 if($this.isLogScale) {
-                    y.set(variable, d3.scale.pow().exponent(1 / 10).range([height, 0]));
+                    y.set(variable, d3.scale.pow().exponent(1 / 10).range([axisHeight, 0]));
                     //y.set(variable, d3.scale.log().range([height, 0]));
                 }
                 else {
-                    y.set(variable, d3.scale.linear().range([height, 0]));
+                    y.set(variable, d3.scale.linear().range([axisHeight, 0]));
                 }
             });
             /*var y = d3.scale.linear()
@@ -306,15 +323,16 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             var svg = div.selectAll('svg')
                 .data(variables)
             .enter().append("svg")
-                .attr("width", this.panel.width() - 10)
-                .attr("height", height + margin.top + margin.bottom)
+                .attr("width", width)
+                .attr("height", height)
+                .attr("class", "grid-item")
             .append("g")
                 .attr("transform", function(d, i) { return "translate(" + margin.left + "," + margin.top + ")";});
 
 
             svg.append("g")
                 .attr("class", "x axisLPLOT")
-                .attr("transform", "translate(" + 0 + "," + height + ")")
+                .attr("transform", "translate(" + 0 + "," + axisHeight + ")")
                 .call(xAxis);
             
             svg.append("g")
@@ -442,8 +460,8 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             svg
                 .append("rect")
                 .attr("fill", "transparent")
-                .attr("width", this.panel.width() - 10)
-                .attr("height", height + margin.top + margin.bottom)
+                .attr("width", axisWidth)
+                .attr("height", axisHeight)
                 .attr("class", "dumbRect")
                 .on("click", mousedown)
                 .append("g")
@@ -456,7 +474,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                 .attr("x1", scaledValue)
                 .attr("x2", scaledValue)
                 .attr("y1", 0)
-                .attr("y2", height)
+                .attr("y2", axisHeight)
                 .attr("class", "timeLine")
                 .attr("stroke", "#111")
                 .attr("stroke-width", 1);
@@ -482,7 +500,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                             .attr("x1", m[0])
                             .attr("x2", m[0])
                             .attr("y1", 0)
-                            .attr("y2", height)
+                            .attr("y2", axisHeight)
                             .attr("class", "timeLine")
                             .attr("stroke", "#111")
                             .attr("stroke-width", 1);
