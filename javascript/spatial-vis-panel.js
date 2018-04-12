@@ -239,7 +239,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
             sceneQty = 1;
         }
 
-        var baseMaterial = new THREE.MeshPhongMaterial( { color: 0x915D0A, side: THREE.DoubleSide, transparent: true, opacity: 0.9 } );
+        var baseMaterial = new THREE.MeshPhongMaterial( { color: 0x915D0A, side: THREE.DoubleSide, transparent: true } );
         var highlightedMaterial = new THREE.LineBasicMaterial( { color: 0xCCCCCC, linewidth: 3 } );
         var wireframeMaterial = new THREE.LineBasicMaterial( { color: 0x000000, linewidth: 2 } );
 
@@ -380,7 +380,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         
 
                         for(var i = 0; i < $this.cellQuantity; i++) {
-                            var object = new THREE.Mesh( geometry, baseMaterial );
+                            var object = new THREE.Mesh( geometry, baseMaterial.clone() );
                             object.position.set(2*($this.cellQuantity/2 - i - 0.5), 0, 0 );
                             //$this.scene.add(object);
                             objects.push(object);
@@ -510,6 +510,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                     .range(scale);
                             }*/
 
+                            var formatSiPrefix = d3.format(".2n");
+
                             var ticksValues = [];
                             var ticksQty = 5;
                             var tickIncrement = (extent[1] - extent[0])/(ticksQty-1)
@@ -535,8 +537,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
 
                                 var percentWidth = (container.getBoundingClientRect().width)/$this.colQty*0.30;
-                                var percentHeight = ($this.panel.height()/$this.lineQty)*0.50;
-                                var legendRect = {left: (container.getBoundingClientRect().width)/$this.colQty-percentWidth, right: (container.getBoundingClientRect().width-$this.marginSize)/$this.colQty, top: ($this.panel.height())/$this.lineQty-percentHeight, bottom: ($this.panel.height()-$this.marginSize)/$this.lineQty};
+                                var percentHeight = ($this.panel.height()/$this.lineQty)*0.40;
+                                var legendRect = {left: (container.getBoundingClientRect().width)/$this.colQty-percentWidth, right: (container.getBoundingClientRect().width)/$this.colQty, top: ($this.panel.height())/$this.lineQty-percentHeight, bottom: ($this.panel.height())/$this.lineQty};
                                 var fullWidth  = legendRect.right - legendRect.left;
                                 var fullHeight = legendRect.bottom - legendRect.top;
                                 var left   = legendRect.left;
@@ -608,7 +610,8 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                     var legendAxis = d3.svg.axis()
                                         .scale(legendScale)
                                         .orient("right")
-                                        .tickValues(ticksValues);
+                                        .tickValues(ticksValues)
+                                        .tickFormat(formatSiPrefix);
                                 }
                                 else {
 
@@ -647,7 +650,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                         .attr('x', (width/2))
                                         .attr('y', 0 - (legendMargin.top / 3))
                                         .attr("text-anchor", "middle")  
-                                        .style("font-size", "10px") 
+                                        .style("font-size", "8px") 
                                         .style("text-decoration", "underline")  
                                         .text("Unit: " + currentVar.unit);
                                 }
@@ -674,6 +677,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                             //console.log(objects[i]);
                             var aObject = objects[i].clone();
+                            var invIdx = $this.cellQuantity - 1 - i;
                             if($this.varList.length > 0) {
                                 var varDataInCell = $this.data[i].variableData.filter(aVar => aVar.variableId == currentVar.id);
                                 //accumulatedVarValues = [].concat(varDataInCell[0].accumulatedData);
@@ -682,16 +686,22 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                 var color = colorScale(mean);
                                 aObject.mean = mean;
                                 //var newMaterial = new THREE.MeshPhongMaterial( { color: lut.getColor(mean), side: THREE.DoubleSide } );
-                                var newMaterial = new THREE.MeshPhongMaterial( { color: color, side: THREE.DoubleSide, transparent: true, opacity: 0.9 } );
+                                var newMaterial = new THREE.MeshPhongMaterial( { color: color, side: THREE.DoubleSide, transparent: true} );
                                 //aObject.material.color = lut.getColor(mean);
                                 aObject.material = newMaterial;
                             }
+                            var aWireframe = Object.assign(wireframes[i]);
+                            if($this.selectedCells.indexOf(invIdx) >= 0) {
+                                aObject.material.opacity = 1;
+                                //aWireframe.material = highlightedMaterial;
+                            }
+                            else {
+                                aObject.material.opacity = 0.8;
+                            }
                             scene.add(aObject);
                             scene.userData.objects.push(aObject);
-                            var aWireframe = Object.assign(wireframes[i]);
-                            var invIdx = $this.cellQuantity - 1 - i;
-                            if($this.selectedCells.indexOf(invIdx) >= 0)
-                                aWireframe.material = highlightedMaterial;
+                            
+                            
                             scene.add(aWireframe);
                             scene.userData.wireframes.push(aWireframe);
                         }
@@ -905,16 +915,16 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         var sIdx = $this.selectedCells.indexOf(objInvIdx);
                         if(sIdx < 0) {
                             for(var i = 0; i < $this.scenes.length; i++) {
-                                $this.scenes[i].userData.wireframes[objIdx].material = highlightedMaterial;
-                                obj.material.transparent = false;
+                                //$this.scenes[i].userData.wireframes[objIdx].material = highlightedMaterial;
+                                obj.material.opacity = 1.0;
 
                             }
                             $this.selectedCells.push(objInvIdx);
                         }
                         else {
                             for(var i = 0; i < $this.scenes.length; i++) {
-                                $this.scenes[i].userData.wireframes[objIdx].material = wireframeMaterial;
-                                obj.material.transparent = true;
+                                //$this.scenes[i].userData.wireframes[objIdx].material = wireframeMaterial;
+                                obj.material.opacity = 0.8;
                             }
                             $this.selectedCells.splice(sIdx, 1);
                         }
@@ -944,14 +954,14 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     for(var i = 0; i < $this.renderers.length; i++) {
                         var renderer = $this.renderers[i];
                         //console.log($this.scenes);
-                        renderer.setSize( (container.getBoundingClientRect().width-$this.marginSize)/$this.colQty, ($this.panel.height()-$this.marginSize)/$this.lineQty );
-                        renderer.setViewport( 0, 0, (container.getBoundingClientRect().width-$this.marginSize)/$this.colQty, ($this.panel.height()-$this.marginSize)/$this.lineQty );
+                        renderer.setSize( (container.getBoundingClientRect().width)/$this.colQty, ($this.panel.height())/$this.lineQty );
+                        renderer.setViewport( 0, 0, (container.getBoundingClientRect().width)/$this.colQty, ($this.panel.height())/$this.lineQty );
                         renderer.render($this.scenes[i], $this.scenes[i].userData.camera);
 
                         renderer.clearDepth();
                         var percentWidth = (container.getBoundingClientRect().width)/$this.colQty*0.25;
                         var percentHeight = ($this.panel.height())/$this.lineQty*0.25;
-                        var axesRect = {left: 0, right: percentWidth, bottom: ($this.panel.height()-$this.marginSize)/$this.lineQty, top: ($this.panel.height()/$this.lineQty)-percentHeight};
+                        var axesRect = {left: 0, right: percentWidth, bottom: ($this.panel.height())/$this.lineQty, top: ($this.panel.height()/$this.lineQty)-percentHeight};
                         // set the viewport
 					    var width  = axesRect.right - axesRect.left;
 					    var height = axesRect.bottom - axesRect.top;
@@ -976,7 +986,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         var percentWidth = (container.getBoundingClientRect().width)/$this.colQty*0.1;
                         var percentHeight = (($this.panel.height())/$this.lineQty)/2;
                         //console.log($this.titleScenes);
-                        var titleRect = {left: percentWidth, right: (container.getBoundingClientRect().width-$this.marginSize)/$this.colQty-percentWidth, top: 0, bottom: percentHeight};
+                        var titleRect = {left: percentWidth, right: (container.getBoundingClientRect().width)/$this.colQty-percentWidth, top: 0, bottom: percentHeight};
                         var width  = titleRect.right - titleRect.left;
 					    var height = titleRect.bottom - titleRect.top;
 					    var left   = titleRect.left;

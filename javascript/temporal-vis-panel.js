@@ -260,8 +260,13 @@ class TemporalVisPanel extends AbstractPanelBuilder {
 
             div.style("grid-template-columns", gridTemplateString);
 
+            var lineQty = 1;
+            while(lineQty*colQty < numberVariables) {
+                lineQty++;
+            }
+
             var width = this.panel.width()/colQty /*- margin.left - margin.right*/;
-            var height = this.panel.height()/colQty /*- margin.top - margin.bottom*/;
+            var height = this.panel.height()/lineQty /*- margin.top - margin.bottom*/;
             var axisWidth = width - margin.left - margin.right;
             var axisHeight = height - margin.top - margin.bottom
 
