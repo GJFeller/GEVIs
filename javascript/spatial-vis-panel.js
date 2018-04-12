@@ -393,7 +393,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                         }
 
-                        var camera = new THREE.PerspectiveCamera( 50, ((container.getBoundingClientRect().width-$this.marginSize)/$this.colQty) / (($this.panel.height()-$this.marginSize)/$this.lineQty), 1, 2000 );
+                        var camera = new THREE.PerspectiveCamera( 50+(($this.colQty+1)*10), ((container.getBoundingClientRect().width)/$this.colQty) / (($this.panel.height())/$this.lineQty), 1, 2000 );
                         camera.position.x = 0;
                         camera.position.y = 0;
                         camera.position.z = $this.cellQuantity*3 + 2;
@@ -536,9 +536,9 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             function createLegend() {
 
 
-                                var percentWidth = (container.getBoundingClientRect().width)/$this.colQty*0.30;
-                                var percentHeight = ($this.panel.height()/$this.lineQty)*0.40;
-                                var legendRect = {left: (container.getBoundingClientRect().width)/$this.colQty-percentWidth, right: (container.getBoundingClientRect().width)/$this.colQty, top: ($this.panel.height())/$this.lineQty-percentHeight, bottom: ($this.panel.height())/$this.lineQty};
+                                var percentWidth = (container.getBoundingClientRect().width-$this.marginSize)/$this.colQty*(0.30+(0.05*($this.colQty-1)));
+                                var percentHeight = (($this.panel.height()/$this.lineQty)-$this.marginSize)*0.40;
+                                var legendRect = {left: (container.getBoundingClientRect().width-$this.marginSize)/$this.colQty-percentWidth, right: (container.getBoundingClientRect().width-$this.marginSize)/$this.colQty, top: ($this.panel.height()-$this.marginSize)/$this.lineQty-percentHeight, bottom: ($this.panel.height()-$this.marginSize)/$this.lineQty};
                                 var fullWidth  = legendRect.right - legendRect.left;
                                 var fullHeight = legendRect.bottom - legendRect.top;
                                 var left   = legendRect.left;
@@ -650,7 +650,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                         .attr('x', (width/2))
                                         .attr('y', 0 - (legendMargin.top / 3))
                                         .attr("text-anchor", "middle")  
-                                        .style("font-size", "8px") 
+                                        .style("font-size", "6px") 
                                         .style("text-decoration", "underline")  
                                         .text("Unit: " + currentVar.unit);
                                 }
@@ -954,14 +954,14 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                     for(var i = 0; i < $this.renderers.length; i++) {
                         var renderer = $this.renderers[i];
                         //console.log($this.scenes);
-                        renderer.setSize( (container.getBoundingClientRect().width)/$this.colQty, ($this.panel.height())/$this.lineQty );
-                        renderer.setViewport( 0, 0, (container.getBoundingClientRect().width)/$this.colQty, ($this.panel.height())/$this.lineQty );
+                        renderer.setSize( (container.getBoundingClientRect().width-$this.marginSize)/$this.colQty, ($this.panel.height()-$this.marginSize)/$this.lineQty );
+                        renderer.setViewport( 0, 0, (container.getBoundingClientRect().width-$this.marginSize)/$this.colQty, ($this.panel.height()-$this.marginSize)/$this.lineQty );
                         renderer.render($this.scenes[i], $this.scenes[i].userData.camera);
 
                         renderer.clearDepth();
-                        var percentWidth = (container.getBoundingClientRect().width)/$this.colQty*0.25;
-                        var percentHeight = ($this.panel.height())/$this.lineQty*0.25;
-                        var axesRect = {left: 0, right: percentWidth, bottom: ($this.panel.height())/$this.lineQty, top: ($this.panel.height()/$this.lineQty)-percentHeight};
+                        var percentWidth = (container.getBoundingClientRect().width-$this.marginSize)/$this.colQty*0.25;
+                        var percentHeight = ($this.panel.height()-$this.marginSize)/$this.lineQty*0.25;
+                        var axesRect = {left: 0, right: percentWidth, bottom: ($this.panel.height()-$this.marginSize)/$this.lineQty, top: (($this.panel.height()-$this.marginSize)/$this.lineQty)-percentHeight};
                         // set the viewport
 					    var width  = axesRect.right - axesRect.left;
 					    var height = axesRect.bottom - axesRect.top;
@@ -983,10 +983,10 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         legendRenderer.render( $this.legendScenes[i], $this.legendScenes[i].userData.camera);*/
 
                         //legendRenderer.clearDepth();
-                        var percentWidth = (container.getBoundingClientRect().width)/$this.colQty*0.1;
-                        var percentHeight = (($this.panel.height())/$this.lineQty)/2;
+                        var percentWidth = (container.getBoundingClientRect().width-$this.marginSize)/$this.colQty*0.1;
+                        var percentHeight = (($this.panel.height()-$this.marginSize)/$this.lineQty)/2;
                         //console.log($this.titleScenes);
-                        var titleRect = {left: percentWidth, right: (container.getBoundingClientRect().width)/$this.colQty-percentWidth, top: 0, bottom: percentHeight};
+                        var titleRect = {left: percentWidth, right: (container.getBoundingClientRect().width-$this.marginSize)/$this.colQty-percentWidth, top: 0, bottom: percentHeight};
                         var width  = titleRect.right - titleRect.left;
 					    var height = titleRect.bottom - titleRect.top;
 					    var left   = titleRect.left;
