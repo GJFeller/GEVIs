@@ -36,6 +36,12 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
         this.getRemoteData();
     }
 
+    initializeWindow(ensembleInfo, query) {
+        this.ensembleInfo = ensembleInfo;
+        this.query = query;
+        this.getRemoteData();
+    }
+
     getRemoteData() {
         $('#loading').css('visibility','visible');
         var $this = this;

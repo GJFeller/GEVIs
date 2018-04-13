@@ -87,6 +87,19 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         this.getRemoteData();
     }
 
+    initializeWindow(ensembleInfo, query) {
+        this.ensembleInfo = ensembleInfo;
+        this.query = query;
+        this.selectedCells = query.selectedCells;
+        this.renderInitialized = false;
+        this.renderers.splice(0,this.renderers.length);
+        this.scenes.splice(0,this.scenes.length);
+        this.axisScenes.splice(0,this.axisScenes.length);
+        this.legendScenes.splice(0,this.legendScenes.length);
+        this.titleScenes.splice(0, this.titleScenes.length);
+        this.getRemoteData();
+    }
+
     getRemoteData() {
         $('#loading').css('visibility','visible');
         var $this = this;

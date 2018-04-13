@@ -225,7 +225,7 @@
                         ensembleInfo: ensembleInfo,
                         currentMultivarPanel: null,
                         queries: {
-                            selectedCells: [],
+                            selectedCells: [0],
                             selectedSimulations: [],
                             selectedTime: 0
                         },
@@ -243,10 +243,10 @@
                                 newWindowsObj.variablesWindow.setWindowSubtitle('(' + newWindowsObj.ensembleInfo.ensembleId +')');
                                 newWindowsObj.varPanel.setVariableList(result);
                                 console.log(ensembleInfo);
-                                newWindowsObj.spatialPanel.setEnsemble(ensembleInfo);
-                                newWindowsObj.multivarPanel.setEnsemble(ensembleInfo);
-                                newWindowsObj.parallelCoordPanel.setEnsemble(ensembleInfo);
-                                newWindowsObj.temporalPanel.setEnsemble(ensembleInfo);
+                                newWindowsObj.spatialPanel.initializeWindow(ensembleInfo, newWindowsObj.queries);
+                                newWindowsObj.multivarPanel.initializeWindow(ensembleInfo, newWindowsObj.queries);
+                                newWindowsObj.parallelCoordPanel.initializeWindow(ensembleInfo, newWindowsObj.queries);
+                                newWindowsObj.temporalPanel.initializeWindow(ensembleInfo, newWindowsObj.queries);
                                 newWindowsObj.spatialWindow = new Window('panel1-'+newWindowsObj.panelIdx+'-3', 'Spatial Domain', newWindowsObj.variablesWindow, newWindowsObj.spatialPanel);
                                 newWindowsObj.spatialWindow.setWindowSubtitle('(' + newWindowsObj.ensembleInfo.ensembleId +')');
                                 //newWindowsObj.spatialWindow.setWindowConfigMenu(spatialWindowConfigMenu);

@@ -37,6 +37,12 @@ class TemporalVisPanel extends AbstractPanelBuilder {
         this.getRemoteData();
     }
 
+    initializeWindow(ensembleInfo, query) {
+        this.ensembleInfo = ensembleInfo;
+        this.query = query;
+        this.getRemoteData();
+    }
+
     setIfLogScale(isLogScale) {
         this.isLogScale = isLogScale;
         this.render();
