@@ -53,8 +53,8 @@ class TemporalVisPanel extends AbstractPanelBuilder {
     }
 
     getRemoteData() {
-        $('#loading').css('visibility','visible');
         if(this.varList.length > 0) {
+            $('#loading').css('visibility','visible');
             var $this = this;
             if(this.data instanceof Array)
                 this.data.splice(0,this.data.length);
@@ -524,6 +524,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                         selectedTimeInstant.time = x.invert(m[0]);
                     }
                     selectedTimeInstant.ensemble = $this.ensembleInfo;
+                    selectedTimeInstant.originPanel = $this;
                     document.dispatchEvent(selectedTimeInstant);
                 }
                 //if(timeLine.length > 0) {

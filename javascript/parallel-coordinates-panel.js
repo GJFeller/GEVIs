@@ -42,7 +42,7 @@ class ParallelCoordinatesPlot extends AbstractPanelBuilder {
     }
 
     getRemoteData() {
-        $('#loading').css('visibility','visible');
+        
         var $this = this;
         if(this.data instanceof Array)
             this.data.splice(0,this.data.length);
@@ -56,6 +56,7 @@ class ParallelCoordinatesPlot extends AbstractPanelBuilder {
         simulationList = this.ensembleInfo.simulations;
         var promises = [];
         if(this.varList.length > 0) {
+            $('#loading').css('visibility','visible');
             for(var i = 0; i < simulationList.length; i++) {
                 var variableStringList = this.varList[0].id;
                 for(var j = 1; j < this.varList.length; j++) {
@@ -311,6 +312,7 @@ class ParallelCoordinatesPlot extends AbstractPanelBuilder {
                 });
                 changedSimulationSelectionEvent.selectedSimulations = selectedSimulations;
                 changedSimulationSelectionEvent.ensemble = $this.ensembleInfo;
+                changedSimulationSelectionEvent.originPanel = $this;
                 document.dispatchEvent(changedSimulationSelectionEvent);
             }
         }

@@ -929,7 +929,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         if(sIdx < 0) {
                             for(var i = 0; i < $this.scenes.length; i++) {
                                 //$this.scenes[i].userData.wireframes[objIdx].material = highlightedMaterial;
-                                obj.material.opacity = 1.0;
+                                $this.scenes[i].userData.objects[objIdx].material.opacity = 1.0;
 
                             }
                             $this.selectedCells.push(objInvIdx);
@@ -937,7 +937,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         else {
                             for(var i = 0; i < $this.scenes.length; i++) {
                                 //$this.scenes[i].userData.wireframes[objIdx].material = wireframeMaterial;
-                                obj.material.opacity = 0.8;
+                                $this.scenes[i].userData.objects[objIdx].material.opacity = 0.8;
                             }
                             $this.selectedCells.splice(sIdx, 1);
                         }
@@ -945,6 +945,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         console.log($this.selectedCells);
                         changedCellSelectionEvent.selectedCells = $this.selectedCells;
                         changedCellSelectionEvent.ensemble = $this.ensembleInfo;
+                        changedCellSelectionEvent.originPanel = $this;
                         document.dispatchEvent(changedCellSelectionEvent);
 
                     }

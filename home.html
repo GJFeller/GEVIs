@@ -229,12 +229,23 @@
                             selectedSimulations: [],
                             selectedTime: 0
                         },
-                        updatePanels: function() {
+                        updatePanels: function(originPanel) {
                             console.log(this);
-                            this.temporalPanel.setQuery(this.queries);
+                            var panels = [];
+                            panels.push(this.temporalPanel);
+                            panels.push(this.spatialPanel);
+                            panels.push(this.multivarPanel);
+                            panels.push(this.parallelCoordPanel);
+
+                            panels.forEach(function(panel) {
+                                if(panel !== originPanel) {
+                                    panel.setQuery(this.queries);
+                                }
+                            });
+                            /*this.temporalPanel.setQuery(this.queries);
                             this.spatialPanel.setQuery(this.queries);
                             this.multivarPanel.setQuery(this.queries);
-                            this.parallelCoordPanel.setQuery(this.queries);
+                            this.parallelCoordPanel.setQuery(this.queries);*/
                         }
                     }
                     backendConnection.getEnsembleVariables(ensembleInfo["_id"])
@@ -414,7 +425,7 @@
                     return element.ensembleInfo === e.ensemble;
                 });
                 windowsObj.queries.selectedCells = selectedCells;
-                windowsObj.updatePanels();
+                windowsObj.updatePanels(e.originPanel);
             });
 
             document.addEventListener('changed-simulation-selection', function (e) {
@@ -425,7 +436,7 @@
                     return element.ensembleInfo === e.ensemble;
                 });
                 windowsObj.queries.selectedSimulations = selectedSimulations;
-                windowsObj.updatePanels();
+                windowsObj.updatePanels(e.originPanel);
             });
 
             document.addEventListener('selected-time-instant', function (e) {
@@ -436,7 +447,7 @@
                     return element.ensembleInfo === e.ensemble;
                 });
                 windowsObj.queries.selectedTime = timeInstant;
-                windowsObj.updatePanels();
+                windowsObj.updatePanels(e.originPanel);
             });
 
             function changeMultivariatePanel(currentEnsemble) {
