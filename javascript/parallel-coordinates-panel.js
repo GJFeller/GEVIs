@@ -217,7 +217,21 @@ class ParallelCoordinatesPlot extends AbstractPanelBuilder {
                     .data($this.data)
                 .enter().append("path")
                     .attr("d", path)
-                    .attr("simulationId", function(d) { return d.simulationId; });
+                    .attr("simulationId", function(d) { return d.simulationId; })
+                    .style("display", function(d) {
+                        console.log($this.query);
+                            if($this.query.selectedSimulations.length > 0) {
+                                if($this.query.selectedSimulations.indexOf(d.simulationId) >= 0) {
+                                    return true;
+                                }
+                                else {
+                                    return "none";
+                                }
+                            }
+                            else {
+                                return true;
+                            }
+                    });
 
                 // Add a group element for each dimension.
                 var g = svg.selectAll(".dimension")
