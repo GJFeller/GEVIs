@@ -114,7 +114,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
         var simulationList = [];
         // FIXME: Implement the query system to solve this problem with selectedSimulations
         //simulationList = this.ensembleInfo.simulations;
-        if(this.query === null || this.query.selectedSimulations === undefined 
+        if(this.query === null || this.query === undefined || this.query.selectedSimulations === undefined 
             || this.query.selectedSimulations.length === 0) {
             simulationList = this.ensembleInfo.simulations;
         }

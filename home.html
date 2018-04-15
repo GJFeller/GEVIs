@@ -231,6 +231,7 @@
                         },
                         updatePanels: function(originPanel) {
                             console.log(this);
+                            var $this = this;
                             var panels = [];
                             panels.push(this.temporalPanel);
                             panels.push(this.spatialPanel);
@@ -239,7 +240,7 @@
 
                             panels.forEach(function(panel) {
                                 if(panel !== originPanel) {
-                                    panel.setQuery(this.queries);
+                                    panel.setQuery($this.queries);
                                 }
                             });
                             /*this.temporalPanel.setQuery(this.queries);

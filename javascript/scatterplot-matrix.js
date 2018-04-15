@@ -5,7 +5,6 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
         this.data = data;
         this.varList = [];
         this.window = window;
-        this.brush = d3.svg.brush();
         this.query = null;
         this.isLogScale = false;
     }
@@ -151,6 +150,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
             var height = this.panel.height() - margin.top - margin.bottom;
             var padding = 10;
 
+            var brush = d3.svg.brush();
             var div = d3.select("#"+this.id+"-scatter");
             console.log($this.data);
 
@@ -209,7 +209,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                     .ticks(6)
                     .tickFormat(formatSiPrefix);
 
-                this.brush
+                brush
                     .x(x)
                     .y(y)
                     .on("brushstart", brushstart)
@@ -279,7 +279,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
 
 
                 // Run the brush
-                cell.call($this.brush);
+                cell.call(brush);
 
                 function plot(p) {
                     var cell = d3.select(this);
@@ -305,7 +305,22 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                         .attr("x-value", function(d) {return d[p.x]; })
                         .attr("y-value", function(d) {return d[p.y]; })
                         .attr("simulationId", function(d) {return d.simulationId; })
-                        .style("fill", function(d) { return d3.rgb(0,0,255); });
+                        .style("fill", function(d) { return d3.rgb(0,0,255); })
+                        .classed("hiddenSPLOTM", function(d) {
+                            console.log($this.query);
+                            if($this.query.selectedSimulations.length > 0) {
+                                if($this.query.selectedSimulations.indexOf(d.simulationId) >= 0) {
+                                    return false;
+                                }
+                                else {
+                                    return true;
+                                }
+                            }
+                            else {
+                                return false;
+                            }
+                        });
+                        
                 }
 
                 function plotHistogram(p) {
@@ -359,7 +374,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                 // Clear the previously-active brush, if any.
                 function brushstart(p) {
                     if (brushCell !== this) {
-                        d3.select(brushCell).call($this.brush.clear());
+                        d3.select(brushCell).call(brush.clear());
                         x.domain(domainByVariable[p.x]);
                         y.domain(domainByVariable[p.y]);
                         brushCell = this;
@@ -368,7 +383,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                 
                 // Highlight the selected circles.
                 function brushmove(p) {
-                    var e = $this.brush.extent();
+                    var e = brush.extent();
                     svg.selectAll("circle").classed("hiddenSPLOTM", function(d) {
                         d.hidden = e[0][0] > d[p.x] || d[p.x] > e[1][0]
                         || e[0][1] > d[p.y] || d[p.y] > e[1][1];
@@ -379,7 +394,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                 // If the brush is empty, select all circles.
                 function brushend() {
                     var selectedSimulations = [];
-                    if ($this.brush.empty()) {
+                    if (brush.empty()) {
                         svg.selectAll(".hiddenSPLOTM").classed("hiddenSPLOTM", false);
                     }
                     else {
@@ -391,6 +406,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                             }
                         });
                     }
+                    $this.query.selectedSimulations = selectedSimulations;
                     changedSimulationSelectionEvent.selectedSimulations = selectedSimulations;
                     changedSimulationSelectionEvent.ensemble = $this.ensembleInfo;
                     changedSimulationSelectionEvent.originPanel = $this;

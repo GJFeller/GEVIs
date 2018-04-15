@@ -33,6 +33,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
     }
 
     setQuery(query) {
+        console.log(query);
         this.query = query;
         this.getRemoteData();
     }
@@ -66,7 +67,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
             //var ensembleId = selectVariablesPanel.getEnsembleList()[0]._id;
             var ensembleId = selectedEnsembles[0]._id;
             var simulationList = [];
-            if(this.query === null || this.query.selectedSimulations === undefined 
+            if(this.query === null || this.query === undefined || this.query.selectedSimulations === undefined 
                 || this.query.selectedSimulations.length === 0) {
                 simulationList = this.ensembleInfo.simulations;
             }

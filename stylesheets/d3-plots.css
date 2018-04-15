@@ -31,6 +31,7 @@ circle {
 
 circle.hiddenSPLOTM {
     fill: #ccc !important;
+    fill-opacity: .5;
 }
 
 .extent {
