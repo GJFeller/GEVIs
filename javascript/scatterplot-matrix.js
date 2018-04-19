@@ -268,14 +268,27 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
 
                 cell.filter(function(d) { return d.i === d.j; })
                     .attr("transform", function(d) { return "translate(" + (d.i * sizeWidth) + "," + d.j * sizeHeight + ")"; })
-                    .each(plotHistogram);
+                    .each(plot);
                     //.each(plotHistogram);
                 // Titles for the diagonal.
-                cell.filter(function(d) { return d.i === d.j; }).append("text")
+                /*cell.filter(function(d) { return d.i === d.j; }).append("text")
                     .attr("x", padding)
                     .attr("y", padding)
                     .attr("dy", ".71em")
+                    .text(function(d) { return d.x; });*/
+                cell.filter(function(d) { return d.j === 0; }).append("text")
+                    .attr("x", 0)
+                    .attr("y", -padding/2)
+                    .attr("dy", ".71em")
+                    .attr("transform", "rotate(-7)")
                     .text(function(d) { return d.x; });
+
+                cell.filter(function(d) { return d.i === numberVariables-1; }).append("text")
+                    .attr("x", padding)
+                    .attr("y", -sizeHeight)
+                    .attr("dy", ".71em")
+                    .attr("transform", "rotate(83)")
+                    .text(function(d) { return d.y; });
 
 
                 // Run the brush
@@ -301,7 +314,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                     .enter().append("circle")
                         .attr("cx", function(d) { return x(d[p.x]); })
                         .attr("cy", function(d) { return y(d[p.y]); })
-                        .attr("r", 4)
+                        .attr("r", 3)
                         .attr("x-value", function(d) {return d[p.x]; })
                         .attr("y-value", function(d) {return d[p.y]; })
                         .attr("simulationId", function(d) {return d.simulationId; })

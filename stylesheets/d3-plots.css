@@ -16,8 +16,8 @@ svg {
 }
 
 .cellSPLOTM text {
-    font-weight: bold;
     text-transform: capitalize;
+    font-size: 9px;
 }
 
 .frameSPLOTM {
