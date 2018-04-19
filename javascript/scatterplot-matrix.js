@@ -307,7 +307,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
                         .attr("simulationId", function(d) {return d.simulationId; })
                         .style("fill", function(d) { return d3.rgb(0,0,255); })
                         .classed("hiddenSPLOTM", function(d) {
-                            console.log($this.query);
+                            //console.log($this.query);
                             if($this.query.selectedSimulations.length > 0) {
                                 if($this.query.selectedSimulations.indexOf(d.simulationId) >= 0) {
                                     return false;

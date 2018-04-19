@@ -185,7 +185,7 @@
                 var windowsObj = windowSetList[windowSetIdx];
                 if(windowsObj !== undefined) {
                     if(e.windowObj == windowsObj.multivarWindow) {
-                        windowsObj.scatterWindow = null;
+                        windowsObj.multivarWindow = null;
                         windowsObj.varPanel.unmarkColumnCheckboxes("multivariate");
                     }
                     if(e.windowObj == windowsObj.temporalWindow) {
@@ -346,7 +346,9 @@
                     console.log("Selected spatial variables");
                     console.log(selectedSpatialVar);
                     if(selectedMultivariateVar.length > 0) {
-                        if(windowsObj.multivarWindow === null) {
+                        console.log('creating new multivar window')
+                        if(windowsObj.multivarWindow == null) {
+                            console.log('creating new multivar window')
                             windowsObj.multivarWindow = new Window('panel1-'+windowsObj.panelIdx+'-1', 'Multivariate Visualization', windowsObj.variablesWindow, windowsObj.currentMultivarPanel);
                             windowsObj.multivarWindow.setWindowSubtitle('(' + windowsObj.ensembleInfo.ensembleId +')');
                             windowsObj.multivarWindow.setWindowConfigMenu(multivarWindowConfigMenu);
@@ -368,9 +370,9 @@
                             });
 
                         }
-                        windowsObj.currentMultivarPanel.setVariableList(selectedMultivariateVar);
-                        //windowsObj.multivarPanel.setVariableList(selectedMultivariateVar);
-                        //windowsObj.parallelCoordPanel.setVariableList(selectedMultivariateVar);
+                        //windowsObj.currentMultivarPanel.setVariableList(selectedMultivariateVar);
+                        windowsObj.multivarPanel.setVariableList(selectedMultivariateVar);
+                        windowsObj.parallelCoordPanel.setVariableList(selectedMultivariateVar);
                     }
                     if(selectedTemporalVar.length > 0) {
                         if(windowsObj.temporalWindow === null) {
