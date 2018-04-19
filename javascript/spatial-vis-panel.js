@@ -549,7 +549,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                             function createLegend() {
 
 
-                                var percentWidth = (container.getBoundingClientRect().width-$this.marginSize)/$this.colQty*(0.30+(0.05*($this.colQty-1)));
+                                var percentWidth = (container.getBoundingClientRect().width-$this.marginSize)/$this.colQty*(0.30+(0.1*($this.colQty-1)));
                                 var percentHeight = (($this.panel.height()/$this.lineQty)-$this.marginSize)*0.40;
                                 var legendRect = {left: (container.getBoundingClientRect().width-$this.marginSize)/$this.colQty-percentWidth, right: (container.getBoundingClientRect().width-$this.marginSize)/$this.colQty, top: ($this.panel.height()-$this.marginSize)/$this.lineQty-percentHeight, bottom: ($this.panel.height()-$this.marginSize)/$this.lineQty};
                                 var fullWidth  = legendRect.right - legendRect.left;
@@ -604,7 +604,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                 legendSvg.append('rect')
                                     .attr('x1', 0)
                                     .attr('y1', 0)
-                                    .attr('width', width*0.2)
+                                    .attr('width', 10)
                                     .attr('height', height)
                                     .style('fill', 'url(#gradient)');
 
@@ -655,7 +655,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
 
                                 legendSvg.append("g")
                                     .attr("class", "legendAxis")
-                                    .attr("transform", "translate(" + width*0.2 + ", 0)")
+                                    .attr("transform", "translate(" + 10 + ", 0)")
                                     .call(legendAxis);
 
                                 if(currentVar.unit !== 'n/a') {
@@ -663,8 +663,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                         .attr('x', (width/2))
                                         .attr('y', 0 - (legendMargin.top / 3))
                                         .attr("text-anchor", "middle")  
-                                        .style("font-size", "6px") 
-                                        .style("text-decoration", "underline")  
+                                        .style("font-size", "9px")  
                                         .text("Unit: " + currentVar.unit);
                                 }
 
