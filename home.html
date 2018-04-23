@@ -509,8 +509,9 @@
                                 windowsObj.spatialWindow = new Window('panel1-'+windowsObj.panelIdx+'-3', 'Spatial Domain', windowsObj.variablesWindow, windowsObj.spatialPanel);
                             });*/
                     })
-                    .catch(function() {
+                    .catch(function(err) {
                         console.log("Erro ao acessar o backend");
+                        console.error(err.message + " - linha: " + err.lineNumber);
                     });
             });
         
