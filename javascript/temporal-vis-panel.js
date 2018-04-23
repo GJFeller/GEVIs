@@ -5,7 +5,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
         this.data = data;
         this.varList = [];
         this.window = window;
-        this.legendElementWidth = 95;
+        this.legendElementWidth = 200;
         this.isLegendColumn = false;
         this.isLogScale = false;
         this.query = null;
@@ -119,7 +119,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                 })
                 .catch(function (err) {
                     console.log("Erro ao pegar dados temporais do servidor");
-                    console.error(err.message);
+                    console.error(err.message + ' - ' + err.lineNumber);
                 });
         }
         
@@ -135,7 +135,7 @@ class TemporalVisPanel extends AbstractPanelBuilder {
         this.varList.forEach(function (variable) {
             varStringList.push(variable.variable + "-" + variable.specie);
         });
-        var simulationList = selectedEnsembles[0].simulations;
+        var simulationList = this.ensembleInfo.simulations;
         console.log(dataList);
         //Set initial data
         var chartMap = new Map();
@@ -155,7 +155,10 @@ class TemporalVisPanel extends AbstractPanelBuilder {
         dataList.forEach(function (data) {
             var simulationId = data.simulationId;
             var time = data.time;
+            console.log(simulationId);
             varStringList.forEach(function (variable) {
+                //console.log(variable);
+                //console.log(chartMap.get(variable));
                 chartMap.get(variable).get(simulationId).push({time: time, value: data[variable], variable: variable});
             });
         });
@@ -167,7 +170,6 @@ class TemporalVisPanel extends AbstractPanelBuilder {
                 });
             });
         });
-
         // Aggregate data by time
         varStringList.forEach(function (variable) {
             simulationList.forEach(function (simulation) {

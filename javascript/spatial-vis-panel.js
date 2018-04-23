@@ -381,7 +381,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                         div.style.position = "relative";
 
                         var legendDiv = document.createElement("div");
-                        legendDiv.id = "spatial-legend-" + sceneIdx;
+                        legendDiv.id = 'spatial-legend-'+ $this.id + '-' + sceneIdx;
                         legendDiv.style.position = "absolute";
                         legendDiv.style.bottom = "5px";
                         legendDiv.style.right = "10px";
@@ -562,7 +562,7 @@ class SpatialVisualizationPanel extends AbstractPanelBuilder {
                                 var height = fullHeight - legendMargin.top - legendMargin.bottom;
 
 
-                                var legendSvg = d3.select('#spatial-legend-' + sceneIdx)
+                                var legendSvg = d3.select('#spatial-legend-'+ $this.id + '-' + sceneIdx)
                                     .append("svg")
                                     .attr('width', fullWidth)
                                     .attr('height', fullHeight)
