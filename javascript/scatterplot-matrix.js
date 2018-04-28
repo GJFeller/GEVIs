@@ -145,7 +145,7 @@ class ScatterplotMatrix extends AbstractPanelBuilder {
     render() {
         if(this.panel !== undefined) {
             var $this = this;
-            var margin = {top: 20, right: 30, bottom: 30, left: 50};
+            var margin = {top: 20, right: 30, bottom: 40, left: 60};
             var width = this.panel.width() - margin.left - margin.right;
             var height = this.panel.height() - margin.top - margin.bottom;
             var padding = 10;
