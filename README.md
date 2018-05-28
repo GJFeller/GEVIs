@@ -1,4 +1,4 @@
-# GCEVT-Msc
+# GEVIs
 
 # Prerequisites
 
